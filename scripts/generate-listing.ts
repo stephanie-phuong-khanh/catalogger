@@ -2,25 +2,20 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import { zodTextFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
 
 dotenv.config();
 
-// --- Minimal config: only the things we MUST know programmatically ---
-// These are the only hardcoded references to specific column names.
-// Everything else, the LLM figures out from the raw data.
+// [HARDCODED] These are the only hardcoded references to specific column names for Golden Designs.
 const CONFIG = {
   productsFile: 'data/Products_GoldenDesigns_Tab 1 - Most Popular.json',
   outputDir: 'data/listings',
-  skuColumn: 'GDINA Item #',    // TODO: Have LLM recognize which column is the unique product ID
-  priceColumn: 'MSRP',          // TODO: Have LLM recognize which column is the listing price
+  skuColumn: 'GDINA Item #',    // [HARDCODED] TODO: Have LLM recognize which column is the unique product ID
+  priceColumn: 'MSRP',          // [HARDCODED] TODO: Have LLM recognize which column is the listing price
 };
 
-// --- OpenAI client ---
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// --- Boilerplate sections (same on every Dansons listing) ---
+// [HARDCODED] Boilerplate sections (same on every Dansons listing)
 // In the future, these come from user configuration / the store's existing listings.
 const BOILERPLATE = {
   affordability: `Dansons Medical believes that everyone, especially those struggling with illness, injury, or aging, should have access to affordable medical equipment. We offer free shipping on all products and a price-match guarantee. Our customer service team is available to assist you with any questions or concerns.`,
@@ -28,7 +23,10 @@ const BOILERPLATE = {
   warranty: `All products come with the manufacturer's warranty. If you experience any issues, please contact our customer service team for assistance with warranty claims and returns.`,
 };
 
-// --- Types ---
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 // Raw product is just whatever came out of the spreadsheet — any keys, any values.
 type RawProduct = Record<string, any>;
 
@@ -39,7 +37,7 @@ interface GeneratedListing {
   title: string;
   features: string[];
   overviewParagraph: string;
-  specifications: Record<string, any>;
+  specifications: { key: string; value: string }[];
   boilerplate: typeof BOILERPLATE;
   _raw: RawProduct;
 }
@@ -56,17 +54,15 @@ function buildPrompt(product: RawProduct): string {
 
 Below is ALL the raw data we have for one product, copied from a supplier pricing sheet. The column names are exactly as they appear in the spreadsheet. Some fields are customer-facing (features, descriptions). Some are internal (dealer cost, shipping logistics). Use your judgment to determine what's relevant for a customer-facing listing.
 
-Your job is to generate a JSON object with these keys:
+Generate the following for this product:
 
-1. "title" (string): A clean product title for the Shopify listing. Should include brand, product name, key differentiator (e.g. capacity, technology), and material if relevant.
+1. "title": A clean product title for the Shopify listing. Should include brand, product name, key differentiator (e.g. capacity, technology), and material if relevant.
 
-2. "features" (array of strings): Clean, concise bullet points for customers. Pull from any fields that describe the product's capabilities, construction, or included features. Remove duplicates. Fix formatting. Exclude delivery/shipping logistics — that's handled separately.
+2. "features": Clean, concise bullet points for customers. Pull from any fields that describe the product's capabilities, construction, or included features. Remove duplicates. Fix formatting. Exclude delivery/shipping logistics — that's handled separately.
 
-3. "overviewParagraph" (string): A single paragraph (3-5 sentences) describing the product in a professional, warm tone. Highlight the most compelling selling points. Do NOT mention pricing. Write for a customer who is browsing and comparing products.
+3. "overviewParagraph": A single paragraph (3-5 sentences) describing the product in a professional, warm tone. Highlight the most compelling selling points. Do NOT mention pricing. Write for a customer who is browsing and comparing products.
 
-4. "specifications" (object): A flat object of key-value pairs for a specs table. Include things like dimensions, weight, capacity, materials, electrical requirements, warranty — whatever is relevant from the data. Use clean, human-readable keys (e.g. "Exterior Dimensions" not "Dimensions"). Exclude internal/logistics data (dealer cost, ship zip, process time).
-
-Return ONLY the JSON object, no markdown fences.
+4. "specifications": Key-value pairs for a specs table. Include things like dimensions, weight, capacity, materials, electrical requirements, warranty — whatever is relevant from the data. Use clean, human-readable keys (e.g. "Exterior Dimensions" not "Dimensions"). Exclude internal/logistics data (dealer cost, ship zip, process time).
 
 ---
 
@@ -75,6 +71,21 @@ Return ONLY the JSON object, no markdown fences.
 ${dataLines}
 `;
 }
+
+// --- Zod schema for structured LLM output ---
+// Note: specifications uses an array of {key, value} objects instead of a Record
+// because OpenAI structured outputs doesn't support dynamic keys (z.record).
+const ListingOutput = z.object({
+  title: z.string().describe('Clean product title for the Shopify listing'),
+  features: z.array(z.string()).describe('Concise customer-facing bullet points'),
+  overviewParagraph: z.string().describe('3-5 sentence product description in a professional, warm tone'),
+  specifications: z.array(
+    z.object({
+      key: z.string().describe('Human-readable spec name, e.g. "Exterior Dimensions"'),
+      value: z.string().describe('The spec value, e.g. \'64" x 44" x 75"\''),
+    })
+  ).describe('Key-value pairs for a specs table'),
+});
 
 // --- Generate listing for one product ---
 async function generateListing(product: RawProduct): Promise<GeneratedListing> {
@@ -89,31 +100,26 @@ async function generateListing(product: RawProduct): Promise<GeneratedListing> {
 
   console.log(`\n--- Generating listing for ${sku} ---`);
 
-  const response = await openai.chat.completions.create({
+  const response = await openai.responses.parse({
     model: 'gpt-4o',
-    messages: [
+    input: [
       {
         role: 'system',
-        content: 'You are a helpful eCommerce copywriter. Always respond with valid JSON only.',
+        content: 'You are a helpful eCommerce copywriter.',
       },
       { role: 'user', content: prompt },
     ],
     temperature: 0.7,
-    response_format: { type: 'json_object' },
+    text: {
+      format: zodTextFormat(ListingOutput, 'listing_output'),
+    },
   });
 
-  const content = response.choices[0].message.content;
-  if (!content) throw new Error(`Empty response for ${sku}`);
-
-  const generated = JSON.parse(content) as {
-    title: string;
-    features: string[];
-    overviewParagraph: string;
-    specifications: Record<string, any>;
-  };
+  const generated = response.output_parsed;
+  if (!generated) throw new Error(`Empty response for ${sku}`);
 
   console.log(`  ✓ "${generated.title}"`);
-  console.log(`  ✓ ${generated.features.length} features, ${Object.keys(generated.specifications).length} specs`);
+  console.log(`  ✓ ${generated.features.length} features, ${generated.specifications.length} specs`);
 
   return {
     sku,
@@ -145,27 +151,38 @@ async function main() {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
   }
 
-  // Generate listings
-  const listings: GeneratedListing[] = [];
-  for (const product of products) {
-    try {
-      const listing = await generateListing(product);
-      listings.push(listing);
-
-      // Save individual listing
-      const individualPath = path.join(CONFIG.outputDir, `${listing.sku}.json`);
-      fs.writeFileSync(individualPath, JSON.stringify(listing, null, 2));
-      console.log(`  → Saved ${individualPath}`);
-    } catch (err: any) {
-      console.error(`  ✗ Failed:`, err.message);
-    }
+  // Generate listing for one product
+  // TODO: Find the one product by sku from the products array.
+  const SKU = 'MX-K306-01';
+  const product = products.find((p) => p[CONFIG.skuColumn] === SKU);
+  if (!product) {
+    console.error(`Product not found: ${SKU}`);
+    process.exit(1);
   }
+  const listing = await generateListing(product);
+  console.log('LISTING:', listing);
+
+  // Generate listings
+  // const listings: GeneratedListing[] = [];
+  // for (const product of products) {
+  //   try {
+  //     const listing = await generateListing(product);
+  //     listings.push(listing);
+
+  //     // Save individual listing
+  //     const individualPath = path.join(CONFIG.outputDir, `${listing.sku}.json`);
+  //     fs.writeFileSync(individualPath, JSON.stringify(listing, null, 2));
+  //     console.log(`  → Saved ${individualPath}`);
+  //   } catch (err: any) {
+  //     console.error(`  ✗ Failed:`, err.message);
+  //   }
+  // }
 
   // Save all listings
-  const allPath = path.join(CONFIG.outputDir, '_all_listings.json');
-  fs.writeFileSync(allPath, JSON.stringify(listings, null, 2));
-  console.log(`\nDone! ${listings.length}/${products.length} listings generated.`);
-  console.log(`All listings saved to ${allPath}`);
+  // const allPath = path.join(CONFIG.outputDir, '_all_listings.json');
+  // fs.writeFileSync(allPath, JSON.stringify(listings, null, 2));
+  // console.log(`\nDone! ${listings.length}/${products.length} listings generated.`);
+  // console.log(`All listings saved to ${allPath}`);
 }
 
 main();
