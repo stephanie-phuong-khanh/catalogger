@@ -15,21 +15,23 @@ import fs from 'fs';
  * TODO: Count the number of unique products in the sheet using script.
  */
 
-const FILENAME = '2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx';
-const OUTPUT_FILENAME = 'golden_designs_sheet1.json';
-const PRODUCTS_OUTPUT_FILENAME = 'golden_designs_products.json';
+const FILENAME = '2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised';
+const OUTPUT_FILENAME = 'Output_GoldenDesigns';
+const PRODUCTS_OUTPUT_FILENAME = 'Products_GoldenDesigns';
 
-const workbook = xlsx.readFile(`data/${FILENAME}`);
+const workbook = xlsx.readFile(`data/${FILENAME}.xlsx`);
 const sheetNames = workbook.SheetNames;
 console.log(sheetNames);
 
 // Print the first sheet data.
 // [HARDCODED] Row 4 is headers. SKU is column B. Products are rows where column B is non-empty. Features span multiple rows.
 // TODO: LLM-assisted parsing, where the LLM analyzes the sheet structure and we use it to parse the sheet programmatically.
-const firstSheet = workbook.Sheets[sheetNames[0]];
+const SHEET_INDEX = 1;
+const sheetName = sheetNames[SHEET_INDEX];
+const firstSheet = workbook.Sheets[sheetName];
 const firstSheetData = xlsx.utils.sheet_to_json(firstSheet, { range: 3 });
-// fs.writeFileSync(`data/${OUTPUT_FILENAME}`, JSON.stringify(firstSheetData, null, 2));
-// console.log(`Wrote ${OUTPUT_FILENAME} to data/ folder.`);
+// fs.writeFileSync(`data/${OUTPUT_FILENAME}.json`, JSON.stringify(firstSheetData, null, 2));
+// console.log(`Wrote ${OUTPUT_FILENAME}.json to data/ folder.`);
 
 const SKU_COLUMN_HEADER = 'GDINA Item #';
 let currentProduct: any = null;
@@ -52,5 +54,5 @@ for (const row of firstSheetData) {
 if (currentProduct !== null) {
     products.push(currentProduct);
 }
-fs.writeFileSync(`data/${PRODUCTS_OUTPUT_FILENAME}`, JSON.stringify(products, null, 2));
-console.log(`Wrote ${PRODUCTS_OUTPUT_FILENAME} to data/ folder.`);
+fs.writeFileSync(`data/${PRODUCTS_OUTPUT_FILENAME}_${sheetName}.json`, JSON.stringify(products, null, 2));
+console.log(`Wrote ${PRODUCTS_OUTPUT_FILENAME}_${sheetName}.json to data/ folder.`);
