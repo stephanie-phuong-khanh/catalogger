@@ -1,58 +1,37 @@
-import xlsx from 'xlsx';
-import fs from 'fs';
-
 /**
- * In the future, we'd like to parse the sheet intelligently, with AI recognizing the structure of the sheet
- * and inferring meaning from color-coding, bolding, etc.
- * Then the app confirms the understanding of the sheet structure with the user, then parses the sheet programmatically.
- * Currently, code will parse one sample sheet based on hardcoded structure determined from manual human inspection.
- * 
- * Random ideas for the agent sheet parsing:
- * - Have the agent find in the sheet the main column headers and subheaders and infer the meaning, creating a key-value pair for each column, the equivalent of a data dictionary in finance.
- *  For example, the Golden Designs sheet has "2025-2026 Dealer Cost", "MAP", and "MSRP" as column headers, which could be inferred using supply chain knowledge.
- * 
- * TODO: Match products on "Most Popular" sheet with products on other sheets. Programatically determine if all the data matches.
- * TODO: Count the number of unique products in the sheet using script.
+ * Entry point: parse a pricing sheet and write products to JSON.
+ * All parsing logic lives in lib/parse-sheet.ts.
+ *
+ * Future: LLM-assisted parsing to infer sheet structure (headers, SKU column, etc.).
+ * TODO: Match products across sheets; count unique products.
  */
+import fs from 'fs';
+import path from 'path';
+import { parseSheet } from '../lib/parse-sheet';
 
-const FILENAME = '2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised';
-const OUTPUT_FILENAME = 'Output_GoldenDesigns';
-const PRODUCTS_OUTPUT_FILENAME = 'Products_GoldenDesigns';
+const CONFIG = {
+  sheetFile: 'data/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',
+  sheetIndex: 1,       // 0-based tab index (1 = "Tab 1 - Most Popular")
+  headerRow: 3,        // 0-based row where headers live (row 4 in Excel)
+  skuColumn: 'GDINA Item #',
+  outputFile: 'data/parsed_products.json',
+};
 
-const workbook = xlsx.readFile(`data/${FILENAME}.xlsx`);
-const sheetNames = workbook.SheetNames;
-console.log(sheetNames);
+function main() {
+  const products = parseSheet({
+    filePath: CONFIG.sheetFile,
+    sheetIndex: CONFIG.sheetIndex,
+    headerRow: CONFIG.headerRow,
+    skuColumn: CONFIG.skuColumn,
+  });
 
-// Print the first sheet data.
-// [HARDCODED] Row 4 is headers. SKU is column B. Products are rows where column B is non-empty. Features span multiple rows.
-// TODO: LLM-assisted parsing, where the LLM analyzes the sheet structure and we use it to parse the sheet programmatically.
-const SHEET_INDEX = 1;
-const sheetName = sheetNames[SHEET_INDEX];
-const firstSheet = workbook.Sheets[sheetName];
-const firstSheetData = xlsx.utils.sheet_to_json(firstSheet, { range: 3 });
-// fs.writeFileSync(`data/${OUTPUT_FILENAME}.json`, JSON.stringify(firstSheetData, null, 2));
-// console.log(`Wrote ${OUTPUT_FILENAME}.json to data/ folder.`);
-
-const SKU_COLUMN_HEADER = 'GDINA Item #';
-let currentProduct: any = null;
-const products: any[] = [];
-for (const row of firstSheetData) {
-    if ((row as any)[SKU_COLUMN_HEADER]) {
-        if (currentProduct !== null) {
-            products.push(currentProduct);
-        }
-        currentProduct = row;
-    } else if (currentProduct !== null) {
-        for (const key in row as any) {
-            const val = (row as any)[key];
-            if (val !== undefined && val !== '') {
-                currentProduct[key] = currentProduct[key] ? currentProduct[key] + ' --- ' + val : val;
-            }
-        }
-    }
+  const outPath = path.resolve(CONFIG.outputFile);
+  const outDir = path.dirname(outPath);
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, { recursive: true });
+  }
+  fs.writeFileSync(outPath, JSON.stringify(products, null, 2));
+  console.log(`Wrote ${products.length} products to ${outPath}`);
 }
-if (currentProduct !== null) {
-    products.push(currentProduct);
-}
-fs.writeFileSync(`data/${PRODUCTS_OUTPUT_FILENAME}_${sheetName}.json`, JSON.stringify(products, null, 2));
-console.log(`Wrote ${PRODUCTS_OUTPUT_FILENAME}_${sheetName}.json to data/ folder.`);
+
+main();
