@@ -1,6 +1,28 @@
+# Env (secrets, local overrides)
 .env
 .env.local
+.env*.local
 
+# Data (pipeline output, uploads, parsed sheets)
 data/
 
+# Dependencies
 node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build output (scripts)
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs / debug
+*.log
+npm-debug.log*
+
+# Vercel (if you deploy there)
+.vercel
