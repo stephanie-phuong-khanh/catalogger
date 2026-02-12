@@ -2,21 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-const RUN_STORAGE_KEY = 'catalogger-run';
+import { useRun } from './run-context';
 
 export default function Home() {
   const router = useRouter();
+  const { setRun } = useRun();
   const [excelFile, setExcelFile] = useState<File | null>(null);
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setMessage(null);
     setIsSubmitting(true);
 
     try {
@@ -35,7 +33,8 @@ export default function Home() {
         setError(data.error ?? 'Request failed');
         return;
       }
-      sessionStorage.setItem(RUN_STORAGE_KEY, JSON.stringify({ tabs: data.tabs, vendorUrl: data.vendorUrl }));
+
+      setRun(data.tabs, data.vendorUrl);
       router.push('/review');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed');
@@ -76,11 +75,10 @@ export default function Home() {
         <input type="text" placeholder="Link to channel or playlist" disabled />
 
         <button type="submit" disabled={isSubmitting} style={{ marginTop: '1rem' }}>
-          {isSubmitting ? 'Processing…' : 'Start'}
+          {isSubmitting ? 'Processing...' : 'Start'}
         </button>
 
-        {message && <p style={{ marginTop: '1rem', color: 'var(--success, #0a0)' }}>{message}</p>}
-        {error && <p style={{ marginTop: '1rem', color: 'var(--error, #c00)' }}>{error}</p>}
+        {error && <p style={{ marginTop: '1rem', color: '#c00' }}>{error}</p>}
       </form>
     </main>
   );
