@@ -21,30 +21,79 @@ export interface TabProducts {
 }
 
 /**
- * Merge rows into products: a new product starts when the SKU column is non-empty.
- * Continuation rows get their values appended to the current product.
+ * Group rows by SKU, then build each product directly as:
+ *  - flat key-value from the primary row (for UI, lookups)
+ *  - _markdown: a markdown table of ALL rows for this SKU, preserving
+ *    the exact column structure from the spreadsheet
  */
-function mergeRowsBySku(rows: Record<string, any>[], skuColumn: string): RawProduct[] {
-  let currentProduct: RawProduct | null = null;
+function groupRowsBySku(
+  rows: Record<string, any>[],
+  skuColumn: string,
+  allColumns: string[],
+): RawProduct[] {
   const products: RawProduct[] = [];
+  let currentRows: Record<string, any>[] = [];
 
   for (const row of rows) {
     if (row[skuColumn]) {
-      if (currentProduct !== null) products.push(currentProduct);
-      currentProduct = { ...row };
-    } else if (currentProduct !== null) {
-      for (const key in row) {
-        const val = row[key];
-        if (val !== undefined && val !== '') {
-          currentProduct[key] = currentProduct[key]
-            ? currentProduct[key] + '\n* ' + val
-            : val;
-        }
+      if (currentRows.length > 0) {
+        products.push(buildProduct(currentRows, allColumns));
       }
+      currentRows = [row];
+    } else if (currentRows.length > 0) {
+      currentRows.push(row);
     }
   }
-  if (currentProduct !== null) products.push(currentProduct);
+  if (currentRows.length > 0) {
+    products.push(buildProduct(currentRows, allColumns));
+  }
   return products;
+}
+
+/**
+ * Build a RawProduct from a group of rows (primary + continuation rows).
+ * The primary row's values are spread as top-level keys for easy access.
+ * _markdown contains a markdown table of ALL rows with the original columns.
+ */
+function buildProduct(rows: Record<string, any>[], allColumns: string[]): RawProduct {
+  // Primary row provides flat key-value access
+  const product: RawProduct = { ...rows[0] };
+
+  // Sanitize a cell value: replace in-cell newlines with spaces
+  // so they don't break the markdown table row structure
+  const sanitize = (val: any): string => {
+    if (val === undefined || val === null) return '';
+    return String(val).replace(/\n/g, ' ');
+  };
+
+  // Build markdown table directly from the raw rows
+  const header = `| ${allColumns.map(sanitize).join(' | ')} |`;
+  const divider = `|${allColumns.map(() => ' --- ').join('|')}|`;
+  const dataRows = rows.map(row => {
+    const cells = allColumns.map(col => sanitize(row[col]));
+    return `| ${cells.join(' | ')} |`;
+  });
+
+  product._markdown = `${header}\n${divider}\n${dataRows.join('\n')}`;
+
+  return product;
+}
+
+/**
+ * Get ALL column headers from a sheet's header row.
+ * This gives us the full column list regardless of which rows have data.
+ */
+function getColumnHeaders(sheet: xlsx.WorkSheet, headerRow: number): string[] {
+  const range = xlsx.utils.decode_range(sheet['!ref'] || 'A1');
+  const headers: string[] = [];
+  for (let col = range.s.c; col <= range.e.c; col++) {
+    const cellAddr = xlsx.utils.encode_cell({ r: headerRow, c: col });
+    const cell = sheet[cellAddr];
+    if (cell && cell.v !== undefined && cell.v !== '') {
+      headers.push(String(cell.v));
+    }
+  }
+  return headers;
 }
 
 /**
@@ -61,8 +110,9 @@ export function parseWorkbookFromBuffer(buffer: Buffer): TabProducts[] {
 
   for (const sheetName of tabsToParse) {
     const sheet = workbook.Sheets[sheetName];
+    const allColumns = getColumnHeaders(sheet, GOLDEN_DESIGNS_CONFIG.headerRow);
     const rows = xlsx.utils.sheet_to_json(sheet, { range: GOLDEN_DESIGNS_CONFIG.headerRow }) as Record<string, any>[];
-    const products = mergeRowsBySku(rows, GOLDEN_DESIGNS_CONFIG.skuColumn);
+    const products = groupRowsBySku(rows, GOLDEN_DESIGNS_CONFIG.skuColumn, allColumns);
     if (products.length > 0) {
       tabs.push({ name: sheetName, products });
     }
@@ -71,43 +121,7 @@ export function parseWorkbookFromBuffer(buffer: Buffer): TabProducts[] {
 }
 
 /**
- * Convert a RawProduct to a markdown string for LLM consumption.
- * Single-value fields become "key: value" lines.
- * Array fields (multi-row data like shipping cartons) become a markdown table
- * so the LLM can see spatial relationships (e.g. Carton A = 154 lbs = 7" x 64" x 71").
- */
-export function productToMarkdown(product: RawProduct): string {
-  const singleFields: string[] = [];
-  const arrayKeys: string[] = [];
-
-  for (const [key, value] of Object.entries(product)) {
-    if (Array.isArray(value)) {
-      arrayKeys.push(key);
-    } else {
-      singleFields.push(`${key}: ${value}`);
-    }
-  }
-
-  let result = singleFields.join('\n');
-
-  if (arrayKeys.length > 0) {
-    const rowCount = Math.max(...arrayKeys.map(k => (product[k] as any[]).length));
-    const header = `| ${arrayKeys.join(' | ')} |`;
-    const divider = `|${arrayKeys.map(() => ' --- ').join('|')}|`;
-    const rows: string[] = [];
-    for (let i = 0; i < rowCount; i++) {
-      const cells = arrayKeys.map(k => (product[k] as any[])[i] ?? '');
-      rows.push(`| ${cells.join(' | ')} |`);
-    }
-    result += `\n\nMulti-row data (each row is one shipping carton):\n${header}\n${divider}\n${rows.join('\n')}`;
-  }
-
-  return result;
-}
-
-/**
  * Parse an .xlsx sheet into an array of product objects (file path).
- * Merges multi-row products (e.g. features spanning multiple rows) into single objects.
  */
 export function parseSheet(config: ParseSheetConfig): RawProduct[] {
   const workbook = xlsx.readFile(config.filePath);
@@ -116,8 +130,9 @@ export function parseSheet(config: ParseSheetConfig): RawProduct[] {
 
   const sheetName = sheetNames[config.sheetIndex];
   const sheet = workbook.Sheets[sheetName];
+  const allColumns = getColumnHeaders(sheet, config.headerRow);
   const rows = xlsx.utils.sheet_to_json(sheet, { range: config.headerRow }) as Record<string, any>[];
-  const products = mergeRowsBySku(rows, config.skuColumn);
+  const products = groupRowsBySku(rows, config.skuColumn, allColumns);
 
   console.log(`Parsed ${products.length} products from "${sheetName}"`);
   return products;
