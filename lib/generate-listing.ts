@@ -27,17 +27,25 @@ const FeaturesOutput = z.object({
   overviewParagraph: z.string().describe('3-5 sentence product summary'),
 });
 
-/** Call 3: Generate specs table from quantitative data */
+/** Call 3: Generate specs as a flexible table with dynamic columns */
 const SpecsOutput = z.object({
-  specifications: z.array(
+  tableTitle: z.string().describe('Title for the specs table, e.g. "Key Measurements of the Maxxus 3-Person Low EMF FAR Infrared Sauna"'),
+  columns: z.array(z.string()).describe('Column headers, e.g. ["Weight", "Length", "Width", "Height"]'),
+  rows: z.array(
     z.object({
-      key: z.string().describe('Human-readable label, e.g. "Product Exterior (L x W x H)"'),
-      value: z.string().describe('The measurement value'),
+      label: z.string().describe('Row label, e.g. "Infrared Sauna (Exterior)" or "Carton A – Shipping"'),
+      values: z.array(z.string()).describe('Values for each column in order. Use "—" for missing values.'),
     })
-  ).describe('Dimensions and weights table. Each physical element gets its own row for dimensions and weight.'),
+  ).describe('One row per physical element: product exterior, interior, each shipping carton, pallet, etc.'),
 });
 
 // ---- Public types ----
+
+export interface SpecsTable {
+  tableTitle: string;
+  columns: string[];
+  rows: { label: string; values: string[] }[];
+}
 
 export interface GeneratedListing {
   sku: string;
@@ -45,7 +53,7 @@ export interface GeneratedListing {
   title: string;
   features: string[];
   overviewParagraph: string;
-  specifications: { key: string; value: string }[];
+  specifications: SpecsTable;
   vendorPageUrl: string | null;
   _raw: RawProduct;
   _vendorData: VendorProduct | null;
@@ -187,10 +195,8 @@ IMPORTANT — the store owner wants THOROUGH listings. Every distinct detail mat
 async function generateSpecs(
   openai: OpenAI,
   specsData: string,
-): Promise<{ key: string; value: string }[]> {
+): Promise<SpecsTable> {
   console.log('  [3/3] Generating specifications table...');
-
-  console.log('SPECS DATA: ', specsData);
 
   const response = await openai.responses.parse({
     model: 'gpt-4o',
@@ -201,20 +207,24 @@ async function generateSpecs(
       },
       {
         role: 'user',
-        content: `Below is the SPECS/MEASUREMENTS data for one product. Format it into a clean key-value specifications table.
+        content: `Below is the SPECS/MEASUREMENTS data for one product. Format it as a multi-column table.
 
 -----
 ${specsData}
 -----
 
 RULES:
-- Each physical element (product exterior, product interior, each shipping carton, LTL pallet) should have its own rows for dimensions and weight.
-- Use the EXACT dimension order from the source data (e.g. if the source says "WDH" use "W x D x H", if it says "LWH" use "L x W x H"). Do NOT assume or change the dimension order.
-- Use keys like "Product Exterior (W x D x H)", "Product Weight", "Carton A Dimensions", "Carton A Weight", "LTL Pallet Dimensions", "LTL Pallet Weight".
+- Choose columns that best represent the data (e.g. "Weight", "Length", "Width", "Height" for products with dimensions).
+- Use the EXACT dimension labels and order from the source data. Do NOT rename or reorder dimensions.
+- One row per physical element: product exterior, product interior, each shipping carton, LTL pallet, etc.
+- Use clear row labels like "Infrared Sauna (Exterior)", "Carton A – Shipping", "LTL Pallet Shipping".
+- Use "—" for missing values (e.g. interior weight if not provided).
 - Include ALL cartons — do NOT omit any.
 - Include ALL weights and dimensions from the source.
+- Include notes like "(roof overhang: adds 5.9" to depth)" inline with the relevant value.
 - Do NOT include qualitative features (glass type, temperature, electrical, etc.).
-- Exclude internal data (dealer cost, ship zip, process time).`,
+- Exclude internal data (dealer cost, ship zip, process time).
+- Give the table a descriptive title.`,
       },
     ],
     temperature: 0.3,
@@ -223,8 +233,8 @@ RULES:
 
   const result = response.output_parsed;
   if (!result) throw new Error('Empty specs response');
-  console.log(`  ✓ ${result.specifications.length} spec rows`);
-  return result.specifications;
+  console.log(`  ✓ ${result.rows.length} spec rows, ${result.columns.length} columns`);
+  return result;
 }
 
 // ---- Main entry point (same interface as before) ----
@@ -260,7 +270,7 @@ export async function generateListing(
     generateSpecs(openai, specsData),
   ]);
 
-  console.log(`  ✓ Complete: "${featuresResult.title}" — ${featuresResult.features.length} features, ${specifications.length} specs`);
+  console.log(`  ✓ Complete: "${featuresResult.title}" — ${featuresResult.features.length} features, ${specifications.rows.length} spec rows`);
 
   return {
     sku,

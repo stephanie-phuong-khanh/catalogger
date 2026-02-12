@@ -130,7 +130,7 @@ export default function ReviewSkuPage() {
       {step !== 'idle' && !listing && (
         <div style={{ margin: '1rem 0', fontSize: '0.875rem', lineHeight: '1.8' }}>
           <StepLine
-            label="Searching vendor website for pro..."
+            label="Searching vendor website for product..."
             status={step === 'searching' ? 'active' : 'done'}
           />
           {vendorInfo && step !== 'searching' && (
@@ -184,13 +184,25 @@ export default function ReviewSkuPage() {
               ))}
             </ul>
 
-            <h4 style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Specifications</h4>
+            <h4 style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+              {listing.specifications.tableTitle || 'Specifications'}
+            </h4>
             <table style={{ width: '100%', fontSize: '0.8125rem', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #ddd' }}>
+                  <th style={{ padding: '0.375rem 0.75rem 0.375rem 0', textAlign: 'left', fontWeight: 600 }}></th>
+                  {listing.specifications.columns.map((col, i) => (
+                    <th key={i} style={{ padding: '0.375rem 0.75rem', textAlign: 'left', fontWeight: 600 }}>{col}</th>
+                  ))}
+                </tr>
+              </thead>
               <tbody>
-                {listing.specifications.map((spec, i) => (
+                {listing.specifications.rows.map((row, i) => (
                   <tr key={i} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '0.25rem 0.5rem 0.25rem 0', fontWeight: 600 }}>{spec.key}</td>
-                    <td style={{ padding: '0.25rem 0' }}>{spec.value}</td>
+                    <td style={{ padding: '0.375rem 0.75rem 0.375rem 0', fontWeight: 600 }}>{row.label}</td>
+                    {row.values.map((val, j) => (
+                      <td key={j} style={{ padding: '0.375rem 0.75rem' }}>{val}</td>
+                    ))}
                   </tr>
                 ))}
               </tbody>

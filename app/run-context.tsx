@@ -18,7 +18,11 @@ export interface ListingResult {
   title: string;
   features: string[];
   overviewParagraph: string;
-  specifications: { key: string; value: string }[];
+  specifications: {
+    tableTitle: string;
+    columns: string[];
+    rows: { label: string; values: string[] }[];
+  };
   vendorPageUrl: string | null;
 }
 
