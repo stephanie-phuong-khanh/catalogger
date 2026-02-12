@@ -20,7 +20,7 @@ export default function Home() {
       if (excelFile) formData.append('file', excelFile);
       formData.append('websiteUrl', websiteUrl);
 
-      const res = await fetch('/api/generate-listings', {
+      const res = await fetch('/api/parse-sheet', {
         method: 'POST',
         body: formData,
       });
@@ -31,7 +31,16 @@ export default function Home() {
         setError(data.error ?? 'Request failed');
         return;
       }
-      setMessage(data.message ?? 'Done.');
+      setMessage(data.tabs?.length ? `Parsed ${data.tabs.length} tab(s). Ready to generate listings.` : 'Sheet parsed. Ready to generate listings.');
+
+      // TEMP: auto-download API response to inspect the parsed sheet (remove when no longer needed)
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `parse-result-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed');
     } finally {
@@ -71,7 +80,7 @@ export default function Home() {
         <input type="text" placeholder="Link to channel or playlist" disabled />
 
         <button type="submit" disabled={isSubmitting} style={{ marginTop: '1rem' }}>
-          {isSubmitting ? 'Processing…' : 'Generate listings'}
+          {isSubmitting ? 'Processing…' : 'Start'}
         </button>
 
         {message && <p style={{ marginTop: '1rem', color: 'var(--success, #0a0)' }}>{message}</p>}

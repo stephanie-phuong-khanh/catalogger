@@ -1,4 +1,4 @@
-import xlsx from 'xlsx';
+import * as xlsx from 'xlsx';
 
 export type RawProduct = Record<string, any>;
 
@@ -9,8 +9,66 @@ interface ParseSheetConfig {
   skuColumn: string;     // [HARDCODED] column name that identifies a new product row
 }
 
+// [HARDCODED] Golden Designs sheet structure. Later: LLM or config to infer.
+const GOLDEN_DESIGNS_CONFIG = {
+  headerRow: 3,
+  skuColumn: 'GDINA Item #',
+};
+
+export interface TabProducts {
+  name: string;
+  products: RawProduct[];
+}
+
 /**
- * Parse an .xlsx sheet into an array of product objects.
+ * Merge rows into products: a new product starts when the SKU column is non-empty.
+ * Continuation rows get their values appended to the current product.
+ */
+function mergeRowsBySku(rows: Record<string, any>[], skuColumn: string): RawProduct[] {
+  let currentProduct: RawProduct | null = null;
+  const products: RawProduct[] = [];
+
+  for (const row of rows) {
+    if (row[skuColumn]) {
+      if (currentProduct !== null) products.push(currentProduct);
+      currentProduct = { ...row };
+    } else if (currentProduct !== null) {
+      for (const key in row) {
+        const val = row[key];
+        if (val !== undefined && val !== '') {
+          currentProduct[key] = currentProduct[key]
+            ? currentProduct[key] + '\n* ' + val
+            : val;
+        }
+      }
+    }
+  }
+  if (currentProduct !== null) products.push(currentProduct);
+  return products;
+}
+
+/**
+ * Parse an .xlsx workbook from a buffer (all tabs). No file written to disk.
+ * Returns one entry per sheet. [HARDCODED] Same headerRow and skuColumn for every tab.
+ */
+export function parseWorkbookFromBuffer(buffer: Buffer): TabProducts[] {
+  const workbook = xlsx.read(buffer, { type: 'buffer' });
+  const sheetNames = workbook.SheetNames;
+  const tabs: TabProducts[] = [];
+
+  for (const sheetName of sheetNames) {
+    const sheet = workbook.Sheets[sheetName];
+    const rows = xlsx.utils.sheet_to_json(sheet, { range: GOLDEN_DESIGNS_CONFIG.headerRow }) as Record<string, any>[];
+    const products = mergeRowsBySku(rows, GOLDEN_DESIGNS_CONFIG.skuColumn);
+    if (products.length > 0) {
+      tabs.push({ name: sheetName, products });
+    }
+  }
+  return tabs;
+}
+
+/**
+ * Parse an .xlsx sheet into an array of product objects (file path).
  * Merges multi-row products (e.g. features spanning multiple rows) into single objects.
  */
 export function parseSheet(config: ParseSheetConfig): RawProduct[] {
@@ -20,33 +78,8 @@ export function parseSheet(config: ParseSheetConfig): RawProduct[] {
 
   const sheetName = sheetNames[config.sheetIndex];
   const sheet = workbook.Sheets[sheetName];
-  const rows = xlsx.utils.sheet_to_json(sheet, { range: config.headerRow });
-
-  // Merge multi-row products: a new product starts when the SKU column is non-empty.
-  // Continuation rows (no SKU) get their values appended to the current product.
-  let currentProduct: RawProduct | null = null;
-  const products: RawProduct[] = [];
-
-  for (const row of rows) {
-    if ((row as any)[config.skuColumn]) {
-      if (currentProduct !== null) {
-        products.push(currentProduct);
-      }
-      currentProduct = { ...(row as any) };
-    } else if (currentProduct !== null) {
-      for (const key in row as any) {
-        const val = (row as any)[key];
-        if (val !== undefined && val !== '') {
-          currentProduct[key] = currentProduct[key]
-            ? currentProduct[key] + '\n* ' + val
-            : val;
-        }
-      }
-    }
-  }
-  if (currentProduct !== null) {
-    products.push(currentProduct);
-  }
+  const rows = xlsx.utils.sheet_to_json(sheet, { range: config.headerRow }) as Record<string, any>[];
+  const products = mergeRowsBySku(rows, config.skuColumn);
 
   console.log(`Parsed ${products.length} products from "${sheetName}"`);
   return products;
