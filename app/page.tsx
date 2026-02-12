@@ -1,8 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+const RUN_STORAGE_KEY = 'catalogger-run';
 
 export default function Home() {
+  const router = useRouter();
   const [excelFile, setExcelFile] = useState<File | null>(null);
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,16 +35,8 @@ export default function Home() {
         setError(data.error ?? 'Request failed');
         return;
       }
-      setMessage(data.tabs?.length ? `Parsed ${data.tabs.length} tab(s). Ready to generate listings.` : 'Sheet parsed. Ready to generate listings.');
-
-      // TEMP: auto-download API response to inspect the parsed sheet (remove when no longer needed)
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `parse-result-${Date.now()}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      sessionStorage.setItem(RUN_STORAGE_KEY, JSON.stringify({ tabs: data.tabs, vendorUrl: data.vendorUrl }));
+      router.push('/review');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed');
     } finally {
