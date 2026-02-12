@@ -106,8 +106,8 @@ async function triageData(
       {
         role: 'system',
         content: 'You are a data organizer for product listings. Your job is to split raw product data into two buckets:\n' +
-          '1. FEATURES DATA: qualitative information — product capabilities, materials, technology, accessories, safety warnings, warranty, delivery/shipping method, disclaimers.\n' +
-          '2. SPECS DATA: quantitative measurements — product dimensions (exterior, interior), product weight, each shipping carton\'s dimensions and weight, pallet dimensions and weight, capacities.\n\n' +
+          '1. SPECS DATA: quantitative measurements — dimensions and measurements of product components, including shipping components. Only include measurements with units. Quantities do not count as measurements.\n\n' +
+          '2. FEATURES DATA: information not included in specs data, which includes but is not limited to just qualitative information. Includes product capabilities, materials, technology, accessories, safety warnings, warranty, delivery/shipping method, disclaimers.\n' +
           'Copy the relevant data verbatim from the sources. Do not paraphrase. Do not drop anything. ' +
           'If something could go in either bucket, put it in features. ' +
           'For specs data, preserve the tabular structure using markdown tables where the source data has rows (e.g. multiple shipping cartons).',
@@ -190,6 +190,8 @@ async function generateSpecs(
 ): Promise<{ key: string; value: string }[]> {
   console.log('  [3/3] Generating specifications table...');
 
+  console.log('SPECS DATA: ', specsData);
+
   const response = await openai.responses.parse({
     model: 'gpt-4o',
     input: [
@@ -207,7 +209,8 @@ ${specsData}
 
 RULES:
 - Each physical element (product exterior, product interior, each shipping carton, LTL pallet) should have its own rows for dimensions and weight.
-- Use keys like "Product Exterior (L x W x H)", "Product Weight", "Carton A (L x W x H)", "Carton A Weight", "LTL Pallet (L x W x H)", "LTL Pallet Weight".
+- Use the EXACT dimension order from the source data (e.g. if the source says "WDH" use "W x D x H", if it says "LWH" use "L x W x H"). Do NOT assume or change the dimension order.
+- Use keys like "Product Exterior (W x D x H)", "Product Weight", "Carton A Dimensions", "Carton A Weight", "LTL Pallet Dimensions", "LTL Pallet Weight".
 - Include ALL cartons — do NOT omit any.
 - Include ALL weights and dimensions from the source.
 - Do NOT include qualitative features (glass type, temperature, electrical, etc.).
