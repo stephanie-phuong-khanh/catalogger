@@ -130,7 +130,7 @@ export default function ReviewSkuPage() {
       {step !== 'idle' && !listing && (
         <div style={{ margin: '1rem 0', fontSize: '0.875rem', lineHeight: '1.8' }}>
           <StepLine
-            label="Searching vendor website..."
+            label="Searching vendor website for pro..."
             status={step === 'searching' ? 'active' : 'done'}
           />
           {vendorInfo && step !== 'searching' && (
@@ -162,17 +162,17 @@ export default function ReviewSkuPage() {
 
       {/* Generated listing (top) */}
       <section style={{ marginTop: '1.5rem' }}>
+        {displayVendorUrl && (
+          <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.75rem' }}>
+            Vendor page: <a href={displayVendorUrl} target="_blank" rel="noopener">{displayVendorUrl}</a>
+          </p>
+        )}
+
         <h2 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>Generated listing</h2>
 
         {listing ? (
           <div style={{ fontSize: '0.875rem' }}>
             <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{listing.title}</h3>
-
-            {displayVendorUrl && (
-              <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.75rem' }}>
-                Vendor page: <a href={displayVendorUrl} target="_blank" rel="noopener">{displayVendorUrl}</a>
-              </p>
-            )}
 
             <h4 style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Overview</h4>
             <p style={{ marginBottom: '0.75rem' }}>{listing.overviewParagraph}</p>

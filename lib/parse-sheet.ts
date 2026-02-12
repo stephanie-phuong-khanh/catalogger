@@ -71,6 +71,41 @@ export function parseWorkbookFromBuffer(buffer: Buffer): TabProducts[] {
 }
 
 /**
+ * Convert a RawProduct to a markdown string for LLM consumption.
+ * Single-value fields become "key: value" lines.
+ * Array fields (multi-row data like shipping cartons) become a markdown table
+ * so the LLM can see spatial relationships (e.g. Carton A = 154 lbs = 7" x 64" x 71").
+ */
+export function productToMarkdown(product: RawProduct): string {
+  const singleFields: string[] = [];
+  const arrayKeys: string[] = [];
+
+  for (const [key, value] of Object.entries(product)) {
+    if (Array.isArray(value)) {
+      arrayKeys.push(key);
+    } else {
+      singleFields.push(`${key}: ${value}`);
+    }
+  }
+
+  let result = singleFields.join('\n');
+
+  if (arrayKeys.length > 0) {
+    const rowCount = Math.max(...arrayKeys.map(k => (product[k] as any[]).length));
+    const header = `| ${arrayKeys.join(' | ')} |`;
+    const divider = `|${arrayKeys.map(() => ' --- ').join('|')}|`;
+    const rows: string[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      const cells = arrayKeys.map(k => (product[k] as any[])[i] ?? '');
+      rows.push(`| ${cells.join(' | ')} |`);
+    }
+    result += `\n\nMulti-row data (each row is one shipping carton):\n${header}\n${divider}\n${rows.join('\n')}`;
+  }
+
+  return result;
+}
+
+/**
  * Parse an .xlsx sheet into an array of product objects (file path).
  * Merges multi-row products (e.g. features spanning multiple rows) into single objects.
  */

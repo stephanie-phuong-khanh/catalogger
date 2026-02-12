@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
-import { RawProduct } from './parse-sheet';
+import { RawProduct, productToMarkdown } from './parse-sheet';
 import { VendorProduct } from './search-vendor';
 
 // --- Zod schema for structured LLM output ---
@@ -56,10 +56,8 @@ function stripHtml(html: string): string {
  * Build the LLM prompt with sheet data and optional vendor website data.
  */
 function buildPrompt(product: RawProduct, vendorData: VendorProduct | null): string {
-  // This is the raw data from the pricing sheet
-  const sheetData = Object.entries(product)
-    .map(([key, value]) => `${key}: ${value}`)
-    .join('\n');
+  // This is the raw data from the pricing sheet, formatted as markdown
+  const sheetData = productToMarkdown(product);
 
   // Copy from the vendor website
   let vendorWebsiteData = '';
