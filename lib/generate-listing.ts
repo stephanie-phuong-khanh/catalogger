@@ -56,30 +56,30 @@ function stripHtml(html: string): string {
  * Build the LLM prompt with sheet data and optional vendor website data.
  */
 function buildPrompt(product: RawProduct, vendorData: VendorProduct | null): string {
-  const dataLines = Object.entries(product)
+  // This is the raw data from the pricing sheet
+  const sheetData = Object.entries(product)
     .map(([key, value]) => `${key}: ${value}`)
     .join('\n');
 
-  let vendorSection = '';
+  // Copy from the vendor website
+  let vendorWebsiteData = '';
   if (vendorData && vendorData.body) {
-    const vendorText = stripHtml(vendorData.body);
-    vendorSection = `
+    const vendorWebsiteBody = stripHtml(vendorData.body);
 
----
-
-**Additional information from the vendor's website (${vendorData.title}):**
-
-${vendorText}
-`;
+    vendorWebsiteData = `Website title: ${vendorData.title}\nWebsite body: ${vendorWebsiteBody}`;
   }
 
-  return `You are writing a product listing for a Shopify eCommerce store (Dansons Medical).
+  return `You are writing a product listing for a Shopify eCommerce store (Dansons Medical). You are given the raw data we have for one product.
 
-Below is ALL the raw data we have for one product, copied from a supplier pricing sheet. The column names are exactly as they appear in the spreadsheet. Some fields are customer-facing (features, descriptions). Some are internal (dealer cost, shipping logistics). Use your judgment to determine what's relevant for a customer-facing listing.
-${vendorSection}
-Cross-reference both sources. The vendor website may have additional details not in the spreadsheet. Include the most complete and accurate information from either source. If there are conflicts, prefer the spreadsheet data (it's the pricing source of truth).
+  Below is the information from the vendor website:
+  -----
+  ${vendorWebsiteData}
+  -----
 
-IMPORTANT — the store owner wants THOROUGH listings. Every distinct detail matters. Do NOT condense or summarize — be comprehensive.
+  Below is the information from the pricing sheet:
+  -----
+  ${sheetData}
+  -----
 
 Generate the following for this product:
 
@@ -99,11 +99,7 @@ Generate the following for this product:
 
 4. "specifications": Key-value pairs for a specs/dimensions table. This should contain ONLY measurements, weights, and capacities — the kind of data that belongs in a "Key Dimensions" or "Key Measurements" table. Include: product dimensions (exterior, interior if available), product weight, shipping carton dimensions and weights (per carton if data is available), pallet dimensions, and any capacity measurements (e.g. weight capacity for lifts). Do NOT include features like glass type, temperature range, electrical requirements, sound system, lighting, etc. — those belong in the features list. Use clean, human-readable keys. Exclude internal data (dealer cost, ship zip, process time).
 
----
-
-**Raw Product Data (from pricing sheet):**
-
-${dataLines}
+IMPORTANT — the store owner wants THOROUGH listings. Every distinct detail matters. Do NOT condense or summarize — be comprehensive.
 `;
 }
 
@@ -126,6 +122,7 @@ export async function generateListing(
 
   const prompt = buildPrompt(product, vendorData);
 
+  console.log(`\n--- LLM PROMPT START ---\n${prompt}\n--- LLM PROMPT END ---\n`);
   console.log(`  Generating listing with LLM...`);
 
   const response = await openai.responses.parse({
