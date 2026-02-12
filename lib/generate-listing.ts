@@ -97,7 +97,7 @@ Generate the following:
    - Do not mention the SKU in the features.
    - ONE fact per bullet. When in doubt, split.
 
-3. "overviewParagraph": A single paragraph (3-5 sentences) summarizing what this product IS. State facts — materials, technology, capacity. No vague marketing language. No pricing.
+3. "overviewParagraph": A single paragraph (3-5 sentences) summarizing what this product is. Open with the full product name and what it is designed for. Include important features and characterstics. No pricing. DO NOT make up information. KEEP IT CONCISE. NO FLUFF.
 
 4. "specifications": A measurements/dimensions table.
    - Choose columns that fit the data (e.g. "Weight", "Length", "Width", "Height").
@@ -144,7 +144,6 @@ export async function generateListing(
       },
       { role: 'user', content: prompt },
     ],
-    temperature: 0.7,
     text: {
       format: zodTextFormat(ListingOutput, 'listing_output'),
     },

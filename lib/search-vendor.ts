@@ -59,6 +59,7 @@ export async function searchVendorSite(
 
     const response = await openai.responses.parse({
       model: 'gpt-4o',
+      temperature: 0,
       input: [
         {
           role: 'system',
