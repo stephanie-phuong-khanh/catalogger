@@ -8,12 +8,20 @@ import { useRun, ListingResult, RawProduct } from '../../run-context';
 // [HARDCODED] Golden Designs SKU column.
 const SKU_COLUMN = 'GDINA Item #';
 
+type Step = 'idle' | 'searching' | 'vendor-found' | 'vendor-not-found' | 'generating' | 'done' | 'error';
+
+interface VendorInfo {
+  title: string;
+  url: string;
+}
+
 export default function ReviewSkuPage() {
   const params = useParams();
   const sku = decodeURIComponent(params.sku as string);
   const { run, setListing } = useRun();
 
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [step, setStep] = useState<Step>('idle');
+  const [vendorInfo, setVendorInfo] = useState<VendorInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const hasTriggered = useRef(false);
 
@@ -34,29 +42,62 @@ export default function ReviewSkuPage() {
     if (!run || !product || listing || hasTriggered.current) return;
     hasTriggered.current = true;
 
-    async function generate() {
-      setIsGenerating(true);
+    async function runPipeline() {
       setError(null);
+
+      // Step 1: Search vendor site
+      let vendorData: any = null;
+      if (run!.vendorUrl) {
+        setStep('searching');
+        try {
+          const res = await fetch('/api/search-vendor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product, vendorUrl: run!.vendorUrl }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            setError(data.error ?? 'Vendor search failed');
+            setStep('error');
+            return;
+          }
+          vendorData = data.vendorData;
+          if (vendorData) {
+            setVendorInfo({ title: vendorData.title, url: vendorData.url });
+            setStep('vendor-found');
+          } else {
+            setStep('vendor-not-found');
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Vendor search failed');
+          setStep('error');
+          return;
+        }
+      }
+
+      // Step 2: Generate listing
+      setStep('generating');
       try {
         const res = await fetch('/api/generate-one-listing', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product, vendorUrl: run!.vendorUrl }),
+          body: JSON.stringify({ product, vendorData }),
         });
         const data = await res.json();
         if (!res.ok) {
           setError(data.error ?? 'Generation failed');
+          setStep('error');
           return;
         }
         setListing(sku, data.listing as ListingResult);
+        setStep('done');
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Generation failed');
-      } finally {
-        setIsGenerating(false);
+        setStep('error');
       }
     }
 
-    generate();
+    runPipeline();
   }, [run, product, listing, sku, setListing]);
 
   if (!run) {
@@ -76,21 +117,42 @@ export default function ReviewSkuPage() {
     );
   }
 
+  // If we already have a listing (e.g. revisiting), pull vendorPageUrl for display
+  const displayVendorUrl = listing?.vendorPageUrl ?? vendorInfo?.url ?? null;
+  const displayVendorTitle = vendorInfo?.title ?? null;
+
   return (
     <main>
       <Link href="/review" style={{ fontSize: '0.875rem' }}>&larr; Back to list</Link>
       <h1 style={{ fontSize: '1.25rem', marginTop: '0.75rem' }}>{sku}</h1>
 
-      {isGenerating && (
-        <p style={{ color: '#666', fontStyle: 'italic', margin: '1rem 0' }}>
-          Generating listing... (searching vendor site + LLM)
-        </p>
+      {/* Progress steps */}
+      {step !== 'idle' && !listing && (
+        <div style={{ margin: '1rem 0', fontSize: '0.875rem', lineHeight: '1.8' }}>
+          <StepLine
+            label="Searching vendor website..."
+            status={step === 'searching' ? 'active' : 'done'}
+          />
+          {vendorInfo && step !== 'searching' && (
+            <StepLine label={`Found: ${vendorInfo.title}`} status="done" detail={vendorInfo.url} />
+          )}
+          {step === 'vendor-not-found' && (
+            <StepLine label="No vendor page found (will generate from sheet data only)" status="warn" />
+          )}
+          {(step === 'generating' || step === 'done') && (
+            <StepLine
+              label="Generating listing..."
+              status={step === 'generating' ? 'active' : 'done'}
+            />
+          )}
+        </div>
       )}
+
       {error && (
         <p style={{ color: '#c00', margin: '1rem 0' }}>
           Error: {error}
           <button
-            onClick={() => { hasTriggered.current = false; setError(null); }}
+            onClick={() => { hasTriggered.current = false; setError(null); setStep('idle'); }}
             style={{ marginLeft: '0.5rem', fontSize: '0.875rem' }}
           >
             Retry
@@ -106,9 +168,9 @@ export default function ReviewSkuPage() {
           <div style={{ fontSize: '0.875rem' }}>
             <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{listing.title}</h3>
 
-            {listing.vendorPageUrl && (
+            {displayVendorUrl && (
               <p style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.75rem' }}>
-                Vendor page: <a href={listing.vendorPageUrl} target="_blank" rel="noopener">{listing.vendorPageUrl}</a>
+                Vendor page: <a href={displayVendorUrl} target="_blank" rel="noopener">{displayVendorUrl}</a>
               </p>
             )}
 
@@ -138,9 +200,9 @@ export default function ReviewSkuPage() {
               Price: ${listing.price}
             </p>
           </div>
-        ) : !isGenerating ? (
+        ) : step !== 'error' && step !== 'idle' ? null : (
           <p style={{ color: '#999' }}>Not yet generated.</p>
-        ) : null}
+        )}
       </section>
 
       {/* Sheet data (below, horizontal scroll like a spreadsheet) */}
@@ -162,7 +224,6 @@ export default function ReviewSkuPage() {
                 {Object.entries(product).map(([key, value]) => {
                   const text = String(value ?? '');
                   const len = text.length;
-                  // Scale column width by content length: short → narrow, long → wide
                   const minWidth = len < 20 ? 80 : len < 80 ? 180 : len < 200 ? 320 : 450;
                   return (
                     <td key={key} style={{ padding: '0.375rem 0.75rem', borderBottom: '1px solid #eee', whiteSpace: 'pre-wrap', minWidth: `${minWidth}px`, verticalAlign: 'top' }}>
@@ -176,5 +237,25 @@ export default function ReviewSkuPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+// --- Step indicator component ---
+
+function StepLine({ label, status, detail }: { label: string; status: 'active' | 'done' | 'warn'; detail?: string }) {
+  const icon = status === 'active' ? '...' : status === 'done' ? '✓' : '—';
+  const color = status === 'active' ? '#666' : status === 'done' ? '#0a0' : '#b80';
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+      <span style={{ color, fontWeight: 600, width: '1.25rem', textAlign: 'center', flexShrink: 0 }}>{icon}</span>
+      <span style={{ fontStyle: status === 'active' ? 'italic' : 'normal', color: status === 'active' ? '#666' : '#1a1a1a' }}>
+        {label}
+        {detail && (
+          <a href={detail} target="_blank" rel="noopener" style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#666' }}>
+            {detail}
+          </a>
+        )}
+      </span>
+    </div>
   );
 }

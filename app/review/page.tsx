@@ -43,7 +43,7 @@ export default function ReviewPage() {
 
       {vendorUrl && (
         <p className="placeholder-note" style={{ marginBottom: '0.5rem' }}>
-          Vendor: {vendorUrl}
+          Vendor website: <a href={vendorUrl} target="_blank" rel="noopener noreferrer">{vendorUrl}</a>
         </p>
       )}
 
@@ -56,7 +56,7 @@ export default function ReviewPage() {
           disabled={generatedCount === 0}
           style={{ fontSize: '0.875rem', opacity: generatedCount === 0 ? 0.4 : 1 }}
         >
-          Download {generatedCount} listing{generatedCount !== 1 ? 's' : ''}
+          Download {generatedCount} generated listing{generatedCount !== 1 ? 's' : ''}
         </button>
       </div>
 

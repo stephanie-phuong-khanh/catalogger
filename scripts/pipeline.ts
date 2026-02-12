@@ -56,8 +56,8 @@ async function main() {
     const sku = product[CONFIG.skuColumn];
     if (!sku) continue;
 
-    // Temporary: Only process one product.
-    if (sku !== 'MX-K306-01') continue;
+    // Temporary: Only process first 5 products for prompt tuning.
+    if (listings.length >= 5) break;
 
     console.log(`\n--- Processing ${sku} ---`);
 

@@ -88,15 +88,16 @@ Generate the following for this product:
 2. "features": Thorough, customer-facing bullet points. This is the MOST IMPORTANT section.
    RULES:
    - Include EVERY distinct feature, capability, and detail from both sources. More bullets is better than fewer.
+   - Be TERSE. State facts plainly. Do NOT add filler phrases, qualifiers, or marketing fluff (e.g. write "3 person capacity" NOT "3-person capacity for spacious relaxation"). Match the tone and brevity of the source material.
    - Keep specific numbers and details as they appear in the source (e.g. counts, placements, measurements). Do NOT generalize specifics into vague statements.
-   - Keep safety warnings VERBATIM.
+   - Keep safety warnings and disclaimers VERBATIM — copy the exact wording from the source, including any "do not" / "not" clauses (e.g. voltage exclusions, usage restrictions). Do not paraphrase or shorten these.
    - Include warranty information as a bullet.
    - Include delivery/shipping info as the LAST bullet.
-   - De-duplicate: if the same fact appears in both sources, include it once. But do NOT merge two different facts into one vague bullet.
+   - ONE fact per bullet. Do NOT combine two separate details into a single bullet (e.g. "Easy assembly with a roof vent" should be two bullets: one for assembly, one for the roof vent). When in doubt, split.
 
 3. "overviewParagraph": A single paragraph (3-5 sentences) describing the product in a professional, warm tone. Be SPECIFIC — reference the product's standout features and benefits by name, based on what's in the data. Do NOT write generic filler. Do NOT mention pricing. Write for a customer who is browsing and comparing products.
 
-4. "specifications": Key-value pairs for a specs table. Include only QUANTITATIVE or CATEGORICAL facts: dimensions, weights, capacities, electrical requirements, materials, warranty, and similar measurable data. Do NOT repeat qualitative features here (e.g. if "Bluetooth speakers" is already a feature bullet, don't add a "Sound System" spec). The specs table should complement the features, not duplicate them. Use clean, human-readable keys. Exclude internal data (dealer cost, ship zip, process time).
+4. "specifications": Key-value pairs for a specs/dimensions table. This should contain ONLY measurements, weights, and capacities — the kind of data that belongs in a "Key Dimensions" or "Key Measurements" table. Include: product dimensions (exterior, interior if available), product weight, shipping carton dimensions and weights (per carton if data is available), pallet dimensions, and any capacity measurements (e.g. weight capacity for lifts). Do NOT include features like glass type, temperature range, electrical requirements, sound system, lighting, etc. — those belong in the features list. Use clean, human-readable keys. Exclude internal data (dealer cost, ship zip, process time).
 
 ---
 
@@ -132,7 +133,7 @@ export async function generateListing(
     input: [
       {
         role: 'system',
-        content: 'You are a thorough eCommerce copywriter for a medical/wellness equipment distributor. You never drop details — every feature, spec, and safety note from the source data must appear in the listing. Comprehensiveness is more important than brevity.',
+        content: 'You are a precise eCommerce copywriter for a medical/wellness equipment distributor. You never drop details — every feature and safety note from the source data must appear in the listing. Be terse and factual. Do not add filler or marketing fluff. Match the tone of the source material.',
       },
       { role: 'user', content: prompt },
     ],

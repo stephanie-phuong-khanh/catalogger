@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
-import { searchVendorSite } from '../../../lib/search-vendor';
 import { generateListing } from '../../../lib/generate-listing';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -12,9 +11,9 @@ const PRICE_COLUMN = 'MSRP';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { product, vendorUrl } = body as {
+    const { product, vendorData } = body as {
       product: Record<string, unknown>;
-      vendorUrl?: string;
+      vendorData?: any;
     };
 
     if (!product) {
@@ -26,23 +25,14 @@ export async function POST(request: NextRequest) {
       return Response.json({ ok: false, error: 'Product has no SKU.' }, { status: 400 });
     }
 
-    // Step 1: Search vendor site (if URL provided)
-    let vendorData = null;
-    if (vendorUrl) {
-      const description = String(product['Description'] ?? '');
-      vendorData = await searchVendorSite(openai, vendorUrl, sku, description);
-    }
-
-    // Step 2: Generate listing with LLM
     const listing = await generateListing(
       openai,
       product as Record<string, any>,
       SKU_COLUMN,
       PRICE_COLUMN,
-      vendorData,
+      vendorData ?? null,
     );
 
-    // Return only the client-facing fields (not _raw and _vendorData)
     return Response.json({
       ok: true,
       listing: {
