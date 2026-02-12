@@ -1,11 +1,8 @@
 ### 1. Connect form → pipeline (or API)
 
-- **Option A — API route:** Add `app/api/run-pipeline/route.ts` that:
+- Add `app/api/run-pipeline/route.ts` that:
   - Accepts the uploaded Excel (multipart) and website URL.
   - Saves the file somewhere (e.g. `data/uploads/`), then calls your existing `parseSheet`, `searchVendorSite`, `generateListing` from `lib/` (you’ll need to pass the sheet path and vendor URL from the request). Return the generated listings as JSON.
-- **Option B — Keep pipeline as a script:** On submit, show a message like “Run `npm run pipeline` with your file in `data/` and vendor URL in config, then refresh.” Then the app only **reads** from `data/listings/` (e.g. via another API route that reads `_all_listings.json`). Simpler for v1.
-
-Recommendation: start with **Option B** so the app is a “review UI” that loads existing pipeline output; add Option A when you’re ready to run the pipeline from the browser.
 
 ### 2. API route to read listings
 

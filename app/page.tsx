@@ -6,13 +6,37 @@ export default function Home() {
   const [excelFile, setExcelFile] = useState<File | null>(null);
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setMessage(null);
     setIsSubmitting(true);
-    // TODO: wire to pipeline or API — for now just log
-    console.log({ excelFile: excelFile?.name, websiteUrl });
-    setIsSubmitting(false);
+
+    try {
+      const formData = new FormData();
+      if (excelFile) formData.append('file', excelFile);
+      formData.append('websiteUrl', websiteUrl);
+
+      const res = await fetch('/api/generate-listings', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? 'Request failed');
+        return;
+      }
+      setMessage(data.message ?? 'Done.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Request failed');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -49,6 +73,9 @@ export default function Home() {
         <button type="submit" disabled={isSubmitting} style={{ marginTop: '1rem' }}>
           {isSubmitting ? 'Processing…' : 'Generate listings'}
         </button>
+
+        {message && <p style={{ marginTop: '1rem', color: 'var(--success, #0a0)' }}>{message}</p>}
+        {error && <p style={{ marginTop: '1rem', color: 'var(--error, #c00)' }}>{error}</p>}
       </form>
     </main>
   );
