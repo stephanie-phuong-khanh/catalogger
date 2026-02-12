@@ -56,7 +56,7 @@ function stripHtml(html: string): string {
 /**
  * Build the LLM prompt with sheet data and optional vendor website data.
  */
-function buildPrompt(product: RawProduct, vendorData: VendorProduct | null): string {
+function buildPrompt(product: RawProduct, vendorData: VendorProduct | null, supplierName?: string): string {
   const sheetData = Object.entries(product)
     .filter(([key]) => !key.startsWith('_'))
     .map(([key, value]) => `${key}: ${value}`)
@@ -67,7 +67,9 @@ function buildPrompt(product: RawProduct, vendorData: VendorProduct | null): str
     vendorWebsiteData = `Website title: ${vendorData.title}\nWebsite body:\n${stripHtml(vendorData.body)}`;
   }
 
-  return `You are writing a product listing for a Shopify eCommerce store (Dansons Medical). You are given the raw data we have for one product.
+  const supplierLine = supplierName ? ` The supplier/vendor is "${supplierName}".` : '';
+
+  return `You are writing a product listing for a Shopify eCommerce store (Dansons Medical).${supplierLine} You are given the raw data we have for one product.
 
 Vendor website data:
 -----
@@ -81,7 +83,7 @@ ${sheetData}
 
 Generate the following:
 
-1. "title": A clean product title. MUST START with the supplier name. Includes the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is relevant). Do NOT include the SKU.
+1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is relevant). Do NOT include the SKU.
 
 2. "features": Customer-facing bullet points. This is the MOST IMPORTANT section.
    RULES:
@@ -92,6 +94,7 @@ Generate the following:
    - Do NOT include dimensions, weights, or shipping carton measurements — those go in the specifications table.
    - Include warranty information as a bullet.
    - Include delivery/shipping method as the LAST bullet.
+   - Do not mention the SKU in the features.
    - ONE fact per bullet. When in doubt, split.
 
 3. "overviewParagraph": A single paragraph (3-5 sentences) summarizing what this product IS. State facts — materials, technology, capacity. No vague marketing language. No pricing.
@@ -120,6 +123,7 @@ export async function generateListing(
   skuColumn: string,
   priceColumn: string,
   vendorData: VendorProduct | null,
+  supplierName?: string,
 ): Promise<GeneratedListing> {
   const sku = product[skuColumn];
   const price = product[priceColumn];
@@ -128,7 +132,7 @@ export async function generateListing(
     throw new Error(`No SKU found in column "${skuColumn}"`);
   }
 
-  const prompt = buildPrompt(product, vendorData);
+  const prompt = buildPrompt(product, vendorData, supplierName);
   console.log(`  Generating listing with LLM...`);
 
   const response = await openai.responses.parse({

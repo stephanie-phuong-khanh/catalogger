@@ -81,7 +81,7 @@ export default function ReviewSkuPage() {
         const res = await fetch('/api/generate-one-listing', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product, vendorData }),
+          body: JSON.stringify({ product, vendorData, supplierName: run?.supplierName }),
         });
         const data = await res.json();
         if (!res.ok) {

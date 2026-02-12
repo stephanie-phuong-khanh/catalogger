@@ -11,9 +11,10 @@ const PRICE_COLUMN = 'MSRP';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { product, vendorData } = body as {
+    const { product, vendorData, supplierName } = body as {
       product: Record<string, unknown>;
       vendorData?: any;
+      supplierName?: string;
     };
 
     if (!product) {
@@ -31,6 +32,7 @@ export async function POST(request: NextRequest) {
       SKU_COLUMN,
       PRICE_COLUMN,
       vendorData ?? null,
+      supplierName,
     );
 
     return Response.json({

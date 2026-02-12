@@ -29,6 +29,7 @@ export interface ListingResult {
 export interface RunData {
   tabs: TabProducts[];
   vendorUrl?: string;
+  supplierName?: string;
   /** Listings generated so far, keyed by SKU. */
   listings: Record<string, ListingResult>;
 }
@@ -36,7 +37,7 @@ export interface RunData {
 interface RunContextValue {
   run: RunData | null;
   /** Set the run after parsing a sheet. Clears any previous listings. */
-  setRun: (tabs: TabProducts[], vendorUrl?: string) => void;
+  setRun: (tabs: TabProducts[], vendorUrl?: string, supplierName?: string) => void;
   /** Store a generated listing for a SKU. */
   setListing: (sku: string, listing: ListingResult) => void;
   /** Clear the entire run. */
@@ -78,8 +79,8 @@ export function RunProvider({ children }: { children: React.ReactNode }) {
     if (stored) setRunState(stored);
   }, []);
 
-  const setRun = useCallback((tabs: TabProducts[], vendorUrl?: string) => {
-    const data: RunData = { tabs, vendorUrl, listings: {} };
+  const setRun = useCallback((tabs: TabProducts[], vendorUrl?: string, supplierName?: string) => {
+    const data: RunData = { tabs, vendorUrl, supplierName, listings: {} };
     setRunState(data);
     saveToStorage(data);
   }, []);

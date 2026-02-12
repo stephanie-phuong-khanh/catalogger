@@ -28,7 +28,7 @@ export interface TabProducts {
 
 /**
  * Merge rows into products: a new product starts when the SKU column is non-empty.
- * Continuation rows get their values appended with "\n* " separator.
+ * Continuation rows get their values appended with "\n " separator.
  */
 function mergeRowsBySku(rows: Record<string, any>[], skuColumn: string): RawProduct[] {
   let currentProduct: RawProduct | null = null;
@@ -43,7 +43,7 @@ function mergeRowsBySku(rows: Record<string, any>[], skuColumn: string): RawProd
         const val = row[key];
         if (val !== undefined && val !== '') {
           currentProduct[key] = currentProduct[key]
-            ? currentProduct[key] + '\n* ' + val
+            ? currentProduct[key] + '\n' + val
             : val;
         }
       }

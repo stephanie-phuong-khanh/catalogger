@@ -8,7 +8,8 @@ export default function Home() {
   const router = useRouter();
   const { setRun } = useRun();
   const [excelFile, setExcelFile] = useState<File | null>(null);
-  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('https://goldendesigninc.com');
+  const [supplierName, setSupplierName] = useState('Golden Designs');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +35,7 @@ export default function Home() {
         return;
       }
 
-      setRun(data.tabs, data.vendorUrl);
+      setRun(data.tabs, data.vendorUrl, supplierName);
       router.push('/review');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed');
@@ -50,12 +51,20 @@ export default function Home() {
 
       <form onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
         <label htmlFor="excel">Pricing sheet (Excel)</label>
-        <p className="placeholder-note">This is the canonical product list.</p>
+        <p className="placeholder-note">For this demo, please upload the Golden Designs pricing sheet (.xlsx). Other sheets are not yet supported.</p>
         <input
           id="excel"
           type="file"
           accept=".xlsx,.xls"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExcelFile(e.target.files?.[0] ?? null)}
+        />
+
+        <label htmlFor="supplier">Supplier / vendor name</label>
+        <input
+          id="supplier"
+          type="text"
+          value={supplierName}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSupplierName(e.target.value)}
         />
 
         <label htmlFor="website">Vendor website</label>
