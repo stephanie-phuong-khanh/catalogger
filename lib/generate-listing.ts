@@ -4,18 +4,40 @@ import { z } from 'zod';
 import { RawProduct } from './parse-sheet';
 import { VendorProduct } from './search-vendor';
 
-// --- Zod schema for structured LLM output ---
-const ListingOutput = z.object({
+// ---- Zod schemas for each LLM call ----
+
+/** Call 1: Triage raw data into features-relevant vs specs-relevant */
+const TriageOutput = z.object({
+  featuresData: z.string().describe(
+    'All qualitative/descriptive information that belongs in the features and overview sections: ' +
+    'product capabilities, materials, technology, included accessories, safety warnings, warranty, delivery info, etc. ' +
+    'Copy the relevant text verbatim from the sources.'
+  ),
+  specsData: z.string().describe(
+    'All quantitative/measurement information that belongs in a dimensions & weights table: ' +
+    'product dimensions, product weight, shipping carton dimensions and weights, pallet dimensions and weights, capacities. ' +
+    'Preserve the tabular structure — use markdown table format if appropriate.'
+  ),
+});
+
+/** Call 2: Generate features + overview + title from qualitative data */
+const FeaturesOutput = z.object({
   title: z.string().describe('Product title: manufacturer brand + product line + key differentiator + material'),
-  features: z.array(z.string()).describe('Thorough customer-facing bullet points. Keep ALL distinct details from sources.'),
-  overviewParagraph: z.string().describe('3-5 sentence product description with specific details and benefits'),
+  features: z.array(z.string()).describe('Thorough customer-facing bullet points'),
+  overviewParagraph: z.string().describe('3-5 sentence product summary'),
+});
+
+/** Call 3: Generate specs table from quantitative data */
+const SpecsOutput = z.object({
   specifications: z.array(
     z.object({
-      key: z.string().describe('Human-readable spec name'),
-      value: z.string().describe('The spec value'),
+      key: z.string().describe('Human-readable label, e.g. "Product Exterior (L x W x H)"'),
+      value: z.string().describe('The measurement value'),
     })
-  ).describe('Key-value pairs for a specs table'),
+  ).describe('Dimensions and weights table. Each physical element gets its own row for dimensions and weight.'),
 });
+
+// ---- Public types ----
 
 export interface GeneratedListing {
   sku: string;
@@ -29,80 +51,184 @@ export interface GeneratedListing {
   _vendorData: VendorProduct | null;
 }
 
+// ---- Helpers ----
+
 /**
  * Strip HTML tags to get plain text, preserving block structure as newlines.
  */
 function stripHtml(html: string): string {
   return html
-    // Preserve structure: block elements and list items become newlines
     .replace(/<\/?(p|div|br|li|h[1-6]|tr|ul|ol)\b[^>]*\/?>/gi, '\n')
-    // Remove all remaining tags
     .replace(/<[^>]*>/g, ' ')
-    // Decode common HTML entities
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    // Collapse runs of spaces (but preserve newlines)
     .replace(/[ \t]+/g, ' ')
-    // Collapse multiple blank lines into one
     .replace(/\n\s*\n/g, '\n')
     .trim();
 }
 
-/**
- * Build the LLM prompt with sheet data and optional vendor website data.
- */
-function buildPrompt(product: RawProduct, vendorData: VendorProduct | null): string {
-  // The markdown table is built directly from the spreadsheet rows at parse time
-  const sheetData = product._markdown || '(no sheet data)';
+/** Build combined raw source text from sheet + vendor site */
+function buildSourceText(product: RawProduct, vendorData: VendorProduct | null): string {
+  const sheetMarkdown = product._markdown || '(no sheet data)';
 
-  // Copy from the vendor website
-  let vendorWebsiteData = '';
+  // Key-value pairs for non-table fields
+  const kvPairs = Object.entries(product)
+    .filter(([key]) => !key.startsWith('_'))
+    .map(([key, value]) => `${key}: ${value}`)
+    .join('\n');
+
+  let vendorText = '';
   if (vendorData && vendorData.body) {
-    const vendorWebsiteBody = stripHtml(vendorData.body);
-
-    vendorWebsiteData = `Website title: ${vendorData.title}\nWebsite body: ${vendorWebsiteBody}`;
+    vendorText = `\n\nVendor website title: ${vendorData.title}\nVendor website body:\n${stripHtml(vendorData.body)}`;
   }
 
-  return `You are writing a product listing for a Shopify eCommerce store (Dansons Medical). You are given the raw data we have for one product.
+  return `Pricing sheet (key-value):\n${kvPairs}\n\nPricing sheet (table view):\n${sheetMarkdown}${vendorText}`;
+}
 
-  Below is the information from the vendor website:
-  -----
-  ${vendorWebsiteData}
-  -----
+// ---- The three LLM calls ----
 
-  Below is the information from the pricing sheet:
-  -----
-  ${sheetData}
-  -----
+/**
+ * Call 1: Triage — split raw data into features-relevant vs specs-relevant.
+ */
+async function triageData(
+  openai: OpenAI,
+  sourceText: string,
+): Promise<{ featuresData: string; specsData: string }> {
+  console.log('  [1/3] Triaging data into features vs specs...');
 
-Generate the following for this product:
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    input: [
+      {
+        role: 'system',
+        content: 'You are a data organizer for product listings. Your job is to split raw product data into two buckets:\n' +
+          '1. FEATURES DATA: qualitative information — product capabilities, materials, technology, accessories, safety warnings, warranty, delivery/shipping method, disclaimers.\n' +
+          '2. SPECS DATA: quantitative measurements — product dimensions (exterior, interior), product weight, each shipping carton\'s dimensions and weight, pallet dimensions and weight, capacities.\n\n' +
+          'Copy the relevant data verbatim from the sources. Do not paraphrase. Do not drop anything. ' +
+          'If something could go in either bucket, put it in features. ' +
+          'For specs data, preserve the tabular structure using markdown tables where the source data has rows (e.g. multiple shipping cartons).',
+      },
+      {
+        role: 'user',
+        content: `Here is ALL the raw data for one product from two sources. Split it into features data vs specs data.\n\n${sourceText}`,
+      },
+    ],
+    temperature: 0.3,
+    text: { format: zodTextFormat(TriageOutput, 'triage_output') },
+  });
 
-1. "title": A clean product title for the Shopify listing. Include the manufacturer/parent brand name, product line or model name, and the most important differentiators (e.g. capacity, size, key technology, or material — whatever is relevant for this product type).
-
-2. "features": Thorough, customer-facing bullet points. This is the MOST IMPORTANT section.
-   RULES:
-   - Include EVERY distinct feature, capability, and detail from both sources. More bullets is better than fewer.
-   - Be TERSE. State facts plainly. Do NOT add filler phrases, qualifiers, or marketing fluff (e.g. write "3 person capacity" NOT "3-person capacity for spacious relaxation"). Match the tone and brevity of the source material.
-   - Keep specific numbers and details as they appear in the source (e.g. counts, placements, measurements). Do NOT generalize specifics into vague statements.
-   - Keep safety warnings and disclaimers VERBATIM — copy the exact wording from the source, including any "do not" / "not" clauses (e.g. voltage exclusions, usage restrictions). Do not paraphrase or shorten these.
-   - Include warranty information as a bullet.
-   - Include delivery/shipping info as the LAST bullet.
-   - ONE fact per bullet. Do NOT combine two separate details into a single bullet (e.g. "Easy assembly with a roof vent" should be two bullets: one for assembly, one for the roof vent). When in doubt, split.
-
-3. "overviewParagraph": A single paragraph (3-5 sentences) summarizing what this product IS and what makes it notable. State facts — materials, technology, capacity, key specs. Do NOT use vague marketing language like "offers a spacious and luxurious experience" or "for a comfortable session." If you can delete a phrase and the sentence still makes sense, delete it. Do NOT mention pricing. Write plainly, like a knowledgeable salesperson explaining the product to a customer.
-
-4. "specifications": Key-value pairs for a specs/dimensions table. This should contain ONLY measurements, weights, and capacities — the kind of data that belongs in a "Key Dimensions" or "Key Measurements" table. Include: product dimensions (exterior, interior if available), product weight, shipping carton dimensions and weights (per carton if data is available), pallet dimensions, and any capacity measurements (e.g. weight capacity for lifts). Do NOT include features like glass type, temperature range, electrical requirements, sound system, lighting, etc. — those belong in the features list. Use clean, human-readable keys. Exclude internal data (dealer cost, ship zip, process time).
-
-IMPORTANT — the store owner wants THOROUGH listings. Every distinct detail matters. Do NOT condense or summarize — be comprehensive.
-`;
+  const result = response.output_parsed;
+  if (!result) throw new Error('Empty triage response');
+  console.log('  ✓ Triage complete');
+  return result;
 }
 
 /**
+ * Call 2: Generate features, overview, and title from the qualitative data.
+ */
+async function generateFeatures(
+  openai: OpenAI,
+  featuresData: string,
+): Promise<{ title: string; features: string[]; overviewParagraph: string }> {
+  console.log('  [2/3] Generating features + overview + title...');
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    input: [
+      {
+        role: 'system',
+        content: 'You are a precise eCommerce copywriter for a medical/wellness equipment distributor. Be terse and factual. Do not add filler or marketing fluff. Match the tone of the source material.',
+      },
+      {
+        role: 'user',
+        content: `You are writing a product listing for Dansons Medical (Shopify store). Below is the FEATURES-RELEVANT data for one product. Dimensions and weights are handled separately — do NOT include them.
+
+-----
+${featuresData}
+-----
+
+Generate:
+
+1. "title": A clean product title. Include manufacturer/brand name, product line or model name, and the most important differentiators (capacity, key technology, material — whatever is relevant).
+
+2. "features": Customer-facing bullet points.
+   RULES:
+   - Include EVERY distinct feature, capability, and detail. More bullets is better than fewer.
+   - Be TERSE. State facts plainly. Do NOT add filler phrases, qualifiers, or marketing fluff (e.g. "3 person capacity" NOT "3-person capacity for spacious relaxation").
+   - Keep specific numbers and details as they appear in the source.
+   - Keep safety warnings and disclaimers VERBATIM.
+   - Include warranty information as a bullet.
+   - Include delivery/shipping info as the LAST bullet.
+   - ONE fact per bullet. Do NOT combine two separate details into one bullet. When in doubt, split.
+   - Do NOT include dimensions, weights, or shipping carton measurements — those are in the specs table.
+
+3. "overviewParagraph": A single paragraph (3-5 sentences) summarizing what this product IS and what makes it notable. State facts — materials, technology, capacity. Do NOT use vague marketing language. If you can delete a phrase and the sentence still makes sense, delete it. Do NOT mention pricing.
+
+IMPORTANT — the store owner wants THOROUGH listings. Every distinct detail matters.`,
+      },
+    ],
+    temperature: 0.7,
+    text: { format: zodTextFormat(FeaturesOutput, 'features_output') },
+  });
+
+  const result = response.output_parsed;
+  if (!result) throw new Error('Empty features response');
+  console.log(`  ✓ "${result.title}" — ${result.features.length} features`);
+  return result;
+}
+
+/**
+ * Call 3: Generate specs/dimensions table from the quantitative data.
+ */
+async function generateSpecs(
+  openai: OpenAI,
+  specsData: string,
+): Promise<{ key: string; value: string }[]> {
+  console.log('  [3/3] Generating specifications table...');
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    input: [
+      {
+        role: 'system',
+        content: 'You are a data formatter. Your job is to take raw measurement data and output a clean, complete specifications table. Do not drop any data. Every dimension and weight from the source must appear.',
+      },
+      {
+        role: 'user',
+        content: `Below is the SPECS/MEASUREMENTS data for one product. Format it into a clean key-value specifications table.
+
+-----
+${specsData}
+-----
+
+RULES:
+- Each physical element (product exterior, product interior, each shipping carton, LTL pallet) should have its own rows for dimensions and weight.
+- Use keys like "Product Exterior (L x W x H)", "Product Weight", "Carton A (L x W x H)", "Carton A Weight", "LTL Pallet (L x W x H)", "LTL Pallet Weight".
+- Include ALL cartons — do NOT omit any.
+- Include ALL weights and dimensions from the source.
+- Do NOT include qualitative features (glass type, temperature, electrical, etc.).
+- Exclude internal data (dealer cost, ship zip, process time).`,
+      },
+    ],
+    temperature: 0.3,
+    text: { format: zodTextFormat(SpecsOutput, 'specs_output') },
+  });
+
+  const result = response.output_parsed;
+  if (!result) throw new Error('Empty specs response');
+  console.log(`  ✓ ${result.specifications.length} spec rows`);
+  return result.specifications;
+}
+
+// ---- Main entry point (same interface as before) ----
+
+/**
  * Generate a listing for one product using sheet data + optional vendor website data.
+ * Uses 3 sequential LLM calls: triage → features → specs.
  */
 export async function generateListing(
   openai: OpenAI,
@@ -118,39 +244,28 @@ export async function generateListing(
     throw new Error(`No SKU found in column "${skuColumn}"`);
   }
 
-  const prompt = buildPrompt(product, vendorData);
+  // Build combined source text once
+  const sourceText = buildSourceText(product, vendorData);
 
-  console.log(`\n--- LLM PROMPT START ---\n${prompt}\n--- LLM PROMPT END ---\n`);
-  console.log(`  Generating listing with LLM...`);
+  // Call 1: Triage
+  const { featuresData, specsData } = await triageData(openai, sourceText);
 
-  const response = await openai.responses.parse({
-    model: 'gpt-4o',
-    input: [
-      {
-        role: 'system',
-        content: 'You are a precise eCommerce copywriter for a medical/wellness equipment distributor. You never drop details — every feature and safety note from the source data must appear in the listing. Be terse and factual. Do not add filler or marketing fluff. Match the tone of the source material.',
-      },
-      { role: 'user', content: prompt },
-    ],
-    temperature: 0.7,
-    text: {
-      format: zodTextFormat(ListingOutput, 'listing_output'),
-    },
-  });
+  // Call 2: Features + overview + title (can run in parallel with Call 3)
+  // Call 3: Specs table
+  const [featuresResult, specifications] = await Promise.all([
+    generateFeatures(openai, featuresData),
+    generateSpecs(openai, specsData),
+  ]);
 
-  const generated = response.output_parsed;
-  if (!generated) throw new Error(`Empty response for ${sku}`);
-
-  console.log(`  ✓ "${generated.title}"`);
-  console.log(`  ✓ ${generated.features.length} features, ${generated.specifications.length} specs`);
+  console.log(`  ✓ Complete: "${featuresResult.title}" — ${featuresResult.features.length} features, ${specifications.length} specs`);
 
   return {
     sku,
     price,
-    title: generated.title,
-    features: generated.features,
-    overviewParagraph: generated.overviewParagraph,
-    specifications: generated.specifications,
+    title: featuresResult.title,
+    features: featuresResult.features,
+    overviewParagraph: featuresResult.overviewParagraph,
+    specifications,
     vendorPageUrl: vendorData?.url || null,
     _raw: product,
     _vendorData: vendorData,
