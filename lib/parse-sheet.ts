@@ -56,7 +56,10 @@ export function parseWorkbookFromBuffer(buffer: Buffer): TabProducts[] {
   const sheetNames = workbook.SheetNames;
   const tabs: TabProducts[] = [];
 
-  for (const sheetName of sheetNames) {
+  // [HARDCODED] Only parse the first tab for the demo.
+  const tabsToParse = sheetNames.slice(0, 1);
+
+  for (const sheetName of tabsToParse) {
     const sheet = workbook.Sheets[sheetName];
     const rows = xlsx.utils.sheet_to_json(sheet, { range: GOLDEN_DESIGNS_CONFIG.headerRow }) as Record<string, any>[];
     const products = mergeRowsBySku(rows, GOLDEN_DESIGNS_CONFIG.skuColumn);
