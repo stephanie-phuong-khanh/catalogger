@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { upload } from '@vercel/blob/client';
 import { useRun } from './run-context';
 
 export default function Home() {
@@ -19,22 +20,31 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      const formData = new FormData();
-      if (excelFile) formData.append('file', excelFile);
-      formData.append('websiteUrl', websiteUrl);
-
-      const res = await fetch('/api/parse-sheet', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? 'Request failed');
+      if (!excelFile) {
+        setError('Please select a pricing sheet file.');
         return;
       }
 
+      // Upload file directly to Vercel Blob (bypasses 4.5MB request body limit)
+      const blob = await upload(excelFile.name, excelFile, {
+        access: 'public',
+        handleUploadUrl: '/api/sheet-upload',
+      });
+
+      // Server fetches from Blob URL and parses (small JSON request)
+      const res = await fetch('/api/parse-sheet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blobUrl: blob.url, websiteUrl }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? `Request failed (${res.status})`);
+        return;
+      }
+
+      const data = await res.json();
       setRun(data.tabs, data.vendorUrl, supplierName);
       router.push('/review');
     } catch (err) {
