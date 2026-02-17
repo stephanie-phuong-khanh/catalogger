@@ -163,7 +163,7 @@ Generate the following:
    - Delivery/shipping as the LAST bullet — combine all shipping details (method, pallet, box count, carrier) into one bullet.
    - Do NOT include the SKU.
    - DO NOT include vendor disclaimers, boilerplate, or color accuracy notices.
-   - IMPORTANT: DO NOT include dimensions, weights, or measurements in this section. Every weight and dimension from the source must be accounted for in the specifications table instead.
+   - IMPORTANT: DO NOT include dimensions, weights, or measurements in this section. This information goes ONLY in the specifications table.
 
 3. "overviewParagraph": A single paragraph (3-4 sentences) summarizing the product. RULES:
    - Open with the full product name and what it is designed for.
