@@ -79,6 +79,8 @@ async function normalizeDimensions(openai: OpenAI, text: string): Promise<string
   if (!matches || matches.length === 0) return text;
 
   const lines = matches.map(l => l.trim());
+  console.log('[dimensions] BEFORE normalization:');
+  lines.forEach((l, i) => console.log(`  ${i + 1}. ${l}`));
 
   const response = await openai.responses.create({
     model: 'gpt-4o',
@@ -101,7 +103,11 @@ ${lines.map((l, i) => `${i + 1}. ${l}`).join('\n')}`,
   });
 
   const outputText = response.output_text.trim();
-  const normalizedLines = outputText.split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim());
+  const rawNormalized = outputText.split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim());
+  // LLM sometimes inserts blank lines; pair by position of non-empty lines so we don't skip replacements
+  const normalizedLines = rawNormalized.filter(l => l.length > 0);
+  console.log('[dimensions] AFTER normalization:');
+  normalizedLines.forEach((l, i) => console.log(`  ${i + 1}. ${l}`));
 
   let result = text;
   for (let i = 0; i < lines.length; i++) {
@@ -109,6 +115,9 @@ ${lines.map((l, i) => `${i + 1}. ${l}`).join('\n')}`,
       result = result.replace(lines[i], normalizedLines[i]);
     }
   }
+
+  console.log('[dimensions] AFTER replacement:');
+  console.log(result);
 
   return result;
 }
@@ -155,7 +164,7 @@ ${sheetData}
 ${contextBlock}
 Generate the following:
 
-1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is most relevant). Do NOT include the SKU or quotation marks around product names. Do not include the wood type in the title.
+1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is most relevant). Do NOT include the SKU or quotation marks around product names.
 
 2. "features": Customer-facing bullet points. This is the MOST IMPORTANT section.
    RULES:
@@ -187,6 +196,7 @@ Generate the following:
    - Use "—" for missing values.
    - Include ALL weights and dimensions from the sources.
    - Always include units (e.g. "200 lbs", "30\\"", not bare numbers).
+   - Preserve inline notes that appear with dimensions in the source (e.g. "(roof overhang: adds 6.7\\" to depth)") — include them in the same cell as the dimension value, e.g. "60\\" (roof overhang: adds 6.7\\" to depth)".
    - Do NOT include qualitative features (glass type, temperature, electrical, etc.).
    - Exclude internal/dealer data (cost, ship zip, process time).
    - Give the table a descriptive title in the format "Key Measurements of the [Product Name]".
@@ -226,7 +236,7 @@ export async function generateListing(
   const prompt = buildPrompt(product, vendorBodyText, vendorTitle, supplierName, supplierContext);
   console.log(`  Generating listing with LLM...`);
 
-  console.log(`*** Prompt: ${prompt}`); // TMP for debugging
+  // console.log(`*** Prompt: ${prompt}`); // TMP for debugging
 
   const response = await openai.responses.parse({
     model: 'gpt-4o',

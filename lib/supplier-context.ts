@@ -12,7 +12,7 @@ export function getSupplierContext(supplierName: string): string | undefined {
 }
 
 const GOLDEN_DESIGNS_CONTEXT = `
-Title: Always start with "Golden Designs". The supplier uses sub-brands like "Dynamic Saunas" and "Maxxus Saunas" — include the sub-brand as a product line name (e.g. "Golden Designs Dynamic Avila..."), but never start the title with the sub-brand.
+Title: Always start with "Golden Designs". The supplier uses sub-brands like "Dynamic Saunas" and "Maxxus Saunas" — include the sub-brand as a product line name (e.g. "Golden Designs Dynamic Avila..."), but never start the title with the sub-brand. Do not include the wood type in the title.
 
 Features — supplier-specific patterns:
 - Combine the Color field (e.g. "Honey Dark Stain") with the wood type into one bullet.
