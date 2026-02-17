@@ -72,6 +72,14 @@ async function main() {
     const sku = product[CONFIG.skuColumn];
     if (!sku) continue;
 
+<<<<<<< Updated upstream
+=======
+    if (sku !== 'DYN-6103-01') continue; // TMP for debugging
+
+    // Temporary: Only process first 5 products for prompt tuning.
+    if (listings.length >= 5) break;
+
+>>>>>>> Stashed changes
     console.log(`\n--- Processing ${sku} ---`);
 
     // Step 2: Search vendor site for this product
