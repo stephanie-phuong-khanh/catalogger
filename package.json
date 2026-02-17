@@ -8,8 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "pipeline": "npx ts-node scripts/pipeline.ts",
-    "eval": "ts-node scripts/run-eval.ts"
+    "pipeline": "npx ts-node scripts/pipeline.ts"
   },
   "keywords": [],
   "author": "",
