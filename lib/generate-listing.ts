@@ -74,7 +74,7 @@ async function normalizeDimensions(openai: OpenAI, text: string): Promise<string
   const lines = matches.map(l => l.trim());
 
   const response = await openai.responses.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     input: [
       {
         role: 'system',
@@ -152,17 +152,18 @@ Generate the following:
 
 2. "features": Customer-facing bullet points. This is the MOST IMPORTANT section.
    RULES:
-   - Include EVERY distinct feature and detail from both sources. Do NOT silently drop features.
-   - Be TERSE but COMPLETE. State facts plainly, no filler or marketing fluff. Do NOT over-abbreviate — preserve the full detail from the source.
+   - Include EVERY distinct feature and detail from both sources. Do NOT EVER DROP FEATURES.
+   - Be TERSE but COMPLETE. State facts plainly, no filler or marketing fluff. Do NOT over-abbreviate or reword. Preserve the full detail from the source, verbatim if possible.
    - Preserve specific numbers, measurements, and parenthetical qualifiers exactly as they appear.
    - Combine the product's finish/color with its material in a single bullet when both are available.
-   - Use °F for temperatures.
+   - BUT DO NOT COMBINE ANY OTHER FEATURES INTO THE SAME BULLET.
+   - Do not drop the ° symbol for temperatures.
    - Keep safety warnings VERBATIM.
    - Include warranty information as a bullet.
    - Delivery/shipping as the LAST bullet — combine all shipping details (method, pallet, box count, carrier) into one bullet.
    - Do NOT include the SKU.
-   - DO NOT include dimensions, weights, or measurements in features — ensure ALL of them appear in the specifications table instead. Every weight and dimension from the source must be accounted for in specs.
    - DO NOT include vendor disclaimers, boilerplate, or color accuracy notices.
+   - IMPORTANT: DO NOT include dimensions, weights, or measurements in this section. Every weight and dimension from the source must be accounted for in the specifications table instead.
 
 3. "overviewParagraph": A single paragraph (3-4 sentences) summarizing the product. RULES:
    - Open with the full product name and what it is designed for.
@@ -180,7 +181,7 @@ Generate the following:
    - Always include units with values (e.g. "250 lbs", "36\\"", not bare numbers).
    - Do NOT include qualitative features (glass type, temperature, electrical, etc.).
    - Exclude internal/dealer data (cost, ship zip, process time).
-   - Give the table a descriptive title.
+   - Give the table a descriptive title in the format "Key Measurements of the [Product Name]".
 
 Be THOROUGH. Every distinct detail from the source data matters.`;
 }
