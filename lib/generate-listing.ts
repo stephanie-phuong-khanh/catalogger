@@ -155,7 +155,7 @@ ${sheetData}
 ${contextBlock}
 Generate the following:
 
-1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is most relevant). Do NOT include the SKU or quotation marks around product names.
+1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is most relevant). Do NOT include the SKU or quotation marks around product names. Do not include the wood type in the title.
 
 2. "features": Customer-facing bullet points. This is the MOST IMPORTANT section.
    RULES:
