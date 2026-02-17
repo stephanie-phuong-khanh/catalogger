@@ -72,8 +72,6 @@ async function main() {
     const sku = product[CONFIG.skuColumn];
     if (!sku) continue;
 
-    if (sku !== 'DYN-6103-01') continue; // TMP for debugging
-
     console.log(`\n--- Processing ${sku} ---`);
 
     // Step 2: Search vendor site for this product
