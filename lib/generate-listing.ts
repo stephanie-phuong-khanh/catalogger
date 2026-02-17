@@ -89,10 +89,10 @@ async function normalizeDimensions(openai: OpenAI, text: string): Promise<string
       },
       {
         role: 'user',
-        content: `Rewrite each dimension line below so the values are explicitly labeled as Length, Width, and Height. Note: Depth = Length (same axis).
+        content: `Rewrite each dimension line below so the values are explicitly labeled as Length, Width, and Height. Note: Depth = Length (same axis). Preserve any additional information about the dimensions (such as roof overhangs) and place it in the appropriate dimension.
 
-Example input:  Exterior dimensions (WDH): 30" x 20" x 40"
-Example output: Exterior dimensions: Length: 20", Width: 30", Height: 40"
+Example input:  Exterior dimensions (WDH): 30" x 20" x 40" (roof overhang: adds 10" to depth)
+Example output: Exterior dimensions: Length: 20" (roof overhang: adds 10" to depth), Width: 30", Height: 40"
 
 Lines to normalize:
 ${lines.map((l, i) => `${i + 1}. ${l}`).join('\n')}`,
@@ -174,7 +174,7 @@ Generate the following:
 
 3. "overviewParagraph": A single paragraph (3-4 sentences) summarizing the product. RULES:
    - Open with the full product name and what it is designed for.
-   - Write a concise NARRATIVE — synthesize, don't enumerate features.
+   - Answer what and who the product is for, how to use it, and why the customer would want to buy the product. Write a concise NARRATIVE. Do not just enumerate features.
    - Mention health/wellness benefits and suitable installation locations if the source provides them.
    - Weave in 1-2 standout features naturally.
    - No pricing. Do NOT make up information.
@@ -186,7 +186,7 @@ Generate the following:
    - One row per physical element (product exterior, product interior, each shipping carton, pallet, etc.).
    - Use "—" for missing values.
    - Include ALL weights and dimensions from the sources.
-   - Always include units (e.g. "250 lbs", "36\\"", not bare numbers).
+   - Always include units (e.g. "200 lbs", "30\\"", not bare numbers).
    - Do NOT include qualitative features (glass type, temperature, electrical, etc.).
    - Exclude internal/dealer data (cost, ship zip, process time).
    - Give the table a descriptive title in the format "Key Measurements of the [Product Name]".

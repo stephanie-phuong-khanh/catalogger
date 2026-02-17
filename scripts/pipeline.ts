@@ -49,16 +49,22 @@ async function main() {
   fs.writeFileSync(parsedPath, JSON.stringify(products, null, 2));
   console.log(`  Saved parsed products to ${parsedPath}\n`);
 
+  // Optional: process only one SKU (e.g. npm run pipeline -- --single DYN-6103-01)
+  const onlySku = (() => {
+    const i = process.argv.indexOf('--single');
+    if (i === -1) return undefined;
+    return process.argv[i + 1]?.trim();
+  })();
+  if (onlySku) {
+    console.log(`  Only processing SKU: ${onlySku}\n`);
+  }
+
   const listings: GeneratedListing[] = [];
   // Step 2: Process each product
   for (const product of products) {
     const sku = product[CONFIG.skuColumn];
     if (!sku) continue;
-
-    if (sku !== 'DYN-6103-01') continue; // TMP for debugging
-
-    // Temporary: Only process first 5 products for prompt tuning.
-    if (listings.length >= 5) break;
+    if (onlySku && sku !== onlySku) continue;
 
     console.log(`\n--- Processing ${sku} ---`);
 
