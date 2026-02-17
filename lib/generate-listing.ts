@@ -54,20 +54,85 @@ function stripHtml(html: string): string {
 }
 
 /**
- * Build the LLM prompt with sheet data and optional vendor website data.
+ * Regex to extract lines that contain dimension information.
+ * Matches patterns like "Exterior dimensions (WDH): 39" x 36" x 73""
+ * or "Dimensions: 36" L x 39" W x 73" H" — any line with a dimensions
+ * label followed by values separated by "x".
  */
-function buildPrompt(product: RawProduct, vendorData: VendorProduct | null, supplierName?: string): string {
+const DIMENSION_LINE_RE = /^.*\bdimensions?\b.*\d+.*x.*\d+.*$/gim;
+
+/**
+ * Use a focused LLM call to normalize extracted dimension lines into
+ * a consistent "Label: Length: ..., Width: ..., Height: ..." format.
+ * This is more reliable than regex-based axis remapping because the LLM
+ * can interpret any ordering convention (WDH, LWH, etc.) or free-form text.
+ */
+async function normalizeDimensions(openai: OpenAI, text: string): Promise<string> {
+  const matches = text.match(DIMENSION_LINE_RE);
+  if (!matches || matches.length === 0) return text;
+
+  const lines = matches.map(l => l.trim());
+
+  const response = await openai.responses.create({
+    model: 'gpt-4o-mini',
+    input: [
+      {
+        role: 'system',
+        content: 'You normalize product dimension lines into a consistent format. For each input line, output ONLY the rewritten line. Preserve the label (e.g. "Exterior dimensions", "Interior dimensions"). Output exactly one line per input line, in the same order.',
+      },
+      {
+        role: 'user',
+        content: `Rewrite each dimension line below so the values are explicitly labeled as Length, Width, and Height. Note: Depth = Length (same axis).
+
+Example input:  Exterior dimensions (WDH): 30" x 20" x 40"
+Example output: Exterior dimensions: Length: 20", Width: 30", Height: 40"
+
+Lines to normalize:
+${lines.map((l, i) => `${i + 1}. ${l}`).join('\n')}`,
+      },
+    ],
+  });
+
+  const outputText = response.output_text.trim();
+  const normalizedLines = outputText.split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim());
+
+  let result = text;
+  for (let i = 0; i < lines.length; i++) {
+    if (normalizedLines[i]) {
+      result = result.replace(lines[i], normalizedLines[i]);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Build the LLM prompt with sheet data and optional vendor website data.
+ * The base prompt is generic — it works for any product from any supplier.
+ * Supplier- or product-type-specific patterns are injected via `supplierContext`.
+ */
+function buildPrompt(
+  product: RawProduct,
+  vendorBodyText: string | null,
+  vendorTitle: string | null,
+  supplierName?: string,
+  supplierContext?: string,
+): string {
   const sheetData = Object.entries(product)
     .filter(([key]) => !key.startsWith('_'))
     .map(([key, value]) => `${key}: ${value}`)
     .join('\n');
 
   let vendorWebsiteData = '';
-  if (vendorData && vendorData.body) {
-    vendorWebsiteData = `Website title: ${vendorData.title}\nWebsite body:\n${stripHtml(vendorData.body)}`;
+  if (vendorBodyText) {
+    vendorWebsiteData = `Website title: ${vendorTitle}\nWebsite body:\n${vendorBodyText}`;
   }
 
   const supplierLine = supplierName ? ` The supplier/vendor is "${supplierName}".` : '';
+
+  const contextBlock = supplierContext
+    ? `\nSupplier-specific patterns (follow these closely):\n-----\n${supplierContext}\n-----\n`
+    : '';
 
   return `You are writing a product listing for a Shopify eCommerce store (Dansons Medical).${supplierLine} You are given the raw data we have for one product.
 
@@ -80,38 +145,44 @@ Pricing sheet data:
 -----
 ${sheetData}
 -----
-
+${contextBlock}
 Generate the following:
 
-1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is relevant). Do NOT include the SKU.
+1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is most relevant). Do NOT include the SKU or quotation marks around product names.
 
 2. "features": Customer-facing bullet points. This is the MOST IMPORTANT section.
    RULES:
-   - Include EVERY distinct feature, capability, and detail from both sources. More bullets is better than fewer.
-   - Be TERSE. State facts plainly. Do NOT add filler phrases, qualifiers, or marketing fluff.
-   - Keep specific numbers and details as they appear in the source.
-   - Keep safety warnings and disclaimers VERBATIM.
-   - Do NOT include dimensions, weights, or shipping carton measurements — those go in the specifications table.
+   - Include EVERY distinct feature and detail from both sources. Do NOT silently drop features.
+   - Be TERSE but COMPLETE. State facts plainly, no filler or marketing fluff. Do NOT over-abbreviate — preserve the full detail from the source.
+   - Preserve specific numbers, measurements, and parenthetical qualifiers exactly as they appear.
+   - Combine the product's finish/color with its material in a single bullet when both are available.
+   - Use °F for temperatures.
+   - Keep safety warnings VERBATIM.
    - Include warranty information as a bullet.
-   - Include delivery/shipping method as the LAST bullet.
-   - Do not mention the SKU in the features.
-   - ONE fact per bullet. When in doubt, split.
+   - Delivery/shipping as the LAST bullet — combine all shipping details (method, pallet, box count, carrier) into one bullet.
+   - Do NOT include the SKU.
+   - DO NOT include dimensions, weights, or measurements in features — ensure ALL of them appear in the specifications table instead. Every weight and dimension from the source must be accounted for in specs.
+   - DO NOT include vendor disclaimers, boilerplate, or color accuracy notices.
 
-3. "overviewParagraph": A single paragraph (3-5 sentences) summarizing what this product is. Open with the full product name and what it is designed for. Include important features and characterstics. No pricing. DO NOT make up information. KEEP IT CONCISE. NO FLUFF.
+3. "overviewParagraph": A single paragraph (3-4 sentences) summarizing the product. RULES:
+   - Open with the full product name and what it is designed for.
+   - Write a concise NARRATIVE — synthesize, don't enumerate features.
+   - Mention health/wellness benefits and suitable installation locations if the source provides them.
+   - Weave in 1-2 standout features naturally.
+   - No pricing. Do NOT make up information.
 
 4. "specifications": A measurements/dimensions table.
    - Choose columns that fit the data (e.g. "Weight", "Length", "Width", "Height").
-   - Use the EXACT dimension labels and order from the source data. Do NOT rename or reorder.
-   - One row per physical element: product exterior, product interior, each shipping carton, LTL pallet.
-   - Use clear row labels like "Infrared Sauna (Exterior)", "Carton A – Shipping", "LTL Pallet Shipping".
+   - Map each dimension value to the CORRECT column based on its label, not position. Depth and Length refer to the same axis.
+   - One row per physical element (product exterior, product interior, each shipping carton, pallet, etc.).
    - Use "—" for missing values.
-   - Include ALL cartons and ALL weights/dimensions from the source. Do NOT omit any.
-   - Include notes like "(roof overhang: adds 5.9" to depth)" inline with the relevant value.
+   - Include ALL weights and dimensions from the sources — nothing should be omitted.
+   - Always include units with values (e.g. "250 lbs", "36\\"", not bare numbers).
    - Do NOT include qualitative features (glass type, temperature, electrical, etc.).
-   - Exclude internal data (dealer cost, ship zip, process time).
+   - Exclude internal/dealer data (cost, ship zip, process time).
    - Give the table a descriptive title.
 
-IMPORTANT — the store owner wants THOROUGH listings. Every distinct detail matters.`;
+Be THOROUGH. Every distinct detail from the source data matters.`;
 }
 
 /**
@@ -124,6 +195,7 @@ export async function generateListing(
   priceColumn: string,
   vendorData: VendorProduct | null,
   supplierName?: string,
+  supplierContext?: string,
 ): Promise<GeneratedListing> {
   const sku = product[skuColumn];
   const price = product[priceColumn];
@@ -132,8 +204,20 @@ export async function generateListing(
     throw new Error(`No SKU found in column "${skuColumn}"`);
   }
 
-  const prompt = buildPrompt(product, vendorData, supplierName);
+  // Pre-process vendor body: strip HTML, then normalize dimensions via focused LLM call
+  let vendorBodyText: string | null = null;
+  let vendorTitle: string | null = null;
+  if (vendorData?.body) {
+    const stripped = stripHtml(vendorData.body);
+    console.log(`  Normalizing vendor dimensions...`);
+    vendorBodyText = await normalizeDimensions(openai, stripped);
+    vendorTitle = vendorData.title;
+  }
+
+  const prompt = buildPrompt(product, vendorBodyText, vendorTitle, supplierName, supplierContext);
   console.log(`  Generating listing with LLM...`);
+
+  console.log(`*** Prompt: ${prompt}`); // TMP for debugging
 
   const response = await openai.responses.parse({
     model: 'gpt-4o',
