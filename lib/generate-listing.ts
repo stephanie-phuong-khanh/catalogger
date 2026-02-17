@@ -11,11 +11,18 @@ const ListingOutput = z.object({
   overviewParagraph: z.string().describe('3-5 sentence product summary'),
   specifications: z.object({
     tableTitle: z.string().describe('Descriptive title for the measurements table'),
-    columns: z.array(z.string()).describe('Column headers, e.g. ["Weight", "Length", "Width", "Height"]'),
+    columns: z
+      .array(z.string())
+      .describe('Exactly 4 column headers in this order: Weight, Length, Width, Height'),
     rows: z.array(
       z.object({
-        label: z.string().describe('Row label, e.g. "Infrared Sauna (Exterior)" or "Carton A – Shipping"'),
-        values: z.array(z.string()).describe('Values for each column in order. Use "—" for missing values.'),
+        label: z.string().describe('Row label, e.g. "Sauna (Exterior)" or "Carton A – Shipping"'),
+        values: z
+          .array(z.string())
+          .length(4)
+          .describe(
+            'Exactly 4 values in column order: [weight e.g. "250 lbs", length e.g. "36\\"", width, height]. Use "—" for missing. First value MUST be weight, then length, width, height.',
+          ),
       })
     ).describe('One row per physical element'),
   }).describe('Dimensions and weights table'),
@@ -173,12 +180,13 @@ Generate the following:
    - No pricing. Do NOT make up information.
 
 4. "specifications": A measurements/dimensions table.
-   - Choose columns that fit the data (e.g. "Weight", "Length", "Width", "Height").
-   - Map each dimension value to the CORRECT column based on its label, not position. Depth and Length refer to the same axis.
+   - Columns MUST be exactly ["Weight", "Length", "Width", "Height"] in that order.
+   - Each row MUST have exactly 4 values in that same order: [weight, length, width, height]. First value = weight (e.g. "250 lbs" or "—"), second = length, third = width, fourth = height. Do not put weight in the last position or dimensions in the weight column.
+   - Map each source value to the correct column by meaning (weight goes in column 1, length in column 2, etc.). Depth = Length.
    - One row per physical element (product exterior, product interior, each shipping carton, pallet, etc.).
    - Use "—" for missing values.
-   - Include ALL weights and dimensions from the sources — nothing should be omitted.
-   - Always include units with values (e.g. "250 lbs", "36\\"", not bare numbers).
+   - Include ALL weights and dimensions from the sources.
+   - Always include units (e.g. "250 lbs", "36\\"", not bare numbers).
    - Do NOT include qualitative features (glass type, temperature, electrical, etc.).
    - Exclude internal/dealer data (cost, ship zip, process time).
    - Give the table a descriptive title in the format "Key Measurements of the [Product Name]".
@@ -222,6 +230,7 @@ export async function generateListing(
 
   const response = await openai.responses.parse({
     model: 'gpt-4o',
+    temperature: 0,
     input: [
       {
         role: 'system',
