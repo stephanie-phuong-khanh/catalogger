@@ -10,6 +10,7 @@
     "start": "next start",
     "pipeline": "npx ts-node scripts/pipeline.ts",
     "parse-sheet": "npx ts-node scripts/parse-sheet.ts",
+    "search-vendor": "npx ts-node scripts/search-vendor.ts",
     "eval-specs": "npx ts-node scripts/eval-specs.ts"
   },
   "keywords": [],

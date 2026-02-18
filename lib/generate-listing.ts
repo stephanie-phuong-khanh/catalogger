@@ -43,24 +43,6 @@ export interface GeneratedListing {
 }
 
 /**
- * Strip HTML tags to get plain text, preserving block structure as newlines.
- */
-function stripHtml(html: string): string {
-  return html
-    .replace(/<\/?(p|div|br|li|h[1-6]|tr|ul|ol)\b[^>]*\/?>/gi, '\n')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n\s*\n/g, '\n')
-    .trim();
-}
-
-/**
  * Regex to extract lines that contain dimension information.
  * Matches patterns like "Exterior dimensions (WDH): 39" x 36" x 73""
  * or "Dimensions: 36" L x 39" W x 73" H" — any line with a dimensions
@@ -222,13 +204,12 @@ export async function generateListing(
     throw new Error(`No SKU found in column "${skuColumn}"`);
   }
 
-  // Pre-process vendor body: strip HTML, then normalize dimensions via focused LLM call
+  // Pre-process vendor body: normalize dimensions via focused LLM call (HTML already stripped in search-vendor)
   let vendorBodyText: string | null = null;
   let vendorTitle: string | null = null;
   if (vendorData?.body) {
-    const stripped = stripHtml(vendorData.body);
     console.log(`  Normalizing vendor dimensions...`);
-    vendorBodyText = await normalizeDimensions(openai, stripped);
+    vendorBodyText = await normalizeDimensions(openai, vendorData.body.join('\n'));
     vendorTitle = vendorData.title;
   }
 

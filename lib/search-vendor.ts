@@ -12,14 +12,63 @@ export interface VendorProduct {
   title: string;
   url: string;
   price: string;
-  body: string;       // HTML description from the vendor site
-  image: string;       // featured image URL
+  body: string[];   // Body split into lines, each line is a string
+  image: string;     // featured image URL
   handle: string;
 }
 
 /**
+ * Strip HTML tags to get plain text, preserving block structure as newlines.
+ */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<\/?(p|div|br|li|h[1-6]|tr|ul|ol)\b[^>]*\/?>/gi, '\n')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n\s*\n/g, '\n')
+    .trim();
+}
+
+/**
+ * Extract the features array from body text by finding a "Features:" section and
+ * collecting the following lines until an empty line (section boundary).
+ * If no "Features:" heading is found, returns [].
+ */
+function parseFeaturesFromBody(body: string): string[] {
+  const lines = body.split(/\r?\n/);
+  const features: string[] = [];
+  let inFeatures = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    const trimmed = line.trim();
+
+    const featuresMatch = trimmed.match(/^Features\s*:\s*(.*)$/i);
+    if (featuresMatch) {
+      inFeatures = true;
+      const afterColon = featuresMatch[1]!.trim();
+      if (afterColon) features.push(afterColon);
+      continue;
+    }
+
+    if (inFeatures) {
+      if (trimmed === '') break; // end of section
+      features.push(trimmed);
+    }
+  }
+
+  return features;
+}
+
+/**
  * Search a Shopify vendor site for a product by SKU, then use LLM to pick the best match.
- * Returns the matched product's data (including the body HTML), or null if not found.
+ * Returns the matched product's data (body is plain text with HTML stripped), or null if not found.
  *
  * [HARDCODED] Assumes the vendor site is Shopify (uses /search/suggest.json endpoint).
  */
@@ -90,13 +139,31 @@ export async function searchVendorSite(
     }
   }
 
+  const rawBody = selected.body || '';
+  const body = stripHtml(rawBody);
+
   return {
     id: selected.id,
     title: selected.title,
     url: `${vendorBaseUrl}${selected.url}`,
     price: selected.price,
-    body: selected.body || '',
+    body: body.split(/\r?\n/).map((s) => s.trim()),
     image: selected.image || selected.featured_image?.url || '',
     handle: selected.handle || '',
   };
+}
+
+/**
+ * Format a vendor product as human-readable text (for prompts or debugging),
+ * analogous to formatProductAsPricingSheetText in parse-sheet.
+ */
+export function formatProductAsVendorSiteText(product: VendorProduct): string {
+  const lines: string[] = [];
+  lines.push(`Title: ${product.title}`);
+  lines.push(`URL: ${product.url}`);
+  lines.push(`Price: ${product.price}`);
+  lines.push('');
+  lines.push('Body:');
+  for (const bodySegment of product.body) lines.push(bodySegment);
+  return lines.join('\n').trimEnd();
 }
