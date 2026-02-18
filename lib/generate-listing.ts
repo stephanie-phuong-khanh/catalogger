@@ -174,7 +174,7 @@ Generate the following:
 
 3. "overviewParagraph": Write a 3-4 sentence e-commerce product overview optimized for conversion and search relevance. RULES:
   - Open with the full product name and clearly state what the product is and its primary purpose.
-  - Clearly explain what problem the product solves and why a customer would want it.
+  - Clearly explain what the product is for, how to use it, and why the customer would care to buy the product.
   - Highlight tangible benefits (e.g., muscle relaxation, stress relief, improved circulation, energy efficiency) only if supported by source material.
   - Incorporate 1-2 specific differentiators (e.g., number of heating panels, material type, connectivity features) naturally within the narrative.
   - Mention suitable installation locations if provided.
