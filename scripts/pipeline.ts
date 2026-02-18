@@ -5,7 +5,6 @@ import OpenAI from 'openai';
 import { parseSheet } from '../lib/parse-sheet';
 import { searchVendorSite } from '../lib/search-vendor';
 import { generateListing, GeneratedListing } from '../lib/generate-listing';
-import { getSupplierContext } from '../lib/supplier-context';
 
 dotenv.config();
 
@@ -13,7 +12,8 @@ dotenv.config();
 const CONFIG = {
   supplierName: 'Golden Designs',
   sheetFile: 'data/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',
-  sheetIndex: 0,          // Tab index (0-based). 0 = "Most Popular"
+  // sheetIndex: 0,          // Tab index (0-based). 0 = "Most Popular"
+  sheetIndex: 3,           // Tab index (0-based). 3 = "Tab 4 - Dynamic Ultra EMF"
   headerRow: 3,           // 0-indexed row where headers are (row 4 in Excel)
   skuColumn: 'GDINA Item #',
   priceColumn: 'MSRP',
@@ -22,7 +22,7 @@ const CONFIG = {
   vendorBaseUrl: 'https://goldendesigninc.com',
 
   // Output
-  outputDir: 'data/listings',
+  outputDir: 'data/listings/tab_4_dynamic_ultra_emf',
 };
 
 const openai = new OpenAI({
@@ -94,7 +94,6 @@ async function main() {
         CONFIG.priceColumn,
         vendorData,
         CONFIG.supplierName,
-        getSupplierContext(CONFIG.supplierName),
       );
       listings.push(listing);
 

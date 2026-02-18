@@ -26,9 +26,19 @@ export interface TabProducts {
   products: RawProduct[];
 }
 
+/** If value is a string with newlines, return array of trimmed non-empty lines; else return single value. */
+function toMultiValue(val: unknown): unknown[] {
+  if (val === undefined || val === null) return [];
+  const s = String(val).trim();
+  if (!s) return [];
+  if (s.includes('\n')) return s.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  return [val];
+}
+
 /**
  * Merge rows into products: a new product starts when the SKU column is non-empty.
- * Continuation rows get their values appended with "\n " separator.
+ * Continuation rows merge into the current product: multi-value fields become arrays
+ * (e.g. "Carton": ["A", "B"], "Features": ["Delivery:...", "Capacity:...", ...]).
  */
 function mergeRowsBySku(rows: Record<string, any>[], skuColumn: string): RawProduct[] {
   let currentProduct: RawProduct | null = null;
@@ -37,14 +47,26 @@ function mergeRowsBySku(rows: Record<string, any>[], skuColumn: string): RawProd
   for (const row of rows) {
     if (row[skuColumn]) {
       if (currentProduct !== null) products.push(currentProduct);
-      currentProduct = { ...row };
+      currentProduct = {};
+      for (const key in row) {
+        const val = row[key];
+        if (val === undefined || val === '') continue;
+        const parts = toMultiValue(val);
+        if (parts.length === 0) continue;
+        currentProduct[key] = parts.length === 1 ? parts[0]! : parts;
+      }
     } else if (currentProduct !== null) {
       for (const key in row) {
         const val = row[key];
-        if (val !== undefined && val !== '') {
-          currentProduct[key] = currentProduct[key]
-            ? currentProduct[key] + '\n' + val
-            : val;
+        if (val === undefined || val === '') continue;
+        const parts = toMultiValue(val);
+        if (parts.length === 0) continue;
+        let existing = currentProduct[key];
+        if (!Array.isArray(existing)) existing = existing !== undefined && existing !== '' ? [existing] : [];
+        if (existing.length === 0) {
+          currentProduct[key] = parts.length === 1 ? parts[0]! : parts;
+        } else {
+          currentProduct[key] = [...existing, ...parts];
         }
       }
     }
@@ -81,13 +103,105 @@ export function parseWorkbookFromBuffer(buffer: Buffer): TabProducts[] {
 export function parseSheet(config: ParseSheetConfig): RawProduct[] {
   const workbook = xlsx.readFile(config.filePath);
   const sheetNames = workbook.SheetNames;
-  console.log(`Sheet tabs: ${sheetNames.join(', ')}`);
+  // console.log(`Sheet tabs: ${sheetNames.join(', ')}`);
 
   const sheetName = sheetNames[config.sheetIndex];
   const sheet = workbook.Sheets[sheetName];
   const rows = xlsx.utils.sheet_to_json(sheet, { range: config.headerRow }) as Record<string, any>[];
   const products = mergeRowsBySku(rows, config.skuColumn);
 
-  console.log(`Parsed ${products.length} products from "${sheetName}"`);
+  console.log(`Parsed ${products.length} products from tab "${sheetName}"`);
   return products;
+}
+
+// --- Format parsed product as human-readable text (for prompts or debugging) ---
+// This is hardcoded to the Golden Designs sheet structure.
+
+/** Keys for the top section, in display order. Sheet headers may contain newlines. */
+const TOP_SECTION_KEYS = [
+  'Description',
+  'EMF\n(Low, Ultra Low, Near Zero)',
+  'Color',
+  'Wood Type\nHemlock\nRed Cedar\nOther',
+  'Brand Name',
+  'Product Ad-Copy',
+  'Features',
+];
+const PRODUCT_DIMENSION_KEYS = ['Product Weight', 'Dimensions', 'Length', 'Width', 'Height'];
+const CARTON_KEYS = ['Carton', 'Ship Weight', 'Ship Dimensions', 'Ship Length', 'Ship Width', 'Ship Height'];
+const BOTTOM_KEYS = ['Ship Ground or LTL', 'LTL Pallet Dims', 'LTL Pallet Weight'];
+
+function lineLabel(key: string): string {
+  return key.replace(/\n/g, ' ') + ': ';
+}
+
+/** Get value as string (arrays joined with newline for backward compat). */
+function getStr(p: RawProduct, key: string): string {
+  const v = p[key];
+  if (v === undefined || v === null) return '';
+  if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter(Boolean).join('\n');
+  return String(v).trim();
+}
+
+/** Get value as array (single values become one-element array). */
+function valueAsArray(v: unknown): string[] {
+  if (v === undefined || v === null) return [];
+  if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter(Boolean);
+  const s = String(v).trim();
+  return s ? [s] : [];
+}
+
+/**
+ * Convert a single parsed product (JSON) into the human-readable "pricing sheet input" text format.
+ * Handles multiple cartons by splitting newline-separated Carton / Ship Weight / Ship Dimensions etc. into separate blocks.
+ */
+export function formatProductAsPricingSheetText(product: RawProduct): string {
+  const lines: string[] = [];
+
+  // Top section
+  for (const key of TOP_SECTION_KEYS) {
+    const label = lineLabel(key);
+    if (key === 'Features') {
+      const featureLines = valueAsArray(product[key]);
+      if (featureLines.length === 0) continue;
+      lines.push('Features:');
+      for (const featureLine of featureLines) lines.push(featureLine);
+      lines.push('');
+    } else {
+      const val = getStr(product, key);
+      if (!val) continue;
+      lines.push(label + val);
+    }
+    lines.push('');
+  }
+  if (lines.length && lines[lines.length - 1] !== '') lines.push('');
+
+  // Product dimensions
+  for (const key of PRODUCT_DIMENSION_KEYS) {
+    const val = getStr(product, key);
+    if (val === '' && key !== 'Product Weight') continue;
+    lines.push(lineLabel(key) + (val || ''));
+  }
+  lines.push('');
+
+  // Carton blocks: each carton is an index into the Carton / Ship Weight / etc. arrays
+  const cartonVals = CARTON_KEYS.map((key) => valueAsArray(product[key]));
+  const nCartons = Math.max(1, ...cartonVals.map((a) => a.length));
+  for (let i = 0; i < nCartons; i++) {
+    lines.push(lineLabel('Carton') + (cartonVals[0][i] ?? ''));
+    lines.push(lineLabel('Ship Weight') + (cartonVals[1][i] ?? ''));
+    lines.push(lineLabel('Ship Dimensions') + (cartonVals[2][i] ?? ''));
+    lines.push(lineLabel('Ship Length') + (cartonVals[3][i] ?? ''));
+    lines.push(lineLabel('Ship Width') + (cartonVals[4][i] ?? ''));
+    lines.push(lineLabel('Ship Height') + (cartonVals[5][i] ?? ''));
+    lines.push('');
+  }
+
+  // LTL / shipping at end
+  for (const key of BOTTOM_KEYS) {
+    const val = getStr(product, key);
+    lines.push(lineLabel(key) + val);
+  }
+
+  return lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
 }

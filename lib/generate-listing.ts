@@ -116,18 +116,23 @@ ${lines.map((l, i) => `${i + 1}. ${l}`).join('\n')}`,
 /**
  * Build the LLM prompt with sheet data and optional vendor website data.
  * The base prompt is generic — it works for any product from any supplier.
- * Supplier- or product-type-specific patterns are injected via `supplierContext`.
  */
 function buildPrompt(
   product: RawProduct,
   vendorBodyText: string | null,
   vendorTitle: string | null,
   supplierName?: string,
-  supplierContext?: string,
 ): string {
   const sheetData = Object.entries(product)
     .filter(([key]) => !key.startsWith('_'))
-    .map(([key, value]) => `${key}: ${value}`)
+    .map(([key, value]) => {
+      const str = value === null || value === undefined
+        ? ''
+        : Array.isArray(value)
+          ? value.map((v) => String(v).trim()).filter(Boolean).join('\n')
+          : String(value);
+      return `${key}: ${str}`;
+    })
     .join('\n');
 
   let vendorWebsiteData = '';
@@ -136,10 +141,6 @@ function buildPrompt(
   }
 
   const supplierLine = supplierName ? ` The supplier/vendor is "${supplierName}".` : '';
-
-  const contextBlock = supplierContext
-    ? `\nSupplier-specific patterns (follow these closely):\n-----\n${supplierContext}\n-----\n`
-    : '';
 
   return `You are writing a product listing for a Shopify eCommerce store (Dansons Medical).${supplierLine} You are given the raw data we have for one product.
 
@@ -152,32 +153,38 @@ Pricing sheet data:
 -----
 ${sheetData}
 -----
-${contextBlock}
 Generate the following:
 
-1. "title": A clean product title.${supplierName ? ` MUST START with "${supplierName}".` : ''} Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is most relevant). Do NOT include the SKU or quotation marks around product names.
+1. "title": A clean product title
+  RULES:
+  - Always start with "${supplierName}". The supplier uses sub-brands like "Dynamic Saunas" and "Maxxus Saunas" — include the sub-brand as a product line name (e.g. "${supplierName} Dynamic Avila..."), but never start the title with the sub-brand.
+  - Include the product line or model name, and the most important differentiators (capacity, key technology, material — whatever is most relevant).
+  - Do not include the wood type in the title.
+  - Do NOT include the SKU or quotation marks around product names.
 
 2. "features": Customer-facing bullet points. This is the MOST IMPORTANT section.
    RULES:
    - Include EVERY distinct feature and detail from both sources. Do NOT EVER DROP FEATURES.
    - Be TERSE but COMPLETE. State facts plainly, no filler or marketing fluff. Do NOT over-abbreviate or reword. Preserve the full detail from the source, verbatim if possible.
    - Preserve specific numbers, measurements, and parenthetical qualifiers exactly as they appear.
-   - Combine the product's finish/color with its material in a single bullet when both are available.
+   - Combine the product's color/finish (e.g. "Honey Dark Stain") with its material (e.g. "Canadian Hemlock") into one bullet when both are available.
    - BUT DO NOT COMBINE ANY OTHER FEATURES INTO THE SAME BULLET.
    - Do not drop the ° symbol for temperatures.
+   - For infrared heating panels: include count, EMF level with measurement (e.g. "5-10 mG at 2-3\""), and placement locations (e.g. "rear walls, side walls, and under the bench").
    - Keep safety warnings VERBATIM.
    - Include warranty information as a bullet.
-   - Delivery/shipping as the LAST bullet — combine all shipping details (method, pallet, box count, carrier) into one bullet.
+   - Delivery/shipping as the LAST bullet — combine all shipping details (method, pallet, box count, carrier) into one bullet. 
    - Do NOT include the SKU.
    - DO NOT include vendor disclaimers, boilerplate, or color accuracy notices.
    - IMPORTANT: DO NOT include dimensions, weights, or measurements in this section. This information goes ONLY in the specifications table.
 
-3. "overviewParagraph": Write a 3-4 sentence e-commerce product overview optimized for conversion and search relevance. RULES:
+3. "overviewParagraph": Write a 3-4 sentence e-commerce product overview optimized for conversion and search relevance.
+  RULES:
   - Open with the full product name and clearly state what the product is and its primary purpose.
   - Clearly explain what the product is for, how to use it, and why the customer would care to buy the product.
-  - Highlight tangible benefits (e.g., muscle relaxation, stress relief, improved circulation, energy efficiency) only if supported by source material.
+  - Highlight tangible health/wellness benefits (e.g., muscle relaxation, stress relief, improved circulation) if supported by source material.
   - Incorporate 1-2 specific differentiators (e.g., number of heating panels, material type, connectivity features) naturally within the narrative.
-  - Mention suitable installation locations if provided.
+  - Mention suitable installation locations if provided (e.g. basements, master baths, walk-in closets, fitness rooms).
   - Write in a confident, benefit-driven tone. Do NOT list features mechanically.
   - No pricing. Do NOT fabricate or infer unsupported claims.
 
@@ -207,7 +214,6 @@ export async function generateListing(
   priceColumn: string,
   vendorData: VendorProduct | null,
   supplierName?: string,
-  supplierContext?: string,
 ): Promise<GeneratedListing> {
   const sku = product[skuColumn];
   const price = product[priceColumn];
@@ -226,7 +232,7 @@ export async function generateListing(
     vendorTitle = vendorData.title;
   }
 
-  const prompt = buildPrompt(product, vendorBodyText, vendorTitle, supplierName, supplierContext);
+  const prompt = buildPrompt(product, vendorBodyText, vendorTitle, supplierName);
   console.log(`  Generating listing with LLM...`);
 
   console.log(`*** Prompt: ${prompt}`); // TMP for debugging

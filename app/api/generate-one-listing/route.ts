@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
 import { generateListing } from '../../../lib/generate-listing';
-import { getSupplierContext } from '../../../lib/supplier-context';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -34,7 +33,6 @@ export async function POST(request: NextRequest) {
       PRICE_COLUMN,
       vendorData ?? null,
       supplierName,
-      supplierName ? getSupplierContext(supplierName) : undefined,
     );
 
     return Response.json({

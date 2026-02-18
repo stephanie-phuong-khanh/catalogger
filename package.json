@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start",
     "pipeline": "npx ts-node scripts/pipeline.ts",
+    "parse-sheet": "npx ts-node scripts/parse-sheet.ts",
     "eval-specs": "npx ts-node scripts/eval-specs.ts"
   },
   "keywords": [],
