@@ -79,9 +79,6 @@ async function normalizeDimensions(openai: OpenAI, text: string): Promise<string
   if (!matches || matches.length === 0) return text;
 
   const lines = matches.map(l => l.trim());
-  console.log('[dimensions] BEFORE normalization:');
-  lines.forEach((l, i) => console.log(`  ${i + 1}. ${l}`));
-
   const response = await openai.responses.create({
     model: 'gpt-4o',
     input: [
@@ -106,8 +103,6 @@ ${lines.map((l, i) => `${i + 1}. ${l}`).join('\n')}`,
   const rawNormalized = outputText.split('\n').map(l => l.replace(/^\d+\.\s*/, '').trim());
   // LLM sometimes inserts blank lines; pair by position of non-empty lines so we don't skip replacements
   const normalizedLines = rawNormalized.filter(l => l.length > 0);
-  console.log('[dimensions] AFTER normalization:');
-  normalizedLines.forEach((l, i) => console.log(`  ${i + 1}. ${l}`));
 
   let result = text;
   for (let i = 0; i < lines.length; i++) {
@@ -115,10 +110,6 @@ ${lines.map((l, i) => `${i + 1}. ${l}`).join('\n')}`,
       result = result.replace(lines[i], normalizedLines[i]);
     }
   }
-
-  console.log('[dimensions] AFTER replacement:');
-  console.log(result);
-
   return result;
 }
 
@@ -181,12 +172,14 @@ Generate the following:
    - DO NOT include vendor disclaimers, boilerplate, or color accuracy notices.
    - IMPORTANT: DO NOT include dimensions, weights, or measurements in this section. This information goes ONLY in the specifications table.
 
-3. "overviewParagraph": A single paragraph (3-4 sentences) summarizing the product. RULES:
-   - Open with the full product name and what it is designed for.
-   - Answer what and who the product is for, how to use it, and why the customer would want to buy the product. Write a concise NARRATIVE. Do not just enumerate features.
-   - Mention health/wellness benefits and suitable installation locations if the source provides them.
-   - Weave in 1-2 standout features naturally.
-   - No pricing. Do NOT make up information.
+3. "overviewParagraph": Write a 3-4 sentence e-commerce product overview optimized for conversion and search relevance. RULES:
+  - Open with the full product name and clearly state what the product is and its primary purpose.
+  - Clearly explain what problem the product solves and why a customer would want it.
+  - Highlight tangible benefits (e.g., muscle relaxation, stress relief, improved circulation, energy efficiency) only if supported by source material.
+  - Incorporate 1-2 specific differentiators (e.g., number of heating panels, material type, connectivity features) naturally within the narrative.
+  - Mention suitable installation locations if provided.
+  - Write in a confident, benefit-driven tone. Do NOT list features mechanically.
+  - No pricing. Do NOT fabricate or infer unsupported claims.
 
 4. "specifications": A measurements/dimensions table.
    - Columns MUST be exactly ["Weight", "Length", "Width", "Height"] in that order.
@@ -236,7 +229,7 @@ export async function generateListing(
   const prompt = buildPrompt(product, vendorBodyText, vendorTitle, supplierName, supplierContext);
   console.log(`  Generating listing with LLM...`);
 
-  // console.log(`*** Prompt: ${prompt}`); // TMP for debugging
+  console.log(`*** Prompt: ${prompt}`); // TMP for debugging
 
   const response = await openai.responses.parse({
     model: 'gpt-4o',
