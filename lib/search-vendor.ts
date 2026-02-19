@@ -2,6 +2,11 @@ import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 
+const VendorBodySeparationSchema = z.object({
+  featuresRelevant: z.string().describe('Lines suitable for customer-facing feature bullets. Exclude section headers like "Features:", "Model: [SKU]", and "DISCLAIMER:..."'),
+  specsRelevant: z.string().describe('Lines that are dimensions or weights only, for the specs table. Exclude everything else.'),
+});
+
 const ProductSelection = z.object({
   selectedProductId: z.number().describe('The Shopify product ID of the best matching product'),
   reasoning: z.string().describe('Brief explanation of why this product was selected'),
@@ -166,4 +171,44 @@ export function formatProductAsVendorSiteText(product: VendorSiteProduct): strin
   lines.push('Body:');
   for (const bodySegment of product.body) lines.push(bodySegment);
   return lines.join('\n').trimEnd();
+}
+
+/**
+ * Use the LLM to separate the full vendor body into features-relevant vs specs-relevant text.
+ * Prompt-tunable: instruct the model to ignore "Features:", "Model: [SKU]", "DISCLAIMER:...", etc.
+ */
+export async function separateVendorBodyWithLLM(
+  openai: OpenAI,
+  vendor: VendorSiteProduct,
+): Promise<{ featuresRelevant: string; specsRelevant: string }> {
+  if (!vendor.body?.length) {
+    return { featuresRelevant: '', specsRelevant: '' };
+  }
+  const fullBody = vendor.body.join('\n');
+  const prompt = `You are separating product copy into two buckets.
+
+VENDOR BODY (one line per item):
+---
+${fullBody}
+---
+
+Rules:
+- featuresRelevant: Include only lines that are suitable for customer-facing feature bullets (capacity, materials, heating, glass, lighting, electrical, temperature, assembly, shipping/delivery, warranty, etc.). Output as a single block of text, one line per bullet.
+- specsRelevant: Include only lines that are purely dimensions or weights (e.g. "Exterior Dimensions: ...", "Shipping weight: ..."). Output as a single block of text, one line per bullet.
+- EXCLUDE from both buckets: section headers (e.g. "Features:"; "Model: [SKU]")
+- EXCLUDE from both buckets: "DISCLAIMER:..." and any legal/color-accuracy boilerplate.
+- Other than these excluded lines, keep every line that is relevant to the product features.
+- Preserve the exact wording of included lines. Do not add commentary.`;
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    temperature: 0,
+    input: [{ role: 'user', content: prompt }],
+    text: { format: zodTextFormat(VendorBodySeparationSchema, 'vendor_body_separation') },
+  });
+  const out = response.output_parsed;
+  return {
+    featuresRelevant: out?.featuresRelevant?.trim() ?? '',
+    specsRelevant: out?.specsRelevant?.trim() ?? '',
+  };
 }

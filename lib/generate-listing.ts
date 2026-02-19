@@ -1,8 +1,8 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
-import { RawProduct, SpecsTable } from './parse-sheet';
-import { VendorSiteProduct } from './search-vendor';
+import { getFeaturesRelevantFromSheet, getSpecsRelevantFromSheet, RawProduct, SpecsTable } from './parse-sheet';
+import { separateVendorBodyWithLLM, VendorSiteProduct } from './search-vendor';
 
 const TitleOutput = z.object({
   title: z.string().describe('The generated product title only, with no preamble or explanation'),
@@ -81,11 +81,29 @@ export async function generateListing(
     _supplierName,
   );
 
-  // TODO: Generate features
+  // Separate features-related information from specs-related information, from both sources.
+  const featuresRelevant = {
+    fromSheet: getFeaturesRelevantFromSheet(product),
+    fromVendor: '',
+  };
+  const specsRelevant = {
+    fromSheet: getSpecsRelevantFromSheet(product),
+    fromVendor: '',
+  };
+  if (vendorSiteData) {
+    const vendorSeparated = await separateVendorBodyWithLLM(_openai, vendorSiteData);
+    featuresRelevant.fromVendor = vendorSeparated.featuresRelevant;
+    specsRelevant.fromVendor = vendorSeparated.specsRelevant;
+  }
 
+  console.log('\n\n=== featuresRelevant from sheet === \n', featuresRelevant.fromSheet);
+  console.log('\n\n=== specsRelevant from sheet ===\n', specsRelevant.fromSheet);
+  console.log('\n\n=== featuresRelevant from vendor ===\n', featuresRelevant.fromVendor);
+  console.log('\n\n=== specsRelevant from vendor ===\n\n\n', specsRelevant.fromVendor);
+
+  // TODO: Generate features (use featuresRelevant)
   // TODO: Generate overview paragraph
-
-  // TODO: Generate specifications
+  // TODO: Generate specifications (use specsRelevant)
 
   return {
     sku,

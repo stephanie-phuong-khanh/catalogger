@@ -205,3 +205,57 @@ export function formatProductAsPricingSheetText(product: RawProduct): string {
 
   return lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
 }
+
+// --- Separate features-relevant vs specs-relevant for listing generation ---
+
+/**
+ * Extract from the pricing sheet only the information relevant to customer-facing features
+ * (description, EMF, color, wood type, brand, ad-copy, features list). Excludes dimensions/weights.
+ */
+export function getFeaturesRelevantFromSheet(product: RawProduct): string {
+  const lines: string[] = [];
+  for (const key of TOP_SECTION_KEYS) {
+    const label = lineLabel(key);
+    if (key === 'Features') {
+      const featureLines = valueAsArray(product[key]);
+      if (featureLines.length === 0) continue;
+      lines.push('Features:');
+      for (const featureLine of featureLines) lines.push(featureLine);
+    } else {
+      const val = getStr(product, key);
+      if (!val) continue;
+      lines.push(label + val);
+    }
+  }
+  return lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
+}
+
+/**
+ * Extract from the pricing sheet only the information relevant to the specifications table
+ * (product weight, dimensions, each carton block, LTL). Excludes descriptive/copy.
+ */
+export function getSpecsRelevantFromSheet(product: RawProduct): string {
+  const lines: string[] = [];
+  for (const key of PRODUCT_DIMENSION_KEYS) {
+    const val = getStr(product, key);
+    if (val === '' && key !== 'Product Weight') continue;
+    lines.push(lineLabel(key) + (val || ''));
+  }
+  lines.push('');
+  const cartonVals = CARTON_KEYS.map((key) => valueAsArray(product[key]));
+  const nCartons = Math.max(1, ...cartonVals.map((a) => a.length));
+  for (let i = 0; i < nCartons; i++) {
+    lines.push(lineLabel('Carton') + (cartonVals[0][i] ?? ''));
+    lines.push(lineLabel('Ship Weight') + (cartonVals[1][i] ?? ''));
+    lines.push(lineLabel('Ship Dimensions') + (cartonVals[2][i] ?? ''));
+    lines.push(lineLabel('Ship Length') + (cartonVals[3][i] ?? ''));
+    lines.push(lineLabel('Ship Width') + (cartonVals[4][i] ?? ''));
+    lines.push(lineLabel('Ship Height') + (cartonVals[5][i] ?? ''));
+    lines.push('');
+  }
+  for (const key of BOTTOM_KEYS) {
+    const val = getStr(product, key);
+    lines.push(lineLabel(key) + val);
+  }
+  return lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
+}
