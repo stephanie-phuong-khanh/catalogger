@@ -2,12 +2,6 @@ import * as xlsx from 'xlsx';
 
 export type RawProduct = Record<string, any>;
 
-export interface SpecsTable {
-  tableTitle: string;
-  columns: string[];
-  rows: { label: string; values: string[] }[];
-}
-
 interface ParseSheetConfig {
   filePath: string;
   sheetIndex: number;   // [HARDCODED] which tab to parse
