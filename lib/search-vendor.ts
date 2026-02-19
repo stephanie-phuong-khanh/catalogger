@@ -12,6 +12,26 @@ const ProductSelection = z.object({
   reasoning: z.string().describe('Brief explanation of why this product was selected'),
 });
 
+/** Normalize for SKU-in-parens comparison: spaces and hyphens treated as equivalent (e.g. "MX-K406-01 CED" ↔ "MX-K406-01-CED"). */
+function normalizeSkuForParensMatch(s: string): string {
+  return String(s).trim().replace(/[\s-]+/g, '-').replace(/-+/g, '-').toUpperCase();
+}
+
+/**
+ * True iff title has a parenthesized segment whose content equals the SKU exactly (after normalization).
+ * So "(DYN-6202-03)" matches "DYN-6202-03", but "(DYN-6202-03 Elite)" does not—the ( ) must contain only the SKU.
+ */
+function titleHasExactSkuInParens(title: string, sku: string): boolean {
+  const exactSku = String(sku).trim();
+  if (!exactSku) return false;
+  const normalizedSku = normalizeSkuForParensMatch(exactSku);
+  const parenBlocks = title.match(/\([^)]+\)/g) || [];
+  return parenBlocks.some((block) => {
+    const inner = block.slice(1, -1).trim(); // content between ( and )
+    return normalizeSkuForParensMatch(inner) === normalizedSku;
+  });
+}
+
 export interface VendorSiteProduct {
   id: number;
   title: string;
@@ -71,9 +91,16 @@ function parseFeaturesFromBody(body: string): string[] {
   return features;
 }
 
+const LLM_FALLBACK_WARNING = `
+  ⚠️  WARNING: VENDOR SELECTED SUBJECTIVELY (LLM FALLBACK)  ⚠️
+  No product had exact SKU in parentheses. An LLM picked a "best match" — please verify manually!
+  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️
+`;
+
 /**
- * Search a Shopify vendor site for a product by SKU, then use LLM to pick the best match.
- * Returns the matched product's data (body is plain text with HTML stripped), or null if not found.
+ * Search a Shopify vendor site for a product by SKU.
+ * 1) Prefer exact match: title contains the EXACT SKU inside parentheses.
+ * 2) Fallback: if none, use LLM to pick best match and log a big warning that it was subjective.
  *
  * [HARDCODED] Assumes the vendor site is Shopify (uses /search/suggest.json endpoint).
  */
@@ -83,7 +110,6 @@ export async function searchVendorSite(
   sku: string,
   productDescription: string,
 ): Promise<VendorSiteProduct | null> {
-  // 1. Search the vendor site
   const searchUrl = `${vendorBaseUrl}/search/suggest.json?q=${encodeURIComponent(sku)}&resources[type]=product`;
   console.log(`  Searching vendor site for "${sku}"...`);
 
@@ -103,14 +129,20 @@ export async function searchVendorSite(
 
   console.log(`  Found ${products.length} result(s) on vendor site.`);
 
-  // 2. If only one result, use it directly. Otherwise, LLM selects.
+  // 1) Prefer: exact SKU inside parentheses (golden design convention).
+  const exactMatches = products.filter((p: any) => titleHasExactSkuInParens(p.title || '', sku));
+
   let selected: any;
 
-  if (products.length === 1) {
-    selected = products[0];
+  if (exactMatches.length > 0) {
+    if (exactMatches.length > 1) {
+      console.log(`  Multiple products have exact SKU in parens; using first: "${exactMatches[0]?.title}".`);
+    }
+    selected = exactMatches[0];
   } else {
+    // 2) Fallback: LLM pick — and warn loudly that it's subjective.
+    console.warn(LLM_FALLBACK_WARNING);
     const productList = products.map((p: any) => `ID: ${p.id} | Title: ${p.title}`).join('\n');
-
     const response = await openai.responses.parse({
       model: 'gpt-4o',
       temperature: 0,
@@ -128,16 +160,13 @@ export async function searchVendorSite(
         format: zodTextFormat(ProductSelection, 'product_selection'),
       },
     });
-
     const selection = response.output_parsed;
     if (!selection) {
       console.error(`  LLM did not return a valid selection.`);
       return null;
     }
-
     console.log(`  LLM selected: ${selection.reasoning}`);
     selected = products.find((p: any) => p.id === selection.selectedProductId);
-
     if (!selected) {
       console.error(`  LLM selected ID ${selection.selectedProductId} but it wasn't in the results.`);
       return null;
