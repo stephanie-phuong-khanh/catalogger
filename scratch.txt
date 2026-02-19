@@ -19,7 +19,7 @@ LISTING_OUTPUT: "7 Dynamic Low EMF FAR Infrared Carbon heating panels (5-10 mG a
 
 VENDOR_WEBSITE: "4 Carbon PureTech™ Ultra Low EMF Heat Emitters (Heating Panels)"
 PRICING_SHEET: "Heating Elements: 4 Dynamic PureTech™ Ultra Low EMF (EMF between 3-5MG - 2 to 3 inches from the heating panels) FAR Infrared Carbon heating panels"
-LISTING_OUTPUT: "4 Carbon PureTech™ Ultra Low EMF (EMF between 3-5MG - 2 to 3 inches from the heating panels) FAR Infrared Carbon heating panels" 
+LISTING_OUTPUT: "4 Carbon PureTech™ Ultra Low EMF (EMF between 3-5MG - 2 to 3 inches from the heating panels) FAR Infrared Carbon heating panels"
 
 
 ------
@@ -61,6 +61,13 @@ Ship Dimensions: 14" L X 70" W X 44" H
 Ship Length: 14
 Ship Width: 70
 Ship Height: 44
+
+Carton: B
+Ship Weight: 88
+Ship Dimensions: 8" L X 42" W X 47" H
+Ship Length: 8
+Ship Width: 42
+Ship Height: 47
 
 Ship Ground or LTL: LTL
 LTL Pallet Dims: 
