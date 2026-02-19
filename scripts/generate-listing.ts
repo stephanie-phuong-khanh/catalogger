@@ -17,7 +17,6 @@ const CONFIG = {
   productsFile: 'data/parsed_products.json',
   outputDir: 'data/listings_sheet_data_only',
   skuColumn: 'GDINA Item #',
-  priceColumn: 'MSRP',
   /** Set to a specific SKU to run one product, or null to run all. */
   singleSku: 'MX-K306-01' as string | null,
 };
@@ -57,7 +56,6 @@ async function main() {
         openai,
         product,
         CONFIG.skuColumn,
-        CONFIG.priceColumn,
         null, // no vendor data
       );
       listings.push(listing);

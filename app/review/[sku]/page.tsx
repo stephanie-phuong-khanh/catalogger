@@ -208,9 +208,6 @@ export default function ReviewSkuPage() {
               </tbody>
             </table>
 
-            <p style={{ marginTop: '0.75rem', fontSize: '0.8125rem', color: '#666' }}>
-              Price: ${listing.price}
-            </p>
           </div>
         ) : step !== 'error' && step !== 'idle' ? null : (
           <p style={{ color: '#999' }}>Not yet generated.</p>

@@ -25,11 +25,8 @@ const CONFIG = {
   sheetIndex: 3,           // Tab index (0-based). 3 = "Tab 4 - Dynamic Ultra EMF"
   headerRow: 3,           // 0-indexed row where headers are (row 4 in Excel)
   skuColumn: 'GDINA Item #',
-  priceColumn: 'MSRP',
-
   // Vendor website
   vendorBaseUrl: 'https://goldendesigninc.com',
-
   // Output
   outputDir: 'data/listings/tab_4_dynamic_ultra_emf',
 };
@@ -97,7 +94,6 @@ async function main() {
         openai,
         product,
         CONFIG.skuColumn,
-        CONFIG.priceColumn,
         vendorSiteData,
         CONFIG.supplierName,
       );

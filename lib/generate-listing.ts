@@ -33,7 +33,6 @@ const SpecsTable = z.object({
 
 export interface GeneratedListing {
   sku: string;
-  price: number | string | null;
   title: string;
   features: string[];
   overviewParagraph: string;
@@ -224,7 +223,6 @@ export async function generateListing(
   _openai: OpenAI,
   product: RawProduct,
   skuColumn: string,
-  priceColumn: string,
   vendorSiteData: VendorSiteProduct | null,
   _supplierName?: string,
 ): Promise<GeneratedListing> {
@@ -232,8 +230,6 @@ export async function generateListing(
   if (!sku) {
     throw new Error(`No SKU found in column "${skuColumn}"`);
   }
-
-  const price = product[priceColumn] || null;
 
   const productNameFromPriceSheet = product['Description']; // [HARDCODED]
   const title = await generateTitle(
@@ -271,7 +267,6 @@ export async function generateListing(
 
   return {
     sku,
-    price,
     title,
     features,
     specifications,

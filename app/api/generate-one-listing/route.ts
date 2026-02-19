@@ -6,7 +6,6 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // [HARDCODED] Golden Designs sheet columns. Later: from run config or user input.
 const SKU_COLUMN = 'GDINA Item #';
-const PRICE_COLUMN = 'MSRP';
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,7 +29,6 @@ export async function POST(request: NextRequest) {
       openai,
       product as Record<string, any>,
       SKU_COLUMN,
-      PRICE_COLUMN,
       vendorData ?? null,
       supplierName,
     );
@@ -39,7 +37,6 @@ export async function POST(request: NextRequest) {
       ok: true,
       listing: {
         sku: listing.sku,
-        price: listing.price,
         title: listing.title,
         features: listing.features,
         overviewParagraph: listing.overviewParagraph,

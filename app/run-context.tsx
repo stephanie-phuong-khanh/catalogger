@@ -11,10 +11,9 @@ export interface TabProducts {
   products: RawProduct[];
 }
 
-/** The subset of GeneratedListing we care about on the client (no _raw, _vendorData). */
+/** The subset of GeneratedListing we care about on the client (no _raw, _vendorData). Price comes from another source. */
 export interface ListingResult {
   sku: string;
-  price: number;
   title: string;
   features: string[];
   overviewParagraph: string;
