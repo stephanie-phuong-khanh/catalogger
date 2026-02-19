@@ -7,7 +7,7 @@ const ProductSelection = z.object({
   reasoning: z.string().describe('Brief explanation of why this product was selected'),
 });
 
-export interface VendorProduct {
+export interface VendorSiteProduct {
   id: number;
   title: string;
   url: string;
@@ -77,7 +77,7 @@ export async function searchVendorSite(
   vendorBaseUrl: string,
   sku: string,
   productDescription: string,
-): Promise<VendorProduct | null> {
+): Promise<VendorSiteProduct | null> {
   // 1. Search the vendor site
   const searchUrl = `${vendorBaseUrl}/search/suggest.json?q=${encodeURIComponent(sku)}&resources[type]=product`;
   console.log(`  Searching vendor site for "${sku}"...`);
@@ -157,7 +157,7 @@ export async function searchVendorSite(
  * Format a vendor product as human-readable text (for prompts or debugging),
  * analogous to formatProductAsPricingSheetText in parse-sheet.
  */
-export function formatProductAsVendorSiteText(product: VendorProduct): string {
+export function formatProductAsVendorSiteText(product: VendorSiteProduct): string {
   const lines: string[] = [];
   lines.push(`Title: ${product.title}`);
   lines.push(`URL: ${product.url}`);
