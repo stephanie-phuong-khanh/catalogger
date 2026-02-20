@@ -12,7 +12,8 @@
     "parse-sheet": "npx ts-node scripts/parse-sheet.ts",
     "search-vendor": "npx ts-node scripts/search-vendor.ts",
     "eval-specs": "npx ts-node scripts/eval-specs.ts",
-    "export-listing-for-review": "npx ts-node scripts/export-listing-for-review.ts"
+    "export-listing-for-review": "npx ts-node scripts/export-listing-for-review.ts",
+    "sync-listings-to-blob": "npx ts-node scripts/sync-listings-to-blob.ts"
   },
   "keywords": [],
   "author": "",
