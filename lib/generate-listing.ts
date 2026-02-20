@@ -216,7 +216,7 @@ function generateOverviewParagraph(
       input: [{ role: 'user', content: prompt }],
       text: { format: zodTextFormat(OverviewParagraph, 'overview_paragraph_output') },
     })
-    .then((response) => response.output_parsed) as Promise<string>;
+    .then((response) => response.output_parsed?.overviewParagraph ?? '');
 }
 
 export async function generateListing(
