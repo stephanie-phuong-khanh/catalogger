@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
-import { generateListing } from '../../../lib/generate-listing';
+import { generateListing, createIncompleteListing } from '../../../lib/generate-listing';
+import { isPricingDataIncomplete } from '../../../lib/pricing-sheet-groups';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -23,6 +24,20 @@ export async function POST(request: NextRequest) {
     const sku = String(product[SKU_COLUMN] ?? '');
     if (!sku) {
       return Response.json({ ok: false, error: 'Product has no SKU.' }, { status: 400 });
+    }
+
+    if (isPricingDataIncomplete(product)) {
+      const listing = createIncompleteListing(sku, product as Record<string, any>, vendorData ?? null);
+      return Response.json({
+        ok: true,
+        listing: {
+          sku: listing.sku,
+          incompletePricingData: true,
+          _raw: listing._raw,
+          _vendorData: listing._vendorData,
+          vendorPageUrl: listing.vendorPageUrl,
+        },
+      });
     }
 
     const listing = await generateListing(

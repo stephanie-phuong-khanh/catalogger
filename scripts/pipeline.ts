@@ -14,7 +14,8 @@ import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { parseSheet } from '../lib/parse-sheet';
 import { searchVendorSite } from '../lib/search-vendor';
-import { generateListing, GeneratedListing } from '../lib/generate-listing';
+import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../lib/generate-listing';
+import { isPricingDataIncomplete } from '../lib/pricing-sheet-groups';
 
 dotenv.config();
 
@@ -22,7 +23,7 @@ dotenv.config();
 const CONFIG = {
   supplierName: 'Golden Designs',
   sheetFile: 'data/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',
-  sheetIndex: 10,           // Tab index (0-based). 10 = "Tab 11 - DCT Chillers"
+  sheetIndex: 10,           // Tab index (0-based). 9 = "Tab 10 - DCT Spa"
   headerRow: 2,           // 0-indexed row where headers are (row 5 in Excel)
   skuColumn: 'GDINA Item #',
   // Vendor website
@@ -38,7 +39,7 @@ const openai = new OpenAI({
 async function main() {
   const printOnly = process.argv.includes('--print-only');
   console.log('=== CATALOGGER PIPELINE ===\n');
-  const listings: GeneratedListing[] = [];
+  const listings: (GeneratedListing | IncompleteListing)[] = [];
 
   // Step 1: Parse sheet
   console.log('STEP 1: Parsing spreadsheet...');
@@ -87,7 +88,21 @@ async function main() {
       console.log(`  ✗ No vendor match found (will generate from sheet data only)`);
     }
 
-    // Step 3: Generate listing with both sources
+    // Step 3: Generate listing (or write incomplete stub when pricing data is missing)
+    if (isPricingDataIncomplete(product as Record<string, unknown>)) {
+      console.log('STEP 3: Incomplete pricing data (e.g. missing Description) — skipping generation.');
+      const listing = createIncompleteListing(sku, product, vendorSiteData);
+      listings.push(listing);
+      if (!printOnly) {
+        const individualPath = path.join(CONFIG.outputDir, `${sku}.json`);
+        fs.writeFileSync(individualPath, JSON.stringify(listing, null, 2));
+        console.log(`  → Saved ${individualPath} (incomplete)`);
+      } else {
+        console.log(JSON.stringify(listing, null, 2));
+      }
+      continue;
+    }
+
     console.log('STEP 3: Generating listing...');
     try {
       const listing = await generateListing(

@@ -42,6 +42,29 @@ export interface GeneratedListing {
   _vendorData: VendorSiteProduct | null;
 }
 
+/** Minimal listing when pricing data is incomplete; no LLM-generated fields. */
+export interface IncompleteListing {
+  sku: string;
+  incompletePricingData: true;
+  _raw: RawProduct;
+  _vendorData: VendorSiteProduct | null;
+  vendorPageUrl: string | null;
+}
+
+export function createIncompleteListing(
+  sku: string,
+  product: RawProduct,
+  vendorSiteData: VendorSiteProduct | null,
+): IncompleteListing {
+  return {
+    sku,
+    incompletePricingData: true,
+    _raw: product,
+    _vendorData: vendorSiteData,
+    vendorPageUrl: vendorSiteData?.url ?? null,
+  };
+}
+
 function generateTitle(
   _openai: OpenAI,
   productNameFromPriceSheet: string,

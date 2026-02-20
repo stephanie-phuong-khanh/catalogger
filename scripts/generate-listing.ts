@@ -9,7 +9,8 @@ import path from 'path';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { RawProduct } from '../lib/parse-sheet';
-import { generateListing, GeneratedListing } from '../lib/generate-listing';
+import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../lib/generate-listing';
+import { isPricingDataIncomplete } from '../lib/pricing-sheet-groups';
 
 dotenv.config();
 
@@ -46,11 +47,20 @@ async function main() {
   }
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const listings: GeneratedListing[] = [];
+  const listings: (GeneratedListing | IncompleteListing)[] = [];
 
   for (const product of toProcess) {
     const sku = product[CONFIG.skuColumn];
     console.log(`--- ${sku} ---`);
+    if (isPricingDataIncomplete(product as Record<string, unknown>)) {
+      console.log('  Incomplete pricing data — skipping generation.');
+      const listing = createIncompleteListing(sku, product, null);
+      listings.push(listing);
+      const outPath = path.join(CONFIG.outputDir, `${sku}.json`);
+      fs.writeFileSync(outPath, JSON.stringify(listing, null, 2));
+      console.log(`  → Saved ${outPath} (incomplete)\n`);
+      continue;
+    }
     try {
       const listing = await generateListing(
         openai,

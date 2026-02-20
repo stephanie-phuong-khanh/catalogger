@@ -104,6 +104,11 @@ export function parseSheet(config: ParseSheetConfig): RawProduct[] {
   const rows = xlsx.utils.sheet_to_json(sheet, { range: config.headerRow }) as Record<string, any>[];
   const products = mergeRowsBySku(rows, config.skuColumn);
 
+  if (rows.length > 0 && products.length === 0) {
+    const headerKeys = Object.keys(rows[0]).filter((k) => k && String(k).trim());
+    console.warn(`  No products found. Header row has ${rows.length} row(s). Column names: ${headerKeys.slice(0, 12).join(', ')}${headerKeys.length > 12 ? '...' : ''}`);
+    console.warn(`  Looking for SKU column: "${config.skuColumn}"`);
+  }
   console.log(`Parsed ${products.length} products from tab "${sheetName}"`);
   return products;
 }

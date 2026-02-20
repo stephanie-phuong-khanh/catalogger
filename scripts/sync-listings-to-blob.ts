@@ -5,16 +5,17 @@
  * - Uploads each file with pathname: listings/<relative-path> (e.g. listings/tab_11_dct_chillers/SKU.json).
  *
  * Modes:
- * - Default: only uploads local files. Does not delete remote blobs. Renames/deletes locally
- *   are not reflected; re-uploading the same pathname may error (no overwrite in this SDK version).
+ * - Default: uploads local files and overwrites existing blobs with the same pathname.
  * - --full: wipes all blobs under listings/ in the store, then uploads current local files.
  *   Use this to make Blob exactly match local (handles renames, deletes, and updates).
+ * - --single <path>: upload only one file. Path is relative to data/listings (e.g. tab_09_gdina_traditional/GDI-8005-01.json).
  *
  * Requires CATALOGGER_LISTINGS_READ_WRITE_TOKEN in .env or .env.local (from the private listings Blob store).
  *
  * Usage:
- *   npm run sync-listings-to-blob           # upload only (no remote wipe)
- *   npm run sync-listings-to-blob -- --full # full sync: wipe listings/ then upload
+ *   npm run sync-listings-to-blob                              # upload all (overwrite existing)
+ *   npm run sync-listings-to-blob -- --full                    # full sync: wipe then upload
+ *   npm run sync-listings-to-blob -- --single tab_09_gdina_traditional/GDI-8005-01.json  # one file
  */
 
 import fs from 'fs';
@@ -82,6 +83,8 @@ async function main() {
   }
 
   const fullSync = process.argv.includes('--full');
+  const singleIdx = process.argv.indexOf('--single');
+  const singlePath = singleIdx !== -1 ? process.argv[singleIdx + 1]?.trim() : undefined;
 
   if (fullSync) {
     console.log('Full sync: listing existing blobs under listings/...');
@@ -100,16 +103,34 @@ async function main() {
     process.exit(1);
   }
 
-  const files: { absolutePath: string; blobPathname: string }[] = [
+  let files: { absolutePath: string; blobPathname: string }[] = [
     ...walkListingFiles(LISTINGS_DIR),
   ];
+
+  if (singlePath) {
+    const normalized = singlePath.replace(/^\.\//, '').replace(/\\/g, '/');
+    const blobPathname = `${BLOB_PREFIX}/${normalized}`;
+    const absolutePath = path.join(LISTINGS_DIR, normalized);
+    if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) {
+      console.error(`File not found: data/listings/${normalized}`);
+      process.exit(1);
+    }
+    if (shouldSkip(path.basename(normalized))) {
+      console.error('Cannot sync files or dirs whose name starts with _.');
+      process.exit(1);
+    }
+    files = [{ absolutePath, blobPathname }];
+    console.log(`Syncing 1 file: ${blobPathname}\n`);
+  }
 
   if (files.length === 0) {
     console.log('No listing files to sync (nothing under data/listings besides _*).');
     return;
   }
 
-  console.log(`Uploading ${files.length} file(s) to Vercel Blob (prefix: ${BLOB_PREFIX}/)...\n`);
+  if (!singlePath) {
+    console.log(`Uploading ${files.length} file(s) to Vercel Blob (prefix: ${BLOB_PREFIX}/)...\n`);
+  }
 
   for (const { absolutePath, blobPathname } of files) {
     const content = fs.readFileSync(absolutePath, 'utf-8');
@@ -118,6 +139,7 @@ async function main() {
       contentType: blobPathname.endsWith('.json') ? 'application/json' : 'text/plain',
       addRandomSuffix: false,
       token: token(),
+      allowOverwrite: true,
     });
     console.log('  ', blobPathname);
   }
