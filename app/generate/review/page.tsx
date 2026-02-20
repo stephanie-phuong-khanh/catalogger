@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRun } from '../run-context';
+import { useRun } from '../../run-context';
 
 // [HARDCODED] Golden Designs SKU column. Later: from config or run.
 const SKU_COLUMN = 'GDINA Item #';
@@ -14,7 +14,7 @@ export default function ReviewPage() {
       <main>
         <h1>Review listings</h1>
         <p>No parsed data. Upload a sheet on the home page first.</p>
-        <Link href="/" style={{ marginTop: '1rem', display: 'inline-block' }}>
+        <Link href="/generate" style={{ marginTop: '1rem', display: 'inline-block' }}>
           &larr; Back to upload
         </Link>
       </main>
@@ -48,7 +48,7 @@ export default function ReviewPage() {
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-        <Link href="/" style={{ fontSize: '0.875rem' }}>
+        <Link href="/generate" style={{ fontSize: '0.875rem' }}>
           &larr; Upload a different sheet
         </Link>
         <button
@@ -96,7 +96,7 @@ export default function ReviewPage() {
                       flexShrink: 0,
                     }} />
                     <Link
-                      href={sku ? `/review/${encodeURIComponent(sku)}` : '#'}
+                      href={sku ? `/generate/review/${encodeURIComponent(sku)}` : '#'}
                       style={{ color: 'inherit', textDecoration: 'none' }}
                     >
                       {label}

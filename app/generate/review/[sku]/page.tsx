@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useRun, ListingResult, RawProduct } from '../../run-context';
+import { useRun, ListingResult, RawProduct } from '../../../run-context';
 
 // [HARDCODED] Golden Designs SKU column.
 const SKU_COLUMN = 'GDINA Item #';
@@ -103,7 +103,7 @@ export default function ReviewSkuPage() {
   if (!run) {
     return (
       <main>
-        <p>No run data. <Link href="/">Upload a sheet first.</Link></p>
+        <p>No run data. <Link href="/generate">Upload a sheet first.</Link></p>
       </main>
     );
   }
@@ -112,7 +112,7 @@ export default function ReviewSkuPage() {
     return (
       <main>
         <p>Product {sku} not found in parsed data.</p>
-        <Link href="/review">&larr; Back to list</Link>
+        <Link href="/generate/review">&larr; Back to list</Link>
       </main>
     );
   }
@@ -123,7 +123,7 @@ export default function ReviewSkuPage() {
 
   return (
     <main>
-      <Link href="/review" style={{ fontSize: '0.875rem' }}>&larr; Back to list</Link>
+      <Link href="/generate/review" style={{ fontSize: '0.875rem' }}>&larr; Back to list</Link>
       <h1 style={{ fontSize: '1.25rem', marginTop: '0.75rem' }}>{sku}</h1>
 
       {/* Progress steps */}
