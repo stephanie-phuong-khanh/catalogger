@@ -18,6 +18,14 @@ interface ListingData {
   vendorPageUrl?: string | null;
 }
 
+/** Coerce to string for display; some blobs have overviewParagraph/title as { overviewParagraph } / { title }. */
+function asText(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value != null && typeof value === 'object' && 'overviewParagraph' in value) return asText((value as { overviewParagraph: unknown }).overviewParagraph);
+  if (value != null && typeof value === 'object' && 'title' in value) return asText((value as { title: unknown }).title);
+  return '';
+}
+
 export default function ListingViewPage() {
   const params = useParams();
   const path = (params.path as string[]) ?? [];
@@ -42,8 +50,8 @@ export default function ListingViewPage() {
       .then((text) => {
         setRaw(text);
         try {
-          const data = JSON.parse(text) as ListingData;
-          setListing(Array.isArray(data) ? data[0] : data);
+          const data = JSON.parse(text) as ListingData | ListingData[];
+          setListing(Array.isArray(data) ? data[0] ?? null : data);
         } catch {
           setListing(null);
         }
@@ -78,7 +86,7 @@ export default function ListingViewPage() {
     <main>
       <Link href="/" style={{ fontSize: '0.875rem' }}>&larr; Back to listings</Link>
       <h1 style={{ fontSize: '1.25rem', marginTop: '0.75rem' }}>
-        {listing?.title ?? file}
+        {asText(listing?.title) || file}
       </h1>
 
       {listing?.vendorPageUrl && (
@@ -87,10 +95,10 @@ export default function ListingViewPage() {
         </p>
       )}
 
-      {listing?.overviewParagraph && (
+      {asText(listing?.overviewParagraph) && (
         <>
           <h2 style={{ fontSize: '1rem', marginTop: '1rem', marginBottom: '0.25rem' }}>Overview</h2>
-          <p style={{ marginBottom: '1rem' }}>{listing.overviewParagraph}</p>
+          <p style={{ marginBottom: '1rem' }}>{asText(listing?.overviewParagraph)}</p>
         </>
       )}
 

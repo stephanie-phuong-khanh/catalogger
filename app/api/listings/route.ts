@@ -5,7 +5,7 @@ const PREFIX = 'listings/';
 
 /** GET /api/listings — returns tree: { folders: { [folderName]: string[] } } (file pathnames under each folder) */
 export async function GET() {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const token = process.env.CATALOGGER_LISTINGS_READ_WRITE_TOKEN;
   if (!token) {
     return NextResponse.json({ error: 'Blob store not configured' }, { status: 503 });
   }

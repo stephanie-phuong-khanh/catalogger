@@ -10,7 +10,7 @@
  * - --full: wipes all blobs under listings/ in the store, then uploads current local files.
  *   Use this to make Blob exactly match local (handles renames, deletes, and updates).
  *
- * Requires BLOB_READ_WRITE_TOKEN in .env or .env.local (e.g. from `vercel env pull`).
+ * Requires CATALOGGER_LISTINGS_READ_WRITE_TOKEN in .env or .env.local (from the private listings Blob store).
  *
  * Usage:
  *   npm run sync-listings-to-blob           # upload only (no remote wipe)
@@ -31,7 +31,7 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 const LISTINGS_DIR = path.join(process.cwd(), 'data', 'listings');
 const BLOB_PREFIX = 'listings';
 
-const token = () => process.env.BLOB_READ_WRITE_TOKEN!;
+const token = () => process.env.CATALOGGER_LISTINGS_READ_WRITE_TOKEN!;
 
 async function listAllPathnamesUnderPrefix(prefix: string): Promise<string[]> {
   const pathnames: string[] = [];
@@ -76,8 +76,8 @@ function* walkListingFiles(
 }
 
 async function main() {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    console.error('Missing BLOB_READ_WRITE_TOKEN. Add it to .env or .env.local (e.g. run: vercel env pull).');
+  if (!process.env.CATALOGGER_LISTINGS_READ_WRITE_TOKEN) {
+    console.error('Missing CATALOGGER_LISTINGS_READ_WRITE_TOKEN. Add it to .env or .env.local (from the private listings Blob store).');
     process.exit(1);
   }
 
@@ -114,7 +114,7 @@ async function main() {
   for (const { absolutePath, blobPathname } of files) {
     const content = fs.readFileSync(absolutePath, 'utf-8');
     await put(blobPathname, content, {
-      access: 'public',
+      access: 'private',
       contentType: blobPathname.endsWith('.json') ? 'application/json' : 'text/plain',
       addRandomSuffix: false,
       token: token(),

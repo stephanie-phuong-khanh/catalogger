@@ -1,14 +1,14 @@
-import { list } from '@vercel/blob';
+import { get } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 const PREFIX = 'listings/';
 
-/** GET /api/listings/tab_01_most_popular/DYN-6103-01.json — returns blob content */
+/** GET /api/listings/tab_01_most_popular/DYN-6103-01.json — returns blob content (uses get() so private blobs work) */
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const token = process.env.CATALOGGER_LISTINGS_READ_WRITE_TOKEN;
   if (!token) {
     return NextResponse.json({ error: 'Blob store not configured' }, { status: 503 });
   }
@@ -18,27 +18,28 @@ export async function GET(
     return NextResponse.json({ error: 'Path required' }, { status: 400 });
   }
 
-  const pathname = PREFIX + pathSegments.join('/');
+  // Decode once (request may have %2520); normalize space to %20 to match Blob pathnames.
+  const decoded = pathSegments.map((s) => {
+    try {
+      return decodeURIComponent(s);
+    } catch {
+      return s;
+    }
+  });
+  const pathnameRaw = PREFIX + decoded.join('/');
+  const pathname = pathnameRaw.replace(/ /g, '%20');
 
-  const { blobs } = await list({
-    prefix: pathname,
-    limit: 1,
+  const result = await get(pathname, {
+    access: 'private',
     token,
   });
 
-  const blob = blobs?.[0];
-  if (!blob?.url) {
+  if (!result || !result.stream) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  const res = await fetch(blob.url);
-  if (!res.ok) {
-    return NextResponse.json({ error: 'Failed to fetch blob' }, { status: 502 });
-  }
-
-  return new NextResponse(res.body, {
-    headers: {
-      'Content-Type': res.headers.get('Content-Type') ?? 'application/json',
-    },
+  const contentType = result.blob?.contentType ?? 'application/json';
+  return new NextResponse(result.stream, {
+    headers: { 'Content-Type': contentType },
   });
 }

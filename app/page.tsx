@@ -1,14 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 
 type Tree = Record<string, string[]>;
+
+function displayFileName(file: string): string {
+  return file.replace(/\.json$/i, '');
+}
 
 export default function Home() {
   const [tree, setTree] = useState<Tree | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch('/api/listings')
@@ -17,24 +22,55 @@ export default function Home() {
         return res.json();
       })
       .then((data: { folders: Tree }) => {
-        setTree(data.folders ?? {});
+        const folders = data.folders ?? {};
+        setTree(folders);
+        setExpandedFolders(new Set(Object.keys(folders).sort()));
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const toggleFolder = useCallback((folder: string) => {
+    setExpandedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(folder)) next.delete(folder);
+      else next.add(folder);
+      return next;
+    });
+  }, []);
+
+  const collapseAll = useCallback(() => setExpandedFolders(new Set()), []);
+  const expandAll = useCallback(() => {
+    if (tree) setExpandedFolders(new Set(Object.keys(tree).sort()));
+  }, [tree]);
 
   if (loading) return <main><p>Loading…</p></main>;
   if (error) return <main><p>Error: {error}</p></main>;
   if (!tree || Object.keys(tree).length === 0) return <main><p>No listings.</p></main>;
 
   const folderNames = Object.keys(tree).sort();
+  const allExpanded = folderNames.length > 0 && folderNames.every((f) => expandedFolders.has(f));
 
   return (
     <main>
-      <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>listings/</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <h1 style={{ fontSize: '1.25rem', margin: 0 }}>listings/</h1>
+        <span style={{ fontSize: '0.8125rem', color: '#666' }}>
+          <button type="button" onClick={allExpanded ? collapseAll : expandAll} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'inherit', fontSize: 'inherit', textDecoration: 'underline' }}>
+            {allExpanded ? 'Collapse all' : 'Expand all'}
+          </button>
+        </span>
+      </div>
       <div style={{ fontFamily: 'ui-monospace, monospace', fontSize: '0.875rem' }}>
         {folderNames.map((folder) => (
-          <FolderRow key={folder} folder={folder} files={tree[folder]} defaultOpen />
+          <FolderRow
+            key={folder}
+            folder={folder}
+            files={tree[folder]}
+            open={expandedFolders.has(folder)}
+            onToggle={() => toggleFolder(folder)}
+            displayFileName={displayFileName}
+          />
         ))}
       </div>
     </main>
@@ -44,19 +80,21 @@ export default function Home() {
 function FolderRow({
   folder,
   files,
-  defaultOpen,
+  open,
+  onToggle,
+  displayFileName,
 }: {
   folder: string;
   files: string[];
-  defaultOpen: boolean;
+  open: boolean;
+  onToggle: () => void;
+  displayFileName: (file: string) => string;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-
   return (
     <div style={{ marginBottom: '0.25rem' }}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={onToggle}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -83,7 +121,7 @@ function FolderRow({
                 href={`/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`}
                 style={{ color: 'inherit', textDecoration: 'none' }}
               >
-                {file}
+                {displayFileName(file)}
               </Link>
             </li>
           ))}
