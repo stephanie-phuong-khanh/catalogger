@@ -5,6 +5,7 @@
  */
 
 import type OpenAI from 'openai';
+import { z } from 'zod';
 
 /** Normalized 0–1 crop region for "center the subject" style cropping. */
 export interface CropSuggestion {
@@ -13,6 +14,13 @@ export interface CropSuggestion {
   width: number;
   height: number;
 }
+
+/** Zod schema for center-crop approval — enforces structure and gives a reason when rejecting. */
+export const ApproveCenterCropSchema = z.object({
+  useCenterCrop: z.boolean().describe('True if the red square crop is acceptable; false if it cuts the product or is badly composed.'),
+  reason: z.string().describe('When useCenterCrop is false, briefly explain why (e.g. "crops the sauna on the left", "cuts through the bed"). When true, leave empty or say "OK".'),
+});
+export type ApproveCenterCropResult = z.infer<typeof ApproveCenterCropSchema>;
 
 /**
  * Interface for vision operations used by image editing (crop suggestions, classification, etc.).
@@ -24,26 +32,62 @@ export interface ImageVisionClient {
    * Returns null if not available or on error. Coordinates are normalized 0–1.
    */
   suggestCrop(imageBuffer: Buffer, mimeType?: string): Promise<CropSuggestion | null>;
+
+  /**
+   * Ask the model whether the proposed center crop (shown as red overlay on the image) is acceptable.
+   * Returns structured result (useCenterCrop + reason) so callers can show why a crop was rejected.
+   */
+  approveCenterCrop(imageWithOverlayBuffer: Buffer, prompt: string, mimeType?: string): Promise<ApproveCenterCropResult>;
 }
 
 /**
- * Stub adapter: no API calls, always returns null. Use when no key is set or for tests.
+ * Stub adapter: no API calls. suggestCrop returns null; approveCenterCrop returns approved (don't block).
  */
 export class NoOpVisionClient implements ImageVisionClient {
   async suggestCrop(): Promise<CropSuggestion | null> {
     return null;
   }
+
+  async approveCenterCrop(): Promise<ApproveCenterCropResult> {
+    return { useCenterCrop: true, reason: '' };
+  }
 }
 
 /**
- * OpenAI-backed vision client (e.g. gpt-4o). suggestCrop is a stub for now.
+ * OpenAI-backed vision client using Responses API (gpt-4o) with Zod for structured output.
  */
 export class OpenAIVisionClient implements ImageVisionClient {
   constructor(private openai: OpenAI) {}
 
   async suggestCrop(_imageBuffer: Buffer, _mimeType?: string): Promise<CropSuggestion | null> {
-    // TODO: call openai.chat.completions or vision API with image, parse bbox from response.
     return null;
+  }
+
+  async approveCenterCrop(
+    imageWithOverlayBuffer: Buffer,
+    prompt: string,
+    mimeType: string = 'image/jpeg',
+  ): Promise<ApproveCenterCropResult> {
+    const { zodTextFormat } = require('openai/helpers/zod');
+    const dataUrl = `data:${mimeType};base64,${imageWithOverlayBuffer.toString('base64')}`;
+    const input = [
+      {
+        role: 'user' as const,
+        content: [
+          { type: 'input_text' as const, text: prompt },
+          { type: 'input_image' as const, image_url: dataUrl, detail: 'low' as const },
+        ],
+      },
+    ];
+    const response = await this.openai.responses.parse({
+      model: 'gpt-4o',
+      temperature: 0,
+      input,
+      text: { format: zodTextFormat(ApproveCenterCropSchema, 'center_crop_approval') },
+    });
+    const parsed = response.output_parsed as ApproveCenterCropResult | null;
+    if (parsed) return parsed;
+    return { useCenterCrop: false, reason: 'No structured response from model.' };
   }
 }
 
@@ -55,8 +99,42 @@ export class GeminiVisionClient implements ImageVisionClient {
   constructor(private _client: unknown) {}
 
   async suggestCrop(_imageBuffer: Buffer, _mimeType?: string): Promise<CropSuggestion | null> {
-    // TODO: send image via this._client.models.generateContent, parse bbox from response.
     return null;
+  }
+
+  async approveCenterCrop(
+    imageWithOverlayBuffer: Buffer,
+    prompt: string,
+    mimeType: string = 'image/jpeg',
+  ): Promise<ApproveCenterCropResult> {
+    const client = this._client as { models: { generateContent: (params: {
+      model: string;
+      contents: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }>;
+      config?: { responseMimeType?: string };
+    }) => Promise<{ text?: string }> } };
+    const base64 = imageWithOverlayBuffer.toString('base64');
+    const contents = [
+      {
+        text:
+          prompt +
+          '\n\nReply with only a JSON object with keys "useCenterCrop" (boolean) and "reason" (string). When useCenterCrop is false, explain why in reason. When true, reason can be empty. No other text.',
+      },
+      { inlineData: { mimeType, data: base64 } },
+    ];
+    const response = await client.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents,
+      config: { responseMimeType: 'application/json' },
+    });
+    const text = response.text?.trim();
+    if (!text) return { useCenterCrop: false, reason: 'Empty response from model.' };
+    try {
+      const parsed = ApproveCenterCropSchema.safeParse(JSON.parse(text));
+      if (parsed.success) return parsed.data;
+      return { useCenterCrop: false, reason: parsed.error.message || 'Invalid response shape.' };
+    } catch (e) {
+      return { useCenterCrop: false, reason: e instanceof Error ? e.message : 'Failed to parse JSON.' };
+    }
   }
 }
 

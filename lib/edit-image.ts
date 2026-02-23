@@ -9,6 +9,16 @@ import type { ImageVisionClient } from './vision-client';
 
 const ALMOST_SQUARE_THRESHOLD = 0.02; // 2%: if (diff / minSide) <= this, center-crop to square
 
+/** Max dimension when sending images to the LLM (saves tokens/cost). */
+const VISION_MAX_DIMENSION = 768;
+
+/** Default prompt for LLM when asking whether the red-square center crop is acceptable. */
+export const DEFAULT_APPROVE_CENTER_CROP_PROMPT =
+  'The image has a red square drawn on it showing the proposed square crop. Only the area inside the red square would be kept.\n\n' +
+  'REJECT if the red square cuts off ANY part of the main product (e.g. the sauna or other primary item). The WHOLE product must be fully inside the red square.\n\n' +
+  'Also REJECT if the crop would cut through furniture, people, or other prominent scene elements in a jarring way, even if the product is fully inside.\n\n' +
+  'APPROVE only when the entire product is inside the red square and the resulting crop would look like a deliberate, well-composed image.';
+
 /**
  * True if the image is close enough to square that a center-crop is safe (won't cut meaningful content).
  */
@@ -30,8 +40,8 @@ export async function resizeImage(
   targetWidthPixels: number = 1500,
   targetHeightPixels: number = 1500,
   visionClient?: ImageVisionClient | null,
+  approveCenterCropPrompt: string = DEFAULT_APPROVE_CENTER_CROP_PROMPT,
 ): Promise<Buffer> {
-  void visionClient; // reserved for intelligent crop
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
   const h = metadata.height ?? 0;
@@ -46,8 +56,25 @@ export async function resizeImage(
   } else if (isAlmostSquare(w, h)) {
     console.log(`Image is almost square: ${w}x${h}. Will center-crop to square.`);
   } else {
-		// TODO: Intelligent cropping.
-    throw new Error(`Not square. Original dimensions: ${w}x${h}. Ratio diff ${((Math.abs(w - h) / Math.min(w, h)) * 100).toFixed(2)}% exceeds ${ALMOST_SQUARE_THRESHOLD * 100}% threshold.`);
+    if (visionClient) {
+      const overlayBuffer = await drawCenterCropOverlay(input, w, h);
+      const forVision = await downscaleForVision(overlayBuffer, VISION_MAX_DIMENSION);
+      const result = await visionClient.approveCenterCrop(forVision, approveCenterCropPrompt, 'image/jpeg');
+      if (result.useCenterCrop) {
+        console.log(`LLM approved center crop for ${w}x${h}. Will center-crop to square.`);
+      } else {
+        const reason = result.reason?.trim() ? ` Reason: ${result.reason}` : '';
+        throw new Error(
+          `Not square. LLM did not approve center crop for ${w}x${h}.${reason} ` +
+            `(Intelligent crop / suggest bbox not implemented yet.)`,
+        );
+      }
+    } else {
+      throw new Error(
+        `Not square. Original dimensions: ${w}x${h}. Ratio diff ${((Math.abs(w - h) / Math.min(w, h)) * 100).toFixed(2)}% exceeds ${ALMOST_SQUARE_THRESHOLD * 100}% threshold. ` +
+          `Pass a vision client to ask the LLM if center crop is acceptable.`,
+      );
+    }
   }
 
   const size = Math.min(w, h);
@@ -72,10 +99,45 @@ export async function resizeImage(
 }
 
 /**
- * TODO:Intelligent cropping.
+ * Downscale an image so the longer side is at most maxDimension. Used before sending to the LLM to save tokens.
  */
-function intelligentCrop(input: Buffer): Buffer {
-  return input;
+async function downscaleForVision(imageBuffer: Buffer, maxDimension: number): Promise<Buffer> {
+  const meta = await sharp(imageBuffer).metadata();
+  const w = meta.width ?? 0;
+  const h = meta.height ?? 0;
+  if (w <= maxDimension && h <= maxDimension) return imageBuffer;
+  const scale = maxDimension / Math.max(w, h);
+  const newW = Math.round(w * scale);
+  const newH = Math.round(h * scale);
+  return sharp(imageBuffer)
+    .resize(newW, newH)
+    .jpeg({ quality: 85 })
+    .toBuffer();
+}
+
+/**
+ * Draw a red rectangle (center-crop region) on a copy of the image and return the new buffer.
+ * Used so the LLM can see the proposed crop and approve or reject.
+ */
+export async function drawCenterCropOverlay(
+  input: Buffer,
+  width: number,
+  height: number,
+  strokeWidthPx: number = 4,
+): Promise<Buffer> {
+  const size = Math.min(width, height);
+  const left = Math.floor((width - size) / 2);
+  const top = Math.floor((height - size) / 2);
+  const svg = Buffer.from(
+    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="${left}" y="${top}" width="${size}" height="${size}" fill="none" stroke="red" stroke-width="${strokeWidthPx}"/>
+</svg>`,
+  );
+  const overlay = await sharp(svg).png().toBuffer();
+  return sharp(input)
+    .composite([{ input: overlay, top: 0, left: 0 }])
+    .png()
+    .toBuffer();
 }
 
 /**
