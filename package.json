@@ -13,7 +13,9 @@
     "search-vendor": "npx ts-node scripts/search-vendor.ts",
     "eval-specs": "npx ts-node scripts/eval-specs.ts",
     "export-listing-for-review": "npx ts-node scripts/export-listing-for-review.ts",
-    "sync-listings-to-blob": "npx ts-node scripts/sync-listings-to-blob.ts"
+    "sync-listings-to-blob": "npx ts-node scripts/sync-listings-to-blob.ts",
+    "process-images": "npx ts-node scripts/process-images.ts",
+    "edit-image": "npx ts-node scripts/edit-image.ts"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +35,7 @@
     "openai": "^6.21.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "sharp": "^0.34.5",
     "zod": "^4.3.6"
   }
 }

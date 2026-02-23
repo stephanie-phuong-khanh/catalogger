@@ -1,23 +1,23 @@
 ## Setup
 
-1. **Install dependencies**
+**Install dependencies**
    ```bash
    npm install
    ```
 
-2. **Start the dev server**
+**Start the dev server**
    ```bash
    npm run dev
    ```
    Open [http://localhost:3000](http://localhost:3000). You should see the form (Excel upload, vendor website, and two placeholders).
 
-3. **Run the pipeline separately (unchanged)**
+**Run the pipeline separately (unchanged)**
    ```bash
    npm run pipeline
    ```
    This still runs from the command line and writes to `data/listings/`. The app does not run the pipeline yet.
 
-4. **Sync listings to Vercel Blob** (optional, for the web listings viewer)
+**Sync listings to Vercel Blob** (optional, for the web listings viewer)
    ```bash
    npm run sync-listings-to-blob                                                              # upload all (overwrites existing)
    npm run sync-listings-to-blob -- --full                                                    # full sync: wipe listings/ in Blob, then upload
