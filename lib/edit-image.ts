@@ -27,7 +27,6 @@ export async function resizeImage(
   input: Buffer,
   targetWidthPixels: number = 1500,
   targetHeightPixels: number = 1500,
-
 ): Promise<Buffer> {
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
@@ -43,10 +42,8 @@ export async function resizeImage(
   } else if (isAlmostSquare(w, h)) {
     console.log(`Image is almost square: ${w}x${h}. Will center-crop to square.`);
   } else {
-    throw new Error(
-      `Not square. Original dimensions: ${w}x${h}. ` +
-        `Ratio diff ${((Math.abs(w - h) / Math.min(w, h)) * 100).toFixed(2)}% exceeds ${ALMOST_SQUARE_THRESHOLD * 100}% threshold.`
-    );
+		// TODO: Intelligent cropping.
+    throw new Error(`Not square. Original dimensions: ${w}x${h}. Ratio diff ${((Math.abs(w - h) / Math.min(w, h)) * 100).toFixed(2)}% exceeds ${ALMOST_SQUARE_THRESHOLD * 100}% threshold.`);
   }
 
   const size = Math.min(w, h);
@@ -57,7 +54,9 @@ export async function resizeImage(
   if (w !== size || h !== size) {
     pipeline = pipeline.extract({ left, top, width: size, height: size });
   }
-  pipeline = pipeline.resize(targetWidthPixels, targetHeightPixels);
+  pipeline = pipeline
+    .resize(targetWidthPixels, targetHeightPixels)
+    .keepIccProfile();
 
   if (format === 'jpeg' || format === 'jpg') {
     return pipeline.jpeg().toBuffer();
@@ -66,6 +65,13 @@ export async function resizeImage(
   } else {
     throw new Error(`Unsupported image format: ${format}`);
   }
+}
+
+/**
+ * TODO:Intelligent cropping.
+ */
+function intelligentCrop(input: Buffer): Buffer {
+  return input;
 }
 
 /**

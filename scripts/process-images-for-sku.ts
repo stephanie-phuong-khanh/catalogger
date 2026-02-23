@@ -1,7 +1,7 @@
 /**
  * Serves as an entry point to process images for a given SKU.
  *
- * Usage: npm run process-images-for-sku -- --sku "MX-J206-01" --input-dir "~/Golden Designs/Tab 1 - Most Popular - Top Sellers/MX-J206-01" --output-dir "data/images/tab_1_most_popular/MX-J206-01"
+ * Usage: npm run process-images-for-sku -- --input-dir "~/Golden Designs/Tab 1 - Most Popular - Top Sellers/MX-J206-01" --output-dir "data/images/tab_1_most_popular/MX-J206-01"
  * 
  * Dansons Medical preferences:
  * - 1500x1500 images
@@ -64,7 +64,6 @@ function expandTilde(p: string): string {
 async function main() {
   let inputDir = parseArg('--input-dir');
   let outputDir = parseArg('--output-dir');
-  let sku = parseArg('--sku');
   if (!inputDir) {
     console.error('Missing --input-dir argument.');
     process.exit(1);
@@ -88,7 +87,7 @@ async function main() {
 
   console.log('Input directory:', inputDir);
   console.log('Output directory:', outputDir);
-  console.log(`Processing ${imageFiles.length} image files for ${sku}:`, imageFiles);
+  console.log(`Processing ${imageFiles.length} image files:`, imageFiles);
   console.log('');
 
   let resizedImages: string[] = [];
@@ -117,7 +116,9 @@ async function main() {
 
   // Instead of logging done, please print a short summary of how many images were processed, how many were resized, and how many were not resized. as well as where the images were saved.
   console.log('');
-  console.log(`Processed ${imageFiles.length} image files for ${sku}. Resized ${resizedImages.length} images. Saved original files for ${unchangedImages.length} images. Overall, processed ${resizedImages.length + unchangedImages.length} images.`);
+  console.log(`Processed ${imageFiles.length} image files.`);
+  console.log(`Resized ${resizedImages.length} images.`);
+  console.log(`Saved original files for ${unchangedImages.length} images.`);
   console.log(`Images saved to: ${outputDir}`);
 }
 
