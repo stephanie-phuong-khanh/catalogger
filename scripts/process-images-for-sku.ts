@@ -43,7 +43,14 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import dotenv from 'dotenv';
 import { resizeImage, saveProcessedImage } from '../lib/edit-image';
+import { createVisionClient } from '../lib/vision-client';
+
+dotenv.config();
+if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
+  dotenv.config({ path: '.env.local', override: true });
+}
 
 const IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp']);
 
@@ -90,6 +97,7 @@ async function main() {
   console.log(`Processing ${imageFiles.length} image files:`, imageFiles);
   console.log('');
 
+  const visionClient = createVisionClient();
   let resizedImages: string[] = [];
   let unchangedImages: string[] = [];
 
@@ -98,7 +106,7 @@ async function main() {
     const imageBuffer = fs.readFileSync(srcPath);
 
     try {
-      const resizedBuffer = await resizeImage(imageBuffer);
+      const resizedBuffer = await resizeImage(imageBuffer, 1500, 1500, visionClient);
       const outPath = path.join(outputDir, file);
       saveProcessedImage(resizedBuffer, outPath);
 

@@ -5,6 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
+import type { ImageVisionClient } from './vision-client';
 
 const ALMOST_SQUARE_THRESHOLD = 0.02; // 2%: if (diff / minSide) <= this, center-crop to square
 
@@ -21,13 +22,16 @@ function isAlmostSquare(width: number, height: number): boolean {
  * Resize an image to the target dimensions (default 1500×1500).
  * - If already square or "almost square" (within 2%): center-crop to square, then downscale to target.
  * - Otherwise: throws "Not square" (padding path not implemented yet).
+ * visionClient is optional; when provided it can be used later for intelligent crop (non–almost-square).
  * Output format matches the input (jpeg → jpeg, png → png, etc.). Returns the encoded Buffer.
  */
 export async function resizeImage(
   input: Buffer,
   targetWidthPixels: number = 1500,
   targetHeightPixels: number = 1500,
+  visionClient?: ImageVisionClient | null,
 ): Promise<Buffer> {
+  void visionClient; // reserved for intelligent crop
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
   const h = metadata.height ?? 0;

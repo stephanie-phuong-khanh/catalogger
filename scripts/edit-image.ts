@@ -2,13 +2,20 @@
  * Serves as an entry point to test individual edits to an image.
  *
  * Usage: npm run edit-image -- --image-path "data/images/MX-J206-01-01 3x3 (1).jpg"
-
+ * Vision provider: set VISION_PROVIDER=openai or gemini (optional); uses OPENAI_API_KEY or GOOGLE_API_KEY.
  */
 
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import dotenv from 'dotenv';
 import { resizeImage, saveProcessedImage } from '../lib/edit-image';
+import { createVisionClient } from '../lib/vision-client';
+
+dotenv.config();
+if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
+  dotenv.config({ path: '.env.local', override: true });
+}
 
 const SUPPORTED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png'];
 
@@ -41,10 +48,11 @@ async function main() {
   }
 
   const imageBuffer = fs.readFileSync(imagePath);
+  const visionClient = createVisionClient();
 
   let resizedBuffer: Buffer;
   try {
-    resizedBuffer = await resizeImage(imageBuffer);
+    resizedBuffer = await resizeImage(imageBuffer, 1500, 1500, visionClient);
   } catch (error) {
     console.error('Error resizing image:', error);
     return;
