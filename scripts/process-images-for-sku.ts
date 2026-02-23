@@ -43,42 +43,82 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { resizeImage, saveProcessedImage } from '../lib/edit-image';
 
-function main() {
-  // Read in the input directory from --input-dir (supports --input-dir=path or --input-dir path).
-  const argIndex = process.argv.findIndex((arg) => arg === '--input-dir' || arg.startsWith('--input-dir='));
-  let inputDir: string | undefined;
-  if (argIndex !== -1) {
-    const arg = process.argv[argIndex];
-    if (arg.includes('=')) {
-      inputDir = arg.split('=').slice(1).join('=').trim(); // in case path contains =
-    } else {
-      inputDir = process.argv[argIndex + 1];
-    }
+const IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+
+function parseArg(name: string): string | undefined {
+  const i = process.argv.findIndex((arg) => arg === name || arg.startsWith(name + '='));
+  if (i === -1) return undefined;
+  const arg = process.argv[i];
+  if (arg.includes('=')) {
+    return arg.split('=').slice(1).join('=').trim();
   }
+  return process.argv[i + 1];
+}
+
+function expandTilde(p: string): string {
+  return p.startsWith('~') ? path.join(os.homedir(), p.slice(1)) : p;
+}
+
+async function main() {
+  let inputDir = parseArg('--input-dir');
+  let outputDir = parseArg('--output-dir');
+  let sku = parseArg('--sku');
   if (!inputDir) {
     console.error('Missing --input-dir argument.');
     process.exit(1);
   }
-  // Node does not expand ~; do it so paths like ~/Google Drive/... work.
-  if (inputDir.startsWith('~')) {
-    inputDir = path.join(os.homedir(), inputDir.slice(1));
+  if (!outputDir) {
+    console.error('Missing --output-dir argument.');
+    process.exit(1);
   }
+  inputDir = expandTilde(inputDir);
+  outputDir = expandTilde(outputDir);
+
   if (!fs.existsSync(inputDir)) {
     console.error('Input directory does not exist:', inputDir);
     process.exit(1);
   }
-  console.log('Input directory:', inputDir);
-  console.log('');
-  console.log(path.basename(inputDir) || inputDir);
-  const files = fs.readdirSync(inputDir);
 
-  console.log('Files:', files);
-  for (const file of files) {
-    console.log(`- ${file}`);
+  const entries = fs.readdirSync(inputDir, { withFileTypes: true });
+  const imageFiles = entries
+    .filter((e) => e.isFile() && IMAGE_EXT.has(path.extname(e.name).toLowerCase()))
+    .map((e) => e.name);
+
+  console.log('Input directory:', inputDir);
+  console.log('Output directory:', outputDir);
+  console.log(`Processing ${imageFiles.length} image files for ${sku}:`, imageFiles);
+  console.log('');
+
+  let resizedImages: string[] = [];
+  let unchangedImages: string[] = [];
+
+  for (const file of imageFiles) {
+    const srcPath = path.join(inputDir, file);
+    const imageBuffer = fs.readFileSync(srcPath);
+
+    try {
+      const resizedBuffer = await resizeImage(imageBuffer);
+      const outPath = path.join(outputDir, file);
+      saveProcessedImage(resizedBuffer, outPath);
+
+      console.log('  ✓', file);
+      resizedImages.push(file);
+    } catch (err) {
+      const outPath = path.join(outputDir, '[ORIG] ' + file);
+      saveProcessedImage(imageBuffer, outPath);
+
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`  [!] Saved original file as "[ORIG] ${file}" for reason: ${message}`);
+      unchangedImages.push(file);
+    }
   }
 
-  // Apply classification logic to the files into categories.
+  // Instead of logging done, please print a short summary of how many images were processed, how many were resized, and how many were not resized. as well as where the images were saved.
+  console.log('');
+  console.log(`Processed ${imageFiles.length} image files for ${sku}. Resized ${resizedImages.length} images. Saved original files for ${unchangedImages.length} images. Overall, processed ${resizedImages.length + unchangedImages.length} images.`);
+  console.log(`Images saved to: ${outputDir}`);
 }
 
 main();
