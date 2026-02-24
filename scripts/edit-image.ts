@@ -13,7 +13,7 @@ import path from 'path';
 import os from 'os';
 import dotenv from 'dotenv';
 import sharp from 'sharp';
-import { resizeImage, saveProcessedImage, drawCenterCropOverlay } from '../lib/edit-image';
+import { resizeImage, saveProcessedImage } from '../lib/edit-image';
 import { createVisionClient } from '../lib/vision-client';
 
 dotenv.config();
@@ -60,13 +60,9 @@ async function main() {
       console.error('Could not read image dimensions.');
       process.exit(1);
     }
-    const overlayBuffer = await drawCenterCropOverlay(imageBuffer, w, h);
-    const outDir = path.join(process.cwd(), 'data', 'image-experiments');
-    const base = path.basename(imagePath, path.extname(imagePath));
-    const outPath = path.join(outDir, `[overlay] ${base}.png`);
-    saveProcessedImage(overlayBuffer, outPath);
-    console.log('Overlay saved (red square = proposed center crop):', outPath);
-    return;
+    
+    // throw an error for now because the code has chagned so much that this script is no longer valid
+    throw new Error('Overlay-only mode is no longer supported. Use crop-with-segmentation.ts instead.');
   }
 
   const visionClient = createVisionClient();

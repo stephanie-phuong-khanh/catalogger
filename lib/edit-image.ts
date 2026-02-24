@@ -60,6 +60,35 @@ async function centerCropToSquare(input: Buffer): Promise<Buffer> {
   throw new Error(`Unsupported image format: ${format}`);
 }
 
+const WHITE = { r: 255, g: 255, b: 255 };
+
+/**
+ * Pad image with white so the result is square. Wide image → pad top/bottom evenly; tall image → pad left/right evenly. Preserves format.
+ */
+async function padWithWhiteToSquare(input: Buffer): Promise<Buffer> {
+  const metadata = await sharp(input).metadata();
+  const w = metadata.width ?? 0;
+  const h = metadata.height ?? 0;
+  const format = metadata.format;
+  if (w === 0 || h === 0) throw new Error(`Invalid image dimensions: ${w}x${h}`);
+  if (w === h) {
+    if (format === 'jpeg' || format === 'jpg') return sharp(input).jpeg().toBuffer();
+    if (format === 'png') return sharp(input).png().toBuffer();
+    throw new Error(`Unsupported image format: ${format}`);
+  }
+  const diff = Math.abs(w - h);
+  const pad1 = Math.floor(diff / 2);
+  const pad2 = diff - pad1;
+  const extend =
+    w > h
+      ? { top: pad1, bottom: pad2, left: 0, right: 0, background: WHITE }
+      : { left: pad1, right: pad2, top: 0, bottom: 0, background: WHITE };
+  const pipeline = sharp(input).extend(extend);
+  if (format === 'jpeg' || format === 'jpg') return pipeline.jpeg().toBuffer();
+  if (format === 'png') return pipeline.png().toBuffer();
+  throw new Error(`Unsupported image format: ${format}`);
+}
+
 /**
  * Resize an image to the target dimensions (default 1500×1500).
  * - If already square or "almost square" (within 2%): center-crop to square, then downscale to target.
@@ -98,13 +127,12 @@ export async function resizeImage(
       const classification = await visionClient.classifyImageContext(downscaled, mimeType);
 
       if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
-        console.log('Image context classification: negligible_background. Will center-crop to square.');
+        console.log(`Image context classification: ${classification.kind}. Will intelligently crop using segmentation of image subject.`);
+        // TODO: Implement intelligent crop using segmentation of image subject.
       } else if (classification.kind === 'contextual') {
-        console.log('Image context classification: contextual. Will not center-crop.');
-        // TODO: Pad with white to make square, then resize to 1500x1500
+        console.log('Image context classification: contextual. Will pad with white to square.');
+        toResize = await padWithWhiteToSquare(input);
       }
-
-      return input; // for now
     } else {
       throw new Error(
         `Not square. Original dimensions: ${w}x${h}. Pass a vision client to classify and choose crop or pad.`,
