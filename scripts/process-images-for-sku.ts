@@ -93,6 +93,9 @@ async function main() {
     const srcPath = path.join(inputDir, file);
     const imageBuffer = fs.readFileSync(srcPath);
 
+    console.log();
+    console.log('Processing image:', file);
+
     try {
       const resizedBuffer = await processImage(imageBuffer, 1500, 1500, visionClient);
       const outPath = path.join(outputDir, file);
@@ -105,7 +108,7 @@ async function main() {
       saveProcessedImage(imageBuffer, outPath);
 
       const message = err instanceof Error ? err.message : String(err);
-      console.error(`  [!] Saved original file as "[ORIG] ${file}" for reason: ${message}`);
+      console.error(`  [ERROR] Saved original file as "[ORIG] ${file}" for reason: ${message}`);
       unchangedImages.push(file);
     }
   }

@@ -152,8 +152,6 @@ function proposeSquareCropCenteredOnBbox(
  * - If cutout: Find segmentation of image subject and crop to center the subject.
  * - Finally, resize to target dimensions.
  * 
- * TODO: Make visionClient required.
- * 
  * Output format matches the input (jpeg → jpeg, png → png, etc.). Returns the encoded Buffer.
  */
 export async function processImage(
@@ -190,16 +188,15 @@ export async function processImage(
       console.log('Image context classification: contextual. Padding with white to square.');
       toResize = await padWithWhiteToSquare(input);
     } else if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
-      console.log(`Image context classification: ${classification.kind}. TODO: Implement intelligent crop using segmentation of image subject.`);
+      console.log(`Image context classification: ${classification.kind}. Cropping to square using segmentation of image subject.`);
 
       // Get segmentation of image subject.
       const { segmentation } = await findSegmentationWithMask(input);
 
       if (segmentation.polygons.length !== 1) {
-        // If there's not exactly one polygon, either throw error or padWithWhiteToSquare.
-        // TODO: log a fat red exclamation mark to make sure it's visible. Consider simply throwing an error.
+        // If there's not exactly one polygon, throw error. Consider graacefully falling back to padWithWhiteToSquare.
         console.error(`Expected exactly one polygon, identified: ${segmentation.polygons.length}`);
-        toResize = await padWithWhiteToSquare(input);
+        throw new Error(`Expected exactly one polygon, identified: ${segmentation.polygons.length}`);
       } else {
         const polygon = segmentation.polygons[0];
         console.log(`Identified 1 polygon, segmentation has${polygon.length} total points.`);
@@ -224,6 +221,7 @@ export async function processImage(
           boundingBox.top >= proposedCrop.top + marginPx &&
           boundingBox.bottom <= proposedCrop.top + proposedCrop.size - marginPx;
         if (fitsWithMargin) {
+          console.log(`Cropping to the proposed square [left=${proposedCrop.left}, top=${proposedCrop.top}, size=${proposedCrop.size}]`);
           toResize = await cropToSquare(input, proposedCrop.left, proposedCrop.top, proposedCrop.size);
         } else {
           console.warn('Proposed crop would cut through the subject bounding box. Aborting. Consider white-pad or different crop.');
