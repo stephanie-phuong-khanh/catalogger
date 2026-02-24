@@ -12,15 +12,6 @@ const ALMOST_SQUARE_THRESHOLD = 0.02; // 2%: if (diff / minSide) <= this, center
 /** Max dimension when sending images to the LLM (saves tokens/cost). */
 const VISION_MAX_DIMENSION = 768;
 
-/** Default prompt for LLM when asking whether the red-square center crop is acceptable. */
-export const DEFAULT_PROPOSE_CROP_PROMPT =
-  'The image has a red square drawn on it showing the proposed square crop. Only the area inside the red square would be kept. Use "left" and "right" from the viewer\'s perspective (left = left side of the image, right = right side).\n\n' +
-  'IMPORTANT: For a non-square image, a center crop always removes equal amounts from BOTH sides of the longer dimension. So the product can be cut on the left, the right, or BOTH. Look carefully at whether the left edge and right edge of the red square both fall completely outside the product. If either edge cuts into the product at all, REJECT and say which side(s): left, right, or both.\n\n' +
-  'REJECT if the red square cuts off ANY part of the main product (e.g. the sauna interior, exterior, or any visible part). The WHOLE product must be fully inside the red square. Even a small trim of the product (e.g. control panel, wall edge) means REJECT.\n\n' +
-  'REJECT if the background is plain or insignificant (e.g. solid white) and the main subject is off-center. Then a center crop would either cut the product or leave a badly composed image; the image should be off-center cropped instead. Reason: e.g. "subject off-center with plain background; should be off-center cropped."\n\n' +
-  'REJECT if the crop would cut through furniture, people, or other prominent scene elements in a jarring way (e.g. lifestyle shots).\n\n' +
-  'APPROVE only when you are certain the entire product is fully inside the red square with no trim on any side, and the composition looks deliberate. When in doubt, REJECT.';
-
 /**
  * True if the image is close enough to square that a center-crop is safe (won't cut meaningful content).
  */
@@ -42,7 +33,6 @@ export async function resizeImage(
   targetWidthPixels: number = 1500,
   targetHeightPixels: number = 1500,
   visionClient?: ImageVisionClient | null,
-  proposeCropPrompt: string = DEFAULT_PROPOSE_CROP_PROMPT,
 ): Promise<Buffer> {
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;

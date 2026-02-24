@@ -24,20 +24,8 @@
  *     - "MP3 Aux Connection.jpg"
  * - The images are already with a white background, so we don't need to implement background removal and placement on white background. However, this probably won't be true for other vendors, so we will implement this later.
  * 
- * Steps:
- * 1. Classify the image based on the naming convention and optionally with multimodal LLM.
- * 2. For each image, have LLM judge if its current state satisfies the Dansons Medical preferences. If not, propose edits.
- * 3. Apply the edits to the image.
- * 4. [TBD] Have LLM judge if the edits satisfy the Dansons Medical preferences.
- * 5. Oh also somewhere in this, we have to make the dimensions 1500x1500 for every image.
- * 6. Save the edited image.
- * 
- * The desired output for each SKU should be edited images, classified as either
- *  (a) product on white background, one of which is proposed as the first image, 
- *  (b) lifestyle image(s), 
- *  (c) detail shot(s). 
- * Images that are failed to be classified or deemed as redundant or irrelevant should be kept and presented as such for human review.
- * 
+ * The desired output for each SKU should be edited images that satisfy the Dansons Medical preferences.
+ * Ordering and classifying images explicitly is out of scope for this script.
  */
 
 import fs from 'fs';
