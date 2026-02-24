@@ -88,6 +88,30 @@ async function centerCropToSquare(input: Buffer): Promise<Buffer> {
 const WHITE = { r: 255, g: 255, b: 255 };
 
 /**
+ * If the image format is not supported for the rest of the pipeline (e.g. webp), decode and re-encode as JPEG.
+ * WebP (and other formats) may have transparency; JPEG does not, so we flatten onto white to avoid black fill.
+ * Returns the buffer and format to use for the rest of processing.
+ */
+async function normalizeToSupportedFormat(
+  input: Buffer,
+  format: string | undefined,
+): Promise<{ buffer: Buffer; format: string }> {
+  const normalized = (format ?? '').toLowerCase();
+  if (normalized === 'jpeg' || normalized === 'jpg' || normalized === 'png') {
+    return { buffer: input, format: normalized === 'jpg' ? 'jpeg' : normalized };
+  }
+  console.log(`Normalizing image format: ${format} to jpeg.`);
+  try {
+    const pipeline = sharp(input).flatten({ background: WHITE }).jpeg({ quality: 85 });
+    const buffer = await pipeline.toBuffer();
+    return { buffer, format: 'jpeg' };
+  } catch (error) {
+    console.error(`Error normalizing image format: ${format} to jpeg.`, error);
+    throw error;
+  }
+}
+
+/**
  * Pad image with white so the result is square. Wide image → pad top/bottom evenly; tall image → pad left/right evenly. Preserves format.
  */
 async function padWithWhiteToSquare(input: Buffer): Promise<Buffer> {
@@ -163,40 +187,39 @@ export async function processImage(
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
   const h = metadata.height ?? 0;
-  const format = metadata.format;
-
   if (w === 0 || h === 0) {
     throw new Error(`Invalid image dimensions: ${w}x${h}`);
   }
 
-  let toResize: Buffer = input;
+  const { buffer: normalizedInput, format } = await normalizeToSupportedFormat(input, metadata.format);
+  let toResize: Buffer = normalizedInput;
 
   if (w === h) {
     console.log(`Image is already square: ${w}x${h}`);
   } else if (isAlmostSquare(w, h)) {
     console.log(`Image is almost square: ${w}x${h}. Will center-crop to square.`);
-    toResize = await centerCropToSquare(input);
+    toResize = await centerCropToSquare(normalizedInput);
   } else {
     console.log('Image is neither square nor almost square. Classifying image context to determine edit strategy.');
 
-    const downscaled = await downscaleForVision(input, VISION_MAX_DIMENSION);
+    const downscaled = await downscaleForVision(normalizedInput, VISION_MAX_DIMENSION);
     const didResize = w > VISION_MAX_DIMENSION || h > VISION_MAX_DIMENSION;
     const mimeType = didResize ? 'image/jpeg' : (format === 'png' ? 'image/png' : 'image/jpeg');
     const classification = await visionClient.classifyImageContext(downscaled, mimeType);
 
     if (classification.kind === 'contextual') {
       console.log('Image context classification: contextual. Padding with white to square.');
-      toResize = await padWithWhiteToSquare(input);
+      toResize = await padWithWhiteToSquare(normalizedInput);
     } else if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
-      console.log(`Image context classification: ${classification.kind}. Cropping to square using segmentation of image subject.`);
+      console.log(`Image context classification: ${classification.kind}. Finding segmentation of image subject.`);
 
       // Get segmentation of image subject.
-      const { segmentation } = await findSegmentationWithMask(input);
+      const { segmentation } = await findSegmentationWithMask(normalizedInput);
 
       if (segmentation.polygons.length !== 1) {
         // If there's not exactly one polygon, throw error. Consider graacefully falling back to padWithWhiteToSquare.
-        console.error(`Expected exactly one polygon, identified: ${segmentation.polygons.length}`);
-        throw new Error(`Expected exactly one polygon, identified: ${segmentation.polygons.length}`);
+        console.error(`Expected exactly one polygon, identified: ${segmentation.polygons.length}. Padding with white to square.`);
+        toResize = await padWithWhiteToSquare(normalizedInput);
       } else {
         const polygon = segmentation.polygons[0];
         console.log(`Identified 1 polygon, segmentation has${polygon.length} total points.`);
@@ -222,10 +245,10 @@ export async function processImage(
           boundingBox.bottom <= proposedCrop.top + proposedCrop.size - marginPx;
         if (fitsWithMargin) {
           console.log(`Cropping to the proposed square [left=${proposedCrop.left}, top=${proposedCrop.top}, size=${proposedCrop.size}]`);
-          toResize = await cropToSquare(input, proposedCrop.left, proposedCrop.top, proposedCrop.size);
+          toResize = await cropToSquare(normalizedInput, proposedCrop.left, proposedCrop.top, proposedCrop.size);
         } else {
-          console.warn('Proposed crop would cut through the subject bounding box. Aborting. Consider white-pad or different crop.');
-          toResize = await padWithWhiteToSquare(input);
+          console.warn('Proposed crop would cut through the subject bounding box. Padding with white to square.');
+          toResize = await padWithWhiteToSquare(normalizedInput);
         }
       }
     } else {
@@ -251,8 +274,8 @@ export async function drawCenterCropOverlay(
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
   const h = metadata.height ?? 0;
-  const format = metadata.format;
   if (w === 0 || h === 0) throw new Error(`Invalid image dimensions: ${w}x${h}`);
+  const { buffer: normalizedInput, format } = await normalizeToSupportedFormat(input, metadata.format);
   const size = Math.min(w, h);
   const left = Math.floor((w - size) / 2);
   const top = Math.floor((h - size) / 2);
@@ -262,7 +285,7 @@ export async function drawCenterCropOverlay(
 </svg>`,
   );
   const overlay = await sharp(svg).png().toBuffer();
-  const pipeline = sharp(input).composite([{ input: overlay, top: 0, left: 0 }]);
+  const pipeline = sharp(normalizedInput).composite([{ input: overlay, top: 0, left: 0 }]);
   return encodePipelineByFormat(pipeline, format);
 }
 

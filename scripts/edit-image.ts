@@ -2,8 +2,8 @@
  * Serves as an entry point to test individual edits to an image.
  *
  * Usage:
- *   npm run edit-image -- --image-path "path/to/image.jpg"
- *   npm run edit-image -- --image-path "path/to/image.jpg" --overlay-only   # draw red center-crop box, save for spot-check
+ *   npm run edit-image -- --image-path "path/to/image.jpg" --out-dir "path/to/output/directory"
+ *   npm run edit-image -- --image-path "path/to/image.jpg" --out-dir "path/to/output/directory" --overlay-only   # draw red center-crop box, save for spot-check
  *
  * Vision provider: set VISION_PROVIDER=openai or gemini (optional); uses OPENAI_API_KEY or GOOGLE_API_KEY.
  */
@@ -24,7 +24,7 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
   dotenv.config({ path: '.env.local', override: true });
 }
 
-const SUPPORTED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png'];
+const SUPPORTED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'webp'];
 const DEFAULT_OUT_DIR = path.join(process.cwd(), 'data', 'image-experiments');
 
 function parseImagePath(): string | undefined {
@@ -69,22 +69,23 @@ async function main() {
   const imageBuffer = fs.readFileSync(imagePath);
   const overlayOnly = process.argv.includes('--overlay-only');
   const outDir = parseOutDir();
-  const fileName = path.basename(imagePath);
+  const ext = path.extname(imagePath).toLowerCase();
+  const baseName = path.basename(imagePath, ext);
+  const outputFileName = ext === '.webp' ? baseName + '.jpg' : path.basename(imagePath);
+  const outPathBase = path.join(outDir, outputFileName);
 
   if (overlayOnly) {
     const overlayBuffer = await drawCenterCropOverlay(imageBuffer);
-    const outPath = path.join(outDir, fileName);
-    saveProcessedImage(overlayBuffer, outPath);
-    console.log('Wrote overlay (red center-crop box):', outPath);
+    saveProcessedImage(overlayBuffer, outPathBase);
+    console.log('Wrote overlay (red center-crop box):', outPathBase);
     return;
   }
 
   const visionClient = createVisionClient();
   try {
     const resizedBuffer = await processImage(imageBuffer, 1500, 1500, visionClient);
-    const outPath = path.join(outDir, fileName);
-    saveProcessedImage(resizedBuffer, outPath);
-    console.log('Wrote', outPath);
+    saveProcessedImage(resizedBuffer, outPathBase);
+    console.log('Wrote', outPathBase);
   } catch (error) {
     console.error('Error processing image:', error);
     process.exit(1);

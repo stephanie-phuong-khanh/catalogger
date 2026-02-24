@@ -78,7 +78,8 @@ async function main() {
   const entries = fs.readdirSync(inputDir, { withFileTypes: true });
   const imageFiles = entries
     .filter((e) => e.isFile() && IMAGE_EXT.has(path.extname(e.name).toLowerCase()))
-    .map((e) => e.name);
+    .map((e) => e.name)
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
   console.log('Input directory:', inputDir);
   console.log('Output directory:', outputDir);
@@ -89,16 +90,20 @@ async function main() {
   let resizedImages: string[] = [];
   let unchangedImages: string[] = [];
 
-  for (const file of imageFiles) {
+  for (let i = 0; i < imageFiles.length; i++) {
+    const file = imageFiles[i];
     const srcPath = path.join(inputDir, file);
     const imageBuffer = fs.readFileSync(srcPath);
 
     console.log();
-    console.log('Processing image:', file);
+    console.log(`[${i + 1} / ${imageFiles.length}] Processing image: ${file}`);
 
     try {
       const resizedBuffer = await processImage(imageBuffer, 1500, 1500, visionClient);
-      const outPath = path.join(outputDir, file);
+      const ext = path.extname(file).toLowerCase();
+      const baseName = path.basename(file, ext);
+      const outputFileName = ext === '.webp' ? baseName + '.jpg' : file;
+      const outPath = path.join(outputDir, outputFileName);
       saveProcessedImage(resizedBuffer, outPath);
 
       console.log('  ✓', file);
