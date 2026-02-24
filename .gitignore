@@ -26,3 +26,6 @@ npm-debug.log*
 
 # Vercel (if you deploy there)
 .vercel
+
+# Python virtual environment
+venv/

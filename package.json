@@ -16,7 +16,8 @@
     "sync-listings-to-blob": "npx ts-node scripts/sync-listings-to-blob.ts",
     "process-images": "npx ts-node scripts/process-images.ts",
     "edit-image": "npx ts-node scripts/edit-image.ts",
-    "process-images-for-sku": "npx ts-node scripts/process-images-for-sku.ts"
+    "process-images-for-sku": "npx ts-node scripts/process-images-for-sku.ts",
+    "test-segmentation": "npx ts-node scripts/test-segmentation.ts"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,7 @@
   "dependencies": {
     "@google/genai": "^1.42.0",
     "@vercel/blob": "^2.3.0",
+    "d3-contour": "^4.0.2",
     "dotenv": "^17.2.4",
     "next": "^14.2.0",
     "openai": "^6.21.0",
