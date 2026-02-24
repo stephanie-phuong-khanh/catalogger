@@ -27,5 +27,4 @@
 
 **Subject segmentation (rembg)** – for outline/crop pipeline
    1. Make sure Docker desktop is installed. Pull the image: `docker pull danielgatis/rembg`
-   2. Populate env variable `REMBG_USE_DOCKER=1`
-   3. Run: `npm run test-segmentation -- --image-path "path/to/image.png"` to test. Outputs go to `data/segmentation-tests/` by default.
+   2. Run: `npm run test-segmentation -- --image-path "path/to/image.png"` to test. Outputs go to `data/segmentation-tests/` by default.

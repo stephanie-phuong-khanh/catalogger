@@ -17,7 +17,8 @@
     "process-images": "npx ts-node scripts/process-images.ts",
     "edit-image": "npx ts-node scripts/edit-image.ts",
     "process-images-for-sku": "npx ts-node scripts/process-images-for-sku.ts",
-    "test-segmentation": "npx ts-node scripts/test-segmentation.ts"
+    "test-segmentation": "npx ts-node scripts/test-segmentation.ts",
+    "crop-with-segmentation": "npx ts-node scripts/crop-with-segmentation.ts"
   },
   "keywords": [],
   "author": "",

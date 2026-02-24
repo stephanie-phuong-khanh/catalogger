@@ -4,14 +4,11 @@
  * Setup (one-time) – use Docker:
  *   1. Install Docker Desktop and start it.
  *   2. docker pull danielgatis/rembg
- *   3. In .env.local add:   REMBG_USE_DOCKER=1
- *
- * Optional: REMBG_DEBUG_SAVE_MASK=1 saves the raw mask as data/segmentation-tests/rembg-raw-mask.png.
- *           REMBG_INVERT_MASK=1 flips subject/background if the overlay highlights the wrong region.
  *
  * Usage:
  *   npm run test-segmentation -- --image-path "path/to/image.png"
  *   npm run test-segmentation -- --image-path "path/to/image.jpg" --out-dir "data/my-seg"
+ *   npm run test-segmentation -- --image-path "path/to/image.png" --out-dir "data/my-seg" --invert-mask
  */
 
 import fs from 'fs';
@@ -19,12 +16,8 @@ import path from 'path';
 import os from 'os';
 import dotenv from 'dotenv';
 import sharp from 'sharp';
-import {
-  findSegmentationWithMask,
-  drawSegmentationOverlay,
-  drawMaskOverlay,
-  saveProcessedImage,
-} from '../lib/edit-image';
+import { findSegmentationWithMask, drawSegmentationOverlay, drawMaskOverlay } from '../lib/segmentation';
+import { saveProcessedImage } from '../lib/edit-image';
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
@@ -55,6 +48,12 @@ async function main() {
   if (!imagePath) {
     console.error('Missing --image-path argument.');
     process.exit(1);
+  }
+
+  let invertMask = false;
+  const invertMaskIndex = process.argv.findIndex((arg) => arg === '--invert-mask' || arg.startsWith('--invert-mask='));
+  if (invertMaskIndex !== -1) {
+    invertMask = true;
   }
 
   if (!SUPPORTED_IMAGE_FORMATS.includes(path.extname(imagePath).slice(1).toLowerCase())) {
