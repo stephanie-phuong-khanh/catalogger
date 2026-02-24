@@ -58,8 +58,14 @@ export async function resizeImage(
   } else if (isAlmostSquare(w, h)) {
     console.log(`Image is almost square: ${w}x${h}. Will center-crop to square.`);
   } else {
+    console.log('Image is not square. Will classify image context.');
     if (visionClient) {
-      // TODO: Implement LLM call which classifies the image as cutout or lifestyle.
+      const downscaled = await downscaleForVision(input, VISION_MAX_DIMENSION);
+      const didResize = w > VISION_MAX_DIMENSION || h > VISION_MAX_DIMENSION;
+      const mimeType = didResize ? 'image/jpeg' : (format === 'png' ? 'image/png' : 'image/jpeg');
+      const classification = await visionClient.classifyImageContext(downscaled, mimeType);
+      console.log(`Image context classification: ${classification.kind}. ${classification.reason ?? ''}`);
+      return input;
     } else {
       throw new Error(
         `Not square. Original dimensions: ${w}x${h}. Ratio diff ${((Math.abs(w - h) / Math.min(w, h)) * 100).toFixed(2)}% exceeds ${ALMOST_SQUARE_THRESHOLD * 100}% threshold. ` +
@@ -108,7 +114,6 @@ async function downscaleForVision(imageBuffer: Buffer, maxDimension: number): Pr
 
 /**
  * Draw a red rectangle (crop region) on a copy of the image and return the new buffer.
- * Used so the LLM can see the proposed crop and approve or reject.
  */
 export async function drawCropOverlay(
   input: Buffer,
