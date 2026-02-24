@@ -1,20 +1,13 @@
 /**
  * Test segmentation: run rembg, get outline, save polygon overlay and mask overlay for inspection.
  *
- * Setup (one-time), pick one:
- *
- *   Docker (easiest if local pip install fails, e.g. llvmlite on macOS 26):
+ * Setup (one-time) – use Docker:
  *   1. Install Docker Desktop and start it.
  *   2. docker pull danielgatis/rembg
  *   3. In .env.local add:   REMBG_USE_DOCKER=1
  *
- *   Or local Python (use 3.11 or 3.12; 3.13+ has no onnxruntime wheels):
- *   1. python3.12 -m venv venv   (or python3.11)
- *   2. source venv/bin/activate   then   pip install "rembg[cpu,cli]"
- *   3. In .env.local add:   REMBG_PYTHON=./venv/bin/python
- *
- * Debug: REMBG_DEBUG_SAVE_MASK=1 saves the raw mask as data/segmentation-tests/rembg-raw-mask.png.
- *       REMBG_INVERT_MASK=1 flips subject/background if the overlay highlights the wrong region.
+ * Optional: REMBG_DEBUG_SAVE_MASK=1 saves the raw mask as data/segmentation-tests/rembg-raw-mask.png.
+ *           REMBG_INVERT_MASK=1 flips subject/background if the overlay highlights the wrong region.
  *
  * Usage:
  *   npm run test-segmentation -- --image-path "path/to/image.png"

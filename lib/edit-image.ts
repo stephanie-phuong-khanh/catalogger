@@ -199,7 +199,7 @@ async function maskToPolygons(
 
 /**
  * Get subject outline as polygon coordinates (for crop proposal). Uses rembg subprocess + contour extraction.
- * Requires: pip install "rembg[cpu,cli]"
+ * Requires: REMBG_USE_DOCKER=1 and Docker with danielgatis/rembg (see lib/segmentation-rembg.ts).
  */
 export async function findSegmentation(input: Buffer): Promise<SegmentationResult> {
   const out = await findSegmentationWithMask(input);

@@ -1,10 +1,11 @@
 /**
- * Subject segmentation via rembg (Python) subprocess.
+ * Subject segmentation via rembg subprocess.
  *
- * Option A – Local Python: pip install "rembg[cpu,cli]", set REMBG_PYTHON=./venv/bin/python if needed.
- * Option B – Docker (no local Python): set REMBG_USE_DOCKER=1 and run:
+ * Recommended: Docker (no local Python). Set REMBG_USE_DOCKER=1 in .env.local and run:
  *   docker pull danielgatis/rembg
- *   (then this script will run rembg via docker run)
+ * This script will run rembg via `docker run` with a mounted temp dir.
+ *
+ * Fallback: local Python (pip install "rembg[cpu,cli]"). Set REMBG_PYTHON=./venv/bin/python if needed.
  *
  * Output: mask as Float32Array (0–1 per pixel), same dimensions as input image.
  * Callers use this to get outline coordinates (contours) and to propose crops.
@@ -43,9 +44,7 @@ function runRembgCommand(
  * Run rembg to get a subject mask; returns mask as float 0–1 (subject = 1, background = 0).
  * Uses "rembg i -om input.png mask.png" so output is mask-only. Reads mask PNG and normalizes to 0–1.
  *
- * Command resolution (first that works):
- * 1. If REMBG_PYTHON is set: use that interpreter (e.g. path/to/venv/bin/python) with -m rembg.
- * 2. Otherwise try: rembg, then python3 -m rembg, then python -m rembg.
+ * Command resolution: if REMBG_USE_DOCKER=1, run rembg via Docker; otherwise try REMBG_PYTHON, then rembg / python3 -m rembg / python -m rembg.
  *
  * If the overlay highlights the background instead of the subject, set REMBG_INVERT_MASK=1.
  */
@@ -105,9 +104,9 @@ export async function runRembgSegmentation(imageBuffer: Buffer): Promise<RembgMa
       const err = result.stderr?.trim() ?? '';
       let hint = '';
       if (err.includes('No module named rembg') || err.includes('No module named \'rembg\'')) {
-        hint = ' Use the Python that has rembg (REMBG_PYTHON) or set REMBG_USE_DOCKER=1 to use Docker.';
+        hint = ' Set REMBG_USE_DOCKER=1 in .env.local and run: docker pull danielgatis/rembg (recommended).';
       } else if (useDocker && err.includes('Cannot connect to the Docker daemon')) {
-        hint = ' Start Docker Desktop or set REMBG_PYTHON to a local venv with rembg.';
+        hint = ' Start Docker Desktop (required for REMBG_USE_DOCKER=1).';
       }
       console.warn(`rembg failed: ${err || 'no mask produced'}${hint}`);
       return null;
