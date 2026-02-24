@@ -242,6 +242,31 @@ export async function processImage(
 }
 
 /**
+ * Draw the proposed center-crop square (red rect) on the image for spot-check. Does not resize or crop.
+ */
+export async function drawCenterCropOverlay(
+  input: Buffer,
+  strokeWidthPx: number = 4,
+): Promise<Buffer> {
+  const metadata = await sharp(input).metadata();
+  const w = metadata.width ?? 0;
+  const h = metadata.height ?? 0;
+  const format = metadata.format;
+  if (w === 0 || h === 0) throw new Error(`Invalid image dimensions: ${w}x${h}`);
+  const size = Math.min(w, h);
+  const left = Math.floor((w - size) / 2);
+  const top = Math.floor((h - size) / 2);
+  const svg = Buffer.from(
+    `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="${left}" y="${top}" width="${size}" height="${size}" fill="none" stroke="red" stroke-width="${strokeWidthPx}"/>
+</svg>`,
+  );
+  const overlay = await sharp(svg).png().toBuffer();
+  const pipeline = sharp(input).composite([{ input: overlay, top: 0, left: 0 }]);
+  return encodePipelineByFormat(pipeline, format);
+}
+
+/**
  * Write a processed image buffer to disk. Creates the parent directory if needed.
  */
 export function saveProcessedImage(buffer: Buffer, outputPath: string): void {

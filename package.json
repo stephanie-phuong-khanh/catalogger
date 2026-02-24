@@ -14,7 +14,6 @@
     "eval-specs": "npx ts-node scripts/eval-specs.ts",
     "export-listing-for-review": "npx ts-node scripts/export-listing-for-review.ts",
     "sync-listings-to-blob": "npx ts-node scripts/sync-listings-to-blob.ts",
-    "process-images": "npx ts-node scripts/process-images.ts",
     "edit-image": "npx ts-node scripts/edit-image.ts",
     "process-images-for-sku": "npx ts-node scripts/process-images-for-sku.ts",
     "test-segmentation": "npx ts-node scripts/test-segmentation.ts",
