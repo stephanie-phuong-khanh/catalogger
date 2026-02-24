@@ -171,14 +171,15 @@ async function main() {
     `Bounding box: ${boundingBox.left}, ${boundingBox.top}, ${boundingBox.right}, ${boundingBox.bottom}`,
   );
 
-  // Draw segmentation (red polygon) on image, then bbox (blue rect) on a transparent layer on top.
+  // Base = image + red polygon; then composite blue bbox on top so both are visible.
   const segmentationOverlayBuffer = await drawSegmentationOverlay(imageBuffer, segmentation);
   const bboxOnlyBuffer = await drawBoundingBoxOverlay(imageWidth, imageHeight, boundingBox);
-  const segBboxBuffer = await applyOverlays(
-    imageBuffer,
-    [segmentationOverlayBuffer, bboxOnlyBuffer], 
-    path.extname(imagePath).toLowerCase(),
-  );
+  const segBboxExt = path.extname(imagePath).toLowerCase();
+  let segBboxPipeline = sharp(segmentationOverlayBuffer).composite([{ input: bboxOnlyBuffer, top: 0, left: 0 }]);
+  const segBboxBuffer =
+    segBboxExt === '.jpg' || segBboxExt === '.jpeg'
+      ? await segBboxPipeline.jpeg({ quality: 90 }).toBuffer()
+      : await segBboxPipeline.png().toBuffer();
   const segBboxOutPath = path.join(outDir, `[seg-bbox] ${base}${path.extname(imagePath).toLowerCase()}`);
   saveProcessedImage(
     segBboxBuffer,
