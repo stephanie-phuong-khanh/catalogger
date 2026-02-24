@@ -105,7 +105,7 @@ async function main() {
       saveProcessedImage(imageBuffer, outPath);
 
       const message = err instanceof Error ? err.message : String(err);
-      console.warn(`  [!] Saved original file as "[ORIG] ${file}" for reason: ${message}`);
+      console.error(`  [!] Saved original file as "[ORIG] ${file}" for reason: ${message}`);
       unchangedImages.push(file);
     }
   }
