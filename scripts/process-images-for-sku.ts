@@ -32,7 +32,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import dotenv from 'dotenv';
-import { resizeImage, saveProcessedImage } from '../lib/edit-image';
+import { processImage, saveProcessedImage } from '../lib/edit-image';
 import { createVisionClient } from '../lib/vision-client';
 
 dotenv.config();
@@ -94,7 +94,7 @@ async function main() {
     const imageBuffer = fs.readFileSync(srcPath);
 
     try {
-      const resizedBuffer = await resizeImage(imageBuffer, 1500, 1500, visionClient);
+      const resizedBuffer = await processImage(imageBuffer, 1500, 1500, visionClient);
       const outPath = path.join(outputDir, file);
       saveProcessedImage(resizedBuffer, outPath);
 

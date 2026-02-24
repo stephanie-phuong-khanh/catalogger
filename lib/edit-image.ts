@@ -95,18 +95,24 @@ async function padWithWhiteToSquare(input: Buffer): Promise<Buffer> {
   return encodePipelineByFormat(pipeline, format);
 }
 
+
 /**
- * Resize an image to the target dimensions (default 1500×1500).
+ * Prepare an individual image for ecommerce catalogue.
  * - If already square or "almost square" (within 2%): center-crop to square, then downscale to target.
- * - Otherwise: throws "Not square" (padding path not implemented yet).
- * visionClient is optional; when provided it can be used later for intelligent crop (non–almost-square).
+ * - Otherwise: classify image context as either contextual or cutout, with empty (or negligible) background.
+ * - If contextual: pad with white to square.
+ * - If cutout: Find segmentation of image subject and crop to center the subject.
+ * - Finally, resize to target dimensions.
+ * 
+ * TODO: Make visionClient required.
+ * 
  * Output format matches the input (jpeg → jpeg, png → png, etc.). Returns the encoded Buffer.
  */
-export async function resizeImage(
+export async function processImage(
   input: Buffer,
   targetWidthPixels: number = 1500,
   targetHeightPixels: number = 1500,
-  visionClient?: ImageVisionClient | null,
+  visionClient: ImageVisionClient,
 ): Promise<Buffer> {
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
@@ -125,24 +131,21 @@ export async function resizeImage(
     console.log(`Image is almost square: ${w}x${h}. Will center-crop to square.`);
     toResize = await centerCropToSquare(input);
   } else {
-    console.log('Image is not square. Will classify image context.');
-    if (visionClient) {
-      const downscaled = await downscaleForVision(input, VISION_MAX_DIMENSION);
-      const didResize = w > VISION_MAX_DIMENSION || h > VISION_MAX_DIMENSION;
-      const mimeType = didResize ? 'image/jpeg' : (format === 'png' ? 'image/png' : 'image/jpeg');
-      const classification = await visionClient.classifyImageContext(downscaled, mimeType);
+    console.log('Image is neither square nor almost square. Classifying image context to determine edit strategy.');
 
-      if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
-        console.log(`Image context classification: ${classification.kind}. TODO: Implement intelligent crop using segmentation of image subject.`);
-        // TODO: Implement intelligent crop using segmentation of image subject.
-      } else if (classification.kind === 'contextual') {
-        console.log('Image context classification: contextual. Padding with white to square.');
-        toResize = await padWithWhiteToSquare(input);
-      }
-    } else {
-      throw new Error(
-        `Not square. Original dimensions: ${w}x${h}. Pass a vision client to classify and choose crop or pad.`,
-      );
+    const downscaled = await downscaleForVision(input, VISION_MAX_DIMENSION);
+    const didResize = w > VISION_MAX_DIMENSION || h > VISION_MAX_DIMENSION;
+    const mimeType = didResize ? 'image/jpeg' : (format === 'png' ? 'image/png' : 'image/jpeg');
+    const classification = await visionClient.classifyImageContext(downscaled, mimeType);
+
+    if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
+      console.log(`Image context classification: ${classification.kind}. TODO: Implement intelligent crop using segmentation of image subject.`);
+      // TODO: Implement intelligent crop using segmentation of image subject.
+
+      
+    } else if (classification.kind === 'contextual') {
+      console.log('Image context classification: contextual. Padding with white to square.');
+      toResize = await padWithWhiteToSquare(input);
     }
   }
 

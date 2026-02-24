@@ -151,7 +151,7 @@ async function main() {
   }
 
   console.log('Running segmentation (rembg)...');
-  const { segmentation, mask } = await findSegmentationWithMask(imageBuffer);
+  const { segmentation } = await findSegmentationWithMask(imageBuffer);
 
   if (segmentation.polygons.length === 0) {
     console.log('No polygons (rembg failed or no contour). Unable to proceed.');
