@@ -22,6 +22,18 @@ function isAlmostSquare(width: number, height: number): boolean {
 }
 
 /**
+ * Encode a sharp pipeline to a buffer using the image format (jpeg/png). Used in centerCropToSquare, padWithWhiteToSquare, resizeImage.
+ */
+function encodePipelineByFormat(
+  pipeline: ReturnType<typeof sharp>,
+  format: string,
+): Promise<Buffer> {
+  if (format === 'jpeg' || format === 'jpg') return pipeline.jpeg().toBuffer();
+  if (format === 'png') return pipeline.png().toBuffer();
+  throw new Error(`Unsupported image format: ${format}`);
+}
+
+/**
  * Downscale an image so the longer side is at most maxDimension. Used before sending to the LLM to save tokens.
  */
 async function downscaleForVision(imageBuffer: Buffer, maxDimension: number): Promise<Buffer> {
@@ -55,9 +67,7 @@ async function centerCropToSquare(input: Buffer): Promise<Buffer> {
   if (w !== size || h !== size) {
     pipeline = pipeline.extract({ left, top, width: size, height: size });
   }
-  if (format === 'jpeg' || format === 'jpg') return pipeline.jpeg().toBuffer();
-  if (format === 'png') return pipeline.png().toBuffer();
-  throw new Error(`Unsupported image format: ${format}`);
+  return encodePipelineByFormat(pipeline, format);
 }
 
 const WHITE = { r: 255, g: 255, b: 255 };
@@ -72,9 +82,7 @@ async function padWithWhiteToSquare(input: Buffer): Promise<Buffer> {
   const format = metadata.format;
   if (w === 0 || h === 0) throw new Error(`Invalid image dimensions: ${w}x${h}`);
   if (w === h) {
-    if (format === 'jpeg' || format === 'jpg') return sharp(input).jpeg().toBuffer();
-    if (format === 'png') return sharp(input).png().toBuffer();
-    throw new Error(`Unsupported image format: ${format}`);
+    return encodePipelineByFormat(sharp(input), format);
   }
   const diff = Math.abs(w - h);
   const pad1 = Math.floor(diff / 2);
@@ -84,9 +92,7 @@ async function padWithWhiteToSquare(input: Buffer): Promise<Buffer> {
       ? { top: pad1, bottom: pad2, left: 0, right: 0, background: WHITE }
       : { left: pad1, right: pad2, top: 0, bottom: 0, background: WHITE };
   const pipeline = sharp(input).extend(extend);
-  if (format === 'jpeg' || format === 'jpg') return pipeline.jpeg().toBuffer();
-  if (format === 'png') return pipeline.png().toBuffer();
-  throw new Error(`Unsupported image format: ${format}`);
+  return encodePipelineByFormat(pipeline, format);
 }
 
 /**
@@ -127,10 +133,10 @@ export async function resizeImage(
       const classification = await visionClient.classifyImageContext(downscaled, mimeType);
 
       if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
-        console.log(`Image context classification: ${classification.kind}. Will intelligently crop using segmentation of image subject.`);
+        console.log(`Image context classification: ${classification.kind}. TODO: Implement intelligent crop using segmentation of image subject.`);
         // TODO: Implement intelligent crop using segmentation of image subject.
       } else if (classification.kind === 'contextual') {
-        console.log('Image context classification: contextual. Will pad with white to square.');
+        console.log('Image context classification: contextual. Padding with white to square.');
         toResize = await padWithWhiteToSquare(input);
       }
     } else {
@@ -145,13 +151,7 @@ export async function resizeImage(
     .resize(targetWidthPixels, targetHeightPixels)
     .keepIccProfile();
 
-  if (format === 'jpeg' || format === 'jpg') {
-    return pipeline.jpeg().toBuffer();
-  } else if (format === 'png') {
-    return pipeline.png().toBuffer();
-  } else {
-    throw new Error(`Unsupported image format: ${format}`);
-  }
+  return encodePipelineByFormat(pipeline, format);
 }
 
 /**
