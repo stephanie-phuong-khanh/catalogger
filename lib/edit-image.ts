@@ -13,7 +13,7 @@ const ALMOST_SQUARE_THRESHOLD = 0.02; // 2%: if (diff / minSide) <= this, center
 const VISION_MAX_DIMENSION = 768;
 
 /** Default prompt for LLM when asking whether the red-square center crop is acceptable. */
-export const DEFAULT_APPROVE_CENTER_CROP_PROMPT =
+export const DEFAULT_PROPOSE_CROP_PROMPT =
   'The image has a red square drawn on it showing the proposed square crop. Only the area inside the red square would be kept. Use "left" and "right" from the viewer\'s perspective (left = left side of the image, right = right side).\n\n' +
   'IMPORTANT: For a non-square image, a center crop always removes equal amounts from BOTH sides of the longer dimension. So the product can be cut on the left, the right, or BOTH. Look carefully at whether the left edge and right edge of the red square both fall completely outside the product. If either edge cuts into the product at all, REJECT and say which side(s): left, right, or both.\n\n' +
   'REJECT if the red square cuts off ANY part of the main product (e.g. the sauna interior, exterior, or any visible part). The WHOLE product must be fully inside the red square. Even a small trim of the product (e.g. control panel, wall edge) means REJECT.\n\n' +
@@ -42,7 +42,7 @@ export async function resizeImage(
   targetWidthPixels: number = 1500,
   targetHeightPixels: number = 1500,
   visionClient?: ImageVisionClient | null,
-  approveCenterCropPrompt: string = DEFAULT_APPROVE_CENTER_CROP_PROMPT,
+  proposeCropPrompt: string = DEFAULT_PROPOSE_CROP_PROMPT,
 ): Promise<Buffer> {
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
@@ -59,18 +59,7 @@ export async function resizeImage(
     console.log(`Image is almost square: ${w}x${h}. Will center-crop to square.`);
   } else {
     if (visionClient) {
-      const overlayBuffer = await drawCenterCropOverlay(input, w, h);
-      const forVision = await downscaleForVision(overlayBuffer, VISION_MAX_DIMENSION);
-      const result = await visionClient.approveCenterCrop(forVision, approveCenterCropPrompt, 'image/jpeg');
-      if (result.useCenterCrop) {
-        console.log(`LLM approved center crop for ${w}x${h}. Will center-crop to square.`);
-      } else {
-        const reason = result.reason?.trim() ? ` Reason: ${result.reason}` : '';
-        throw new Error(
-          `Not square. LLM did not approve center crop for ${w}x${h}.${reason} ` +
-            `(Intelligent crop / suggest bbox not implemented yet.)`,
-        );
-      }
+      // TODO: Implement LLM call which classifies the image as cutout or lifestyle.
     } else {
       throw new Error(
         `Not square. Original dimensions: ${w}x${h}. Ratio diff ${((Math.abs(w - h) / Math.min(w, h)) * 100).toFixed(2)}% exceeds ${ALMOST_SQUARE_THRESHOLD * 100}% threshold. ` +
@@ -118,8 +107,33 @@ async function downscaleForVision(imageBuffer: Buffer, maxDimension: number): Pr
 }
 
 /**
- * Draw a red rectangle (center-crop region) on a copy of the image and return the new buffer.
+ * Draw a red rectangle (crop region) on a copy of the image and return the new buffer.
  * Used so the LLM can see the proposed crop and approve or reject.
+ */
+export async function drawCropOverlay(
+  input: Buffer,
+  left: number,
+  top: number,
+  cropWidth: number,
+  cropHeight: number,
+  imageWidth: number,
+  imageHeight: number,
+  strokeWidthPx: number = 4,
+): Promise<Buffer> {
+  const svg = Buffer.from(
+    `<svg width="${imageWidth}" height="${imageHeight}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="${left}" y="${top}" width="${cropWidth}" height="${cropHeight}" fill="none" stroke="red" stroke-width="${strokeWidthPx}"/>
+</svg>`,
+  );
+  const overlay = await sharp(svg).png().toBuffer();
+  return sharp(input)
+    .composite([{ input: overlay, top: 0, left: 0 }])
+    .png()
+    .toBuffer();
+}
+
+/**
+ * Draw the center-crop overlay by computing the center square and calling drawCropOverlay.
  */
 export async function drawCenterCropOverlay(
   input: Buffer,
@@ -130,16 +144,7 @@ export async function drawCenterCropOverlay(
   const size = Math.min(width, height);
   const left = Math.floor((width - size) / 2);
   const top = Math.floor((height - size) / 2);
-  const svg = Buffer.from(
-    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-  <rect x="${left}" y="${top}" width="${size}" height="${size}" fill="none" stroke="red" stroke-width="${strokeWidthPx}"/>
-</svg>`,
-  );
-  const overlay = await sharp(svg).png().toBuffer();
-  return sharp(input)
-    .composite([{ input: overlay, top: 0, left: 0 }])
-    .png()
-    .toBuffer();
+  return drawCropOverlay(input, left, top, size, size, width, height, strokeWidthPx);
 }
 
 /**
