@@ -6,9 +6,12 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import type { ImageVisionClient } from './vision-client';
+import { findSegmentationWithMask } from './segmentation';
 
-const ALMOST_SQUARE_THRESHOLD = 0.02; // 2%: if (diff / minSide) <= this, center-crop to square
-
+/** Threshold for considering an image "almost square" (within 2% of square). */
+const ALMOST_SQUARE_THRESHOLD = 0.02;
+/** Minimum margin around subject as a fraction of crop size (e.g. 0.02 = 2%). Subject must be this far inside the crop on all sides. */
+const CROP_SUBJECT_MARGIN_RATIO = 0.02;
 /** Max dimension when sending images to the LLM (saves tokens/cost). */
 const VISION_MAX_DIMENSION = 768;
 
@@ -51,24 +54,36 @@ async function downscaleForVision(imageBuffer: Buffer, maxDimension: number): Pr
 }
 
 /**
- * Center-crop the image to a square (side = min(width, height)). Preserves format. 
+ * Crop a square region from the image. Preserves format. Used by centerCropToSquare and by the segmentation-based crop path.
+ */
+async function cropToSquare(
+  input: Buffer,
+  left: number,
+  top: number,
+  size: number,
+): Promise<Buffer> {
+  const metadata = await sharp(input).metadata();
+  const format = metadata.format;
+  if (format === undefined) throw new Error('Could not determine image format.');
+  const pipeline = sharp(input).extract({ left, top, width: size, height: size });
+  return encodePipelineByFormat(pipeline, format);
+}
+
+/**
+ * Center-crop the image to a square (side = min(width, height)). Preserves format.
  * Used when isAlmostSquare or for negligible_background/cutout.
  */
 async function centerCropToSquare(input: Buffer): Promise<Buffer> {
   const metadata = await sharp(input).metadata();
   const w = metadata.width ?? 0;
   const h = metadata.height ?? 0;
-  const format = metadata.format;
   if (w === 0 || h === 0) throw new Error(`Invalid image dimensions: ${w}x${h}`);
   const size = Math.min(w, h);
   const left = Math.floor((w - size) / 2);
   const top = Math.floor((h - size) / 2);
-  let pipeline = sharp(input);
-  if (w !== size || h !== size) {
-    pipeline = pipeline.extract({ left, top, width: size, height: size });
-  }
-  return encodePipelineByFormat(pipeline, format);
+  return cropToSquare(input, left, top, size);
 }
+
 
 const WHITE = { r: 255, g: 255, b: 255 };
 
@@ -93,6 +108,39 @@ async function padWithWhiteToSquare(input: Buffer): Promise<Buffer> {
       : { left: pad1, right: pad2, top: 0, bottom: 0, background: WHITE };
   const pipeline = sharp(input).extend(extend);
   return encodePipelineByFormat(pipeline, format);
+}
+
+
+/** 
+ * Get the bounding box of a polygon.
+ */
+function getBoundingBox(
+  polygon: Array<{ x: number; y: number }>,
+): { left: number; top: number; right: number; bottom: number } {
+  const left = Math.min(...polygon.map((p) => p.x));
+  const top = Math.min(...polygon.map((p) => p.y));
+  const right = Math.max(...polygon.map((p) => p.x));
+  const bottom = Math.max(...polygon.map((p) => p.y));
+  return { left, top, right, bottom };
+}
+
+
+/**
+ * Propose a square crop: side = min(imageWidth, imageHeight), centered on the bounding box center, clamped to image.
+ */
+function proposeSquareCropCenteredOnBbox(
+  imageWidth: number,
+  imageHeight: number,
+  boundingBox: { left: number; top: number; right: number; bottom: number },
+): { left: number; top: number; size: number } {
+  const size = Math.min(imageWidth, imageHeight);
+  const bboxCenterX = (boundingBox.left + boundingBox.right) / 2;
+  const bboxCenterY = (boundingBox.top + boundingBox.bottom) / 2;
+  let left = Math.round(bboxCenterX - size / 2);
+  let top = Math.round(bboxCenterY - size / 2);
+  left = Math.max(0, Math.min(imageWidth - size, left));
+  top = Math.max(0, Math.min(imageHeight - size, top));
+  return { left, top, size };
 }
 
 
@@ -138,14 +186,52 @@ export async function processImage(
     const mimeType = didResize ? 'image/jpeg' : (format === 'png' ? 'image/png' : 'image/jpeg');
     const classification = await visionClient.classifyImageContext(downscaled, mimeType);
 
-    if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
-      console.log(`Image context classification: ${classification.kind}. TODO: Implement intelligent crop using segmentation of image subject.`);
-      // TODO: Implement intelligent crop using segmentation of image subject.
-
-      
-    } else if (classification.kind === 'contextual') {
+    if (classification.kind === 'contextual') {
       console.log('Image context classification: contextual. Padding with white to square.');
       toResize = await padWithWhiteToSquare(input);
+    } else if (classification.kind === 'negligible_background' || classification.kind === 'cutout') {
+      console.log(`Image context classification: ${classification.kind}. TODO: Implement intelligent crop using segmentation of image subject.`);
+
+      // Get segmentation of image subject.
+      const { segmentation } = await findSegmentationWithMask(input);
+
+      if (segmentation.polygons.length !== 1) {
+        // If there's not exactly one polygon, either throw error or padWithWhiteToSquare.
+        // TODO: log a fat red exclamation mark to make sure it's visible. Consider simply throwing an error.
+        console.error(`Expected exactly one polygon, identified: ${segmentation.polygons.length}`);
+        toResize = await padWithWhiteToSquare(input);
+      } else {
+        const polygon = segmentation.polygons[0];
+        console.log(`Identified 1 polygon, segmentation has${polygon.length} total points.`);
+
+        // Get bounding box of segmentation
+        const boundingBox = getBoundingBox(polygon);
+        console.log(
+          `Bounding box [left=${boundingBox.left}, top=${boundingBox.top}, right=${boundingBox.right}, bottom=${boundingBox.bottom}] on image with dimensions [w=${w}, h=${h}].`,
+        );
+
+        // Propose a square crop centered on the bounding box.
+        const proposedCrop = proposeSquareCropCenteredOnBbox(w, h, boundingBox);
+        console.log(
+          `Proposed square crop [left=${proposedCrop.left}, top=${proposedCrop.top}, size=${proposedCrop.size}] on image with dimensions [w=${w}, h=${h}].`,
+        );
+
+        // Check if the bounding box fits cleanly inside the proposed crop with a margin of padding.
+        const marginPx = Math.floor(CROP_SUBJECT_MARGIN_RATIO * proposedCrop.size);
+        const fitsWithMargin =
+          boundingBox.left >= proposedCrop.left + marginPx &&
+          boundingBox.right <= proposedCrop.left + proposedCrop.size - marginPx &&
+          boundingBox.top >= proposedCrop.top + marginPx &&
+          boundingBox.bottom <= proposedCrop.top + proposedCrop.size - marginPx;
+        if (fitsWithMargin) {
+          toResize = await cropToSquare(input, proposedCrop.left, proposedCrop.top, proposedCrop.size);
+        } else {
+          console.warn('Proposed crop would cut through the subject bounding box. Aborting. Consider white-pad or different crop.');
+          toResize = await padWithWhiteToSquare(input);
+        }
+      }
+    } else {
+      throw new Error(`Unsupported image context classification: ${classification.kind}`);
     }
   }
 

@@ -163,7 +163,7 @@ async function main() {
     console.log(`Identified 1 polygon, ${segmentation.polygons.flat().length} total points.`);
   }
 
-  const polygon = segmentation.polygons[0];
+  const polygon = segmentation.polygons[0]
 
   const boundingBox = getBoundingBox(polygon);
   console.log(
