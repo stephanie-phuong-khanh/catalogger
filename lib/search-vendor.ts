@@ -7,11 +7,6 @@ const VendorBodySeparationSchema = z.object({
   specsRelevant: z.string().describe('Lines that are dimensions or weights only, for the specs table. Exclude everything else.'),
 });
 
-const ProductSelection = z.object({
-  selectedProductId: z.number().describe('The Shopify product ID of the best matching product'),
-  reasoning: z.string().describe('Brief explanation of why this product was selected'),
-});
-
 /** Normalize for SKU-in-parens comparison: spaces and hyphens treated as equivalent (e.g. "MX-K406-01 CED" ↔ "MX-K406-01-CED"). */
 function normalizeSkuForParensMatch(s: string): string {
   return String(s).trim().replace(/[\s-]+/g, '-').replace(/-+/g, '-').toUpperCase();
@@ -91,16 +86,10 @@ function parseFeaturesFromBody(body: string): string[] {
   return features;
 }
 
-const LLM_FALLBACK_WARNING = `
-  ⚠️  WARNING: VENDOR SELECTED SUBJECTIVELY (LLM FALLBACK)  ⚠️
-  No product had exact SKU in parentheses. An LLM picked a "best match" — please verify manually!
-  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️  ⚠️
-`;
-
 /**
  * Search a Shopify vendor site for a product by SKU.
- * 1) Prefer exact match: title contains the EXACT SKU inside parentheses.
- * 2) Fallback: if none, use LLM to pick best match and log a big warning that it was subjective.
+ * Only matches when a product title contains the EXACT SKU inside parentheses (e.g. "(GDI-6996-01)").
+ * If no such product exists, returns null — no LLM fallback.
  *
  * [HARDCODED] Assumes the vendor site is Shopify (uses /search/suggest.json endpoint).
  */
@@ -140,37 +129,8 @@ export async function searchVendorSite(
     }
     selected = exactMatches[0];
   } else {
-    // 2) Fallback: LLM pick — and warn loudly that it's subjective.
-    console.warn(LLM_FALLBACK_WARNING);
-    const productList = products.map((p: any) => `ID: ${p.id} | Title: ${p.title}`).join('\n');
-    const response = await openai.responses.parse({
-      model: 'gpt-4o',
-      temperature: 0,
-      input: [
-        {
-          role: 'system',
-          content: 'You are matching a product from a pricing sheet to a vendor website search result. Pick the single best match.',
-        },
-        {
-          role: 'user',
-          content: `SKU: ${sku}\nDescription: ${productDescription}\n\nSearch results:\n${productList}`,
-        },
-      ],
-      text: {
-        format: zodTextFormat(ProductSelection, 'product_selection'),
-      },
-    });
-    const selection = response.output_parsed;
-    if (!selection) {
-      console.error(`  LLM did not return a valid selection.`);
-      return null;
-    }
-    console.log(`  LLM selected: ${selection.reasoning}`);
-    selected = products.find((p: any) => p.id === selection.selectedProductId);
-    if (!selected) {
-      console.error(`  LLM selected ID ${selection.selectedProductId} but it wasn't in the results.`);
-      return null;
-    }
+    console.log(`  No product had exact SKU in parentheses; treating as no website match.`);
+    return null;
   }
 
   const rawBody = selected.body || '';
