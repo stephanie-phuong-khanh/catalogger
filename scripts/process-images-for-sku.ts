@@ -41,6 +41,8 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 }
 
 const IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+const COPY_AS_IS_EXT = new Set(['.pdf']);
+const FILE_EXT = new Set([...IMAGE_EXT, ...COPY_AS_IS_EXT]);
 
 function parseArg(name: string): string | undefined {
   const i = process.argv.findIndex((arg) => arg === name || arg.startsWith(name + '='));
@@ -76,31 +78,42 @@ async function main() {
   }
 
   const entries = fs.readdirSync(inputDir, { withFileTypes: true });
-  const imageFiles = entries
-    .filter((e) => e.isFile() && IMAGE_EXT.has(path.extname(e.name).toLowerCase()))
+  const files = entries
+    .filter((e) => e.isFile() && FILE_EXT.has(path.extname(e.name).toLowerCase()))
     .map((e) => e.name)
     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
   console.log('Input directory:', inputDir);
   console.log('Output directory:', outputDir);
-  console.log(`Processing ${imageFiles.length} image files:`, imageFiles);
+  console.log(`Processing ${files.length} files:`, files);
   console.log('');
 
   const visionClient = createVisionClient();
   let resizedImages: string[] = [];
   let unchangedImages: string[] = [];
+  let copiedAsIs: string[] = [];
 
-  for (let i = 0; i < imageFiles.length; i++) {
-    const file = imageFiles[i];
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     const srcPath = path.join(inputDir, file);
-    const imageBuffer = fs.readFileSync(srcPath);
+    const ext = path.extname(file).toLowerCase();
 
     console.log();
-    console.log(`[${i + 1} / ${imageFiles.length}] Processing image: ${file}`);
+    console.log(`[${i + 1} / ${files.length}] ${file}`);
+
+    if (COPY_AS_IS_EXT.has(ext)) {
+      const outPath = path.join(outputDir, file);
+      fs.mkdirSync(path.dirname(outPath), { recursive: true });
+      fs.copyFileSync(srcPath, outPath);
+      console.log('  ✓ copied as-is (no processing)');
+      copiedAsIs.push(file);
+      continue;
+    }
+
+    const imageBuffer = fs.readFileSync(srcPath);
 
     try {
       const resizedBuffer = await processImage(imageBuffer, 1500, 1500, visionClient);
-      const ext = path.extname(file).toLowerCase();
       const baseName = path.basename(file, ext);
       const outputFileName = ext === '.webp' ? baseName + '.jpg' : file;
       const outPath = path.join(outputDir, outputFileName);
@@ -118,12 +131,10 @@ async function main() {
     }
   }
 
-  // Instead of logging done, please print a short summary of how many images were processed, how many were resized, and how many were not resized. as well as where the images were saved.
   console.log('');
-  console.log(`Processed ${imageFiles.length} image files.`);
-  console.log(`Resized ${resizedImages.length} images.`);
-  console.log(`Saved original files for ${unchangedImages.length} images.`);
-  console.log(`Images saved to: ${outputDir}`);
+  console.log(`Processed ${files.length} files.`);
+  console.log(`Resized: ${resizedImages.length}. Copied as-is (e.g. PDF): ${copiedAsIs.length}. Saved original on error: ${unchangedImages.length}.`);
+  console.log(`Output: ${outputDir}`);
 }
 
 main();
