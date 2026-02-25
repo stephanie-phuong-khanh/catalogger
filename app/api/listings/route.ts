@@ -46,5 +46,9 @@ export async function GET() {
     sorted[folder] = [...folders[folder]].sort();
   }
 
-  return NextResponse.json({ folders: sorted });
+  return NextResponse.json({ folders: sorted }, {
+    headers: {
+      'Cache-Control': 'no-store, max-age=0',
+    },
+  });
 }
