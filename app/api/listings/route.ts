@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server';
 
 const PREFIX = 'listings/';
 
+/** Disable static/cache so listing always reflects current blob store (e.g. after sync). */
+export const dynamic = 'force-dynamic';
+
 /** GET /api/listings — returns tree: { folders: { [folderName]: string[] } } (file pathnames under each folder) */
 export async function GET() {
   const token = process.env.CATALOGGER_LISTINGS_READ_WRITE_TOKEN;
