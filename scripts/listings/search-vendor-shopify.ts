@@ -1,14 +1,14 @@
 /**
  * Entry point: search a Shopify vendor site for one product by SKU.
- * All search logic lives in lib/listings/search-vendor.ts.
+ * All search logic lives in lib/listings/search-vendor-shopify.ts.
  *
  * Usage:
- *   npm run search-vendor              # search full sheet
- *   npm run search-vendor -- --json     # output only JSON
+ *   npm run search-vendor-shopify              # search full sheet
+ *   npm run search-vendor-shopify -- --json     # output only JSON
  */
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import { searchVendorSite, formatProductAsVendorSiteText } from '../../lib/listings/search-vendor';
+import { searchVendorSite, formatProductAsVendorSiteText } from '../../lib/listings/search-vendor-shopify';
 
 dotenv.config();
 

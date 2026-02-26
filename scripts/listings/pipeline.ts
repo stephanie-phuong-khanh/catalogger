@@ -1,6 +1,6 @@
 /**
  * Entry point: run the full pipeline (parse sheet, search vendor, generate listing).
- * All logic lives in lib/listings/ (parse-sheet, search-vendor, generate-listing).
+ * All logic lives in lib/listings/ (parse-sheet, search-vendor-shopify, generate-listing).
  *
  * Usage:
  *   npm run pipeline              # run full pipeline
@@ -13,7 +13,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { parseSheet } from '../../lib/listings/parse-sheet';
-import { searchVendorSite } from '../../lib/listings/search-vendor';
+import { searchVendorSite } from '../../lib/listings/search-vendor-shopify';
 import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../../lib/listings/generate-listing';
 import { isPricingDataIncomplete } from '../../lib/listings/pricing-sheet-groups';
 

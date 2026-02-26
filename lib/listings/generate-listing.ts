@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 import { getFeaturesRelevantFromSheet, getSpecsRelevantFromSheet, RawProduct } from './parse-sheet';
-import { separateVendorBodyWithLLM, VendorSiteProduct } from './search-vendor';
+import { separateVendorBodyWithLLM, VendorSiteProduct } from './search-vendor-shopify';
 
 const TitleOutput = z.object({
   title: z.string().describe('The generated product title only, with no preamble or explanation'),

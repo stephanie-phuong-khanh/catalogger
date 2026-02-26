@@ -8,7 +8,7 @@
 import fs from 'fs';
 import path from 'path';
 import { formatProductAsPricingSheetText } from '../../lib/listings/parse-sheet';
-import { formatProductAsVendorSiteText } from '../../lib/listings/search-vendor';
+import { formatProductAsVendorSiteText } from '../../lib/listings/search-vendor-shopify';
 
 const SECTION_SEP = '========================================================================';
 
