@@ -18,7 +18,8 @@
     "process-images-for-sku": "npx ts-node scripts/images/process-images-for-sku.ts",
     "test-segmentation": "npx ts-node scripts/images/test-segmentation.ts",
     "crop-with-segmentation": "npx ts-node scripts/images/crop-with-segmentation.ts",
-    "parse-pdf-pricing-sheet": "npx ts-node scripts/listings/parse-pdf-pricing-sheet.ts"
+    "parse-pdf-pricing-sheet": "npx ts-node scripts/listings/parse-pdf-pricing-sheet.ts",
+    "parse-pdf-pricing-sheet-v2": "npx ts-node scripts/listings/parse-pdf-pricing-sheet-v2.ts"
   },
   "keywords": [],
   "author": "",
@@ -38,6 +39,7 @@
     "dotenv": "^17.2.4",
     "next": "^14.2.0",
     "openai": "^6.21.0",
+    "pdf-parse": "^2.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sharp": "^0.34.5",
