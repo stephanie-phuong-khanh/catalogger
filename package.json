@@ -18,6 +18,7 @@
     "sync-listings-to-blob": "npx ts-node scripts/listings/sync-listings-to-blob.ts",
     "edit-image": "npx ts-node scripts/images/edit-image.ts",
     "process-images-for-sku": "npx ts-node scripts/images/process-images-for-sku.ts",
+    "rename-sku-images": "npx ts-node scripts/images/rename-sku-images.ts",
     "test-segmentation": "npx ts-node scripts/images/test-segmentation.ts",
     "crop-with-segmentation": "npx ts-node scripts/images/crop-with-segmentation.ts",
     "parse-pdf-pricing-sheet": "npx ts-node scripts/listings/parse-pdf-pricing-sheet.ts",
