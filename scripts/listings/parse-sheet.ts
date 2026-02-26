@@ -16,11 +16,11 @@ import path from 'path';
 import { parseSheet, formatProductAsPricingSheetText } from '../../lib/listings/parse-sheet';
 
 const CONFIG = {
-  sheetFile: 'data/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',
+  sheetFile: 'data/input/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',
   sheetIndex: 3,       // 0-based tab index (0 = "Tab 1 - Most Popular")
   headerRow: 3,        // 0-based row where headers live (row 4 in Excel)
   skuColumn: 'GDINA Item #',
-  outputFile: 'data/parsed_products.json',
+  outputFile: 'data/parsed-pricing-sheets/golden_designs.json',
 };
 
 function main() {

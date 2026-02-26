@@ -1,3 +1,8 @@
+/**
+ * This is a library to parse a pricing sheet that is an Excel file.
+ * Currently, this handles only the Golden Designs pricing sheet.
+ */
+
 import * as xlsx from 'xlsx';
 
 export type RawProduct = Record<string, any>;
@@ -97,7 +102,6 @@ export function parseWorkbookFromBuffer(buffer: Buffer): TabProducts[] {
 export function parseSheet(config: ParseSheetConfig): RawProduct[] {
   const workbook = xlsx.readFile(config.filePath);
   const sheetNames = workbook.SheetNames;
-  // console.log(`Sheet tabs: ${sheetNames.join(', ')}`);
 
   const sheetName = sheetNames[config.sheetIndex];
   const sheet = workbook.Sheets[sheetName];

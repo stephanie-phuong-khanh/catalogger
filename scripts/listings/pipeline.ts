@@ -22,7 +22,7 @@ dotenv.config();
 // [HARDCODED] All vendor-specific configuration lives here.
 const CONFIG = {
   supplierName: 'Golden Designs',
-  sheetFile: 'data/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',
+  sheetFile: 'data/input/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',
   sheetIndex: 2,           // Tab index (0-based). 2 = "Tab 3 - Dynamic Low EMF"
   headerRow: 3,           // 0-indexed row where headers are (row 4 in Excel)
   skuColumn: 'GDINA Item #',
