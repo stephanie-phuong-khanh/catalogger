@@ -1,8 +1,14 @@
 /**
  * Parse a PDF pricing sheet via Llama Cloud (LlamaExtract) and write structured JSON.
  * Handles multi-page PDFs (e.g. Elina Pilates 3-page pricing sheet).
+ * 
+ * 1. Ensures an extraction agent exists: creates one with the pricing-sheet JSON schema if needed (or reuses an existing agent by name).
+ * 2. Uploads your PDF to Llama Cloud Files API.
+ * 3. Starts an extraction job (document + agent).
+ * 4. Polls until the job finishes.
+ * 5. Writes the extraction result to the output directory.
  *
- * Prereq: LLAMA_CLOUD_API_KEY in .env (see docs/llamaparse-setup.md).
+ * Prereq: LLAMA_CLOUD_API_KEY in .env
  *
  * Usage:
  *   npm run parse-pdf-pricing-sheet -- --input-file="data/elina_pilates_pricing_sheet.pdf"
@@ -17,41 +23,111 @@ dotenv.config();
 if (fs.existsSync('.env.local')) dotenv.config({ path: '.env.local', override: true });
 
 const CONFIG = {
-  inputFile: 'data/elina_pilates_pricing_sheet.pdf',
+  inputFile: 'data/input/elina_pilates_pricing_sheet.pdf',
   outDir: 'data/parsed-pricing-sheets',
 };
 
 const LLAMA_CLOUD_BASE = 'https://api.cloud.llamaindex.ai';
 const EXTRACTION_AGENT_NAME = 'catalogger_pricing_sheet';
 
-/** JSON Schema for extraction: root object with a single "products" array. Customize to match your pricing sheet. */
+
+// const PRICING_SHEET_EXTRACTION_SCHEMA = {
+//   type: 'object',
+//   description: 'Pricing sheet with a list of products',
+//   properties: {
+//     products: {
+//       type: 'array',
+//       description: 'List of products from the pricing sheet',
+//       items: {
+//         type: 'object',
+//         properties: {
+//           description: {
+//             type: 'string',
+//             description: 'The product name, without the color of the product. In the document, this is spelled in all caps with spaces or underscores between words. In the extraction output, it should be spelled normally with only spaces between words.',
+//             example: 'Elite Reformer Tower',
+//           },
+//           variants: {
+//             type: 'array',
+//             description: 'The variants of the product. Each variant is a different color of the product.',
+//             items: {
+//               type: 'object',
+//               properties: {
+//                 article_ref: {
+//                   type: 'string',
+//                   description: 'The article reference number of the product variant. It is a combination of the country code and the 6-digit article number. Do not include the country code in the extraction output.',
+//                   example: '400004',
+//                 },
+//                 color: {
+//                   type: 'string',
+//                   description: 'The color of the product variant. In the document, the color is included in the product name. In the extraction output, it should be spelled in all caps. Do not include the color in the description.',
+//                   example: 'BLACK',
+//                 },
+//                 price_usd: {
+//                   type: 'number',
+//                   description: 'The price of the item as a numeric value. Note: The document uses European format where \'.\' is the thousand separator and \',\' is the decimal. Strip the currency symbol and normalize to a standard float (e.g., \'$3.995,00\' should become 3995.0).',
+//                   example: 2725.00,
+//                 },
+//                 barcode: {
+//                   type: 'string',
+//                   description: 'The barcode of the product variant. It is a 13-digit number that is unique to the product variant.',
+//                   example: '8421941006647',
+//                 }
+//               },
+//               required: ['article_ref', 'color', 'price_usd', 'barcode'],
+//             },
+//           },
+//         },
+//         required: ['description', 'variants'],
+//       },
+//     },
+//   },
+//   required: ['products'],
+// } as const;
+
 const PRICING_SHEET_EXTRACTION_SCHEMA = {
   type: 'object',
-  description: 'Pricing sheet with a list of products or services',
   properties: {
-    products: {
+    items: {
       type: 'array',
-      description: 'List of products or services from the pricing sheet',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Product or service name' },
-          sku: { type: 'string', description: 'SKU or item number if present' },
-          price: { type: 'string', description: 'Price as shown (e.g. "$99" or "99.00")' },
-          description: { type: 'string', description: 'Short description if present' },
-          features: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Bullet points or feature list',
+      description: 'A flat list of every individual row/item in the pricing table.',
+        items: {
+          type: 'object',
+          properties: {
+            product_base_name: {
+              type: 'string',
+              description: 'The product name, without the color of the product. Listed as part of the content of the "Description" column of the input table. In the document, this is spelled in all caps with spaces or underscores between words. Products of the same name but different colors are listed in consecutive rows. In the extraction output, it should be spelled normally with only spaces between words. DO NOT include the color in the product_base_name.',
+              example: 'Elite Reformer Tower',
+            },
+            color: {
+              type: 'string',
+              description: 'The color of the product variant. Listed as part of the content of the "Description" column of the input table. In the extraction output, it should be spelled in all caps. Do not include the color in the product_base_name.',
+              example: 'BLACK',
+            },
+            article_number: {
+              type: 'string',
+              description: 'The article reference number of the product variant. Listed in the "Article Ref." column of the input table, as a combination of the country code and the 6-digit article number. Do not include the country code in the extraction output.',
+              example: '400004',
+              pattern: '^[0-9]{6}$',
+            },
+            price_usd: {
+              type: 'number',
+              description: 'Numeric price. Listed in the "Prices / MAP Prices$" column of the input table. The value is the price of the item in USD. Note: The document uses European format where \'.\' is the thousand separator and \',\' is the decimal. Strip the currency symbol and normalize to a standard float (e.g., \'$3.995,00\' should become 3995.0).',
+              example: 2725.00,
+            },
+            barcode: {
+              type: 'string',
+              description: 'The 13-digit barcode of the product variant. Listed in the "Barcode" column of the input table.',
+              example: '8421941006647',
+              pattern: '^[0-9]{13}$',
+            }
           },
-          notes: { type: 'string', description: 'Any other notes or terms' },
-        },
-        additionalProperties: true,
-      },
+          required: ['product_base_name', 'color', 'article_number', 'price_usd', 'barcode'],
+        }
     },
   },
-  required: ['products'],
+  required: ['items']
 } as const;
+
 
 type ApiResponse = { id?: string; [k: string]: unknown };
 
@@ -59,7 +135,7 @@ function getApiKey(): string {
   const key = process.env.LLAMA_CLOUD_API_KEY?.trim();
   if (!key) {
     throw new Error(
-      'LLAMA_CLOUD_API_KEY is not set. Add it to .env (see docs/llamaparse-setup.md).'
+      'LLAMA_CLOUD_API_KEY is not set. Add it to .env or .env.local.'
     );
   }
   return key;
@@ -103,7 +179,7 @@ async function getOrCreateExtractionAgent(apiKey: string): Promise<string> {
       name: EXTRACTION_AGENT_NAME,
       data_schema: PRICING_SHEET_EXTRACTION_SCHEMA,
       config: {
-        extraction_target: 'PER_DOC',
+        extraction_target: 'PER_TABLE_ROW',
         extraction_mode: 'BALANCED',
       },
     }),
@@ -221,10 +297,10 @@ async function main(): Promise<void> {
     throw new Error(`Input file not found: ${inputPath}`);
   }
 
-  const agentId = await getOrCreateExtractionAgent(apiKey);
-  const fileId = await uploadFile(apiKey, inputPath);
-  const jobId = await runExtractionJob(apiKey, agentId, fileId);
-  const status = await pollJobUntilDone(apiKey, jobId);
+  const agentId = await getOrCreateExtractionAgent(apiKey); // 1 - Ensures an extraction agent exists
+  const fileId = await uploadFile(apiKey, inputPath); // 2 - Uploads PDF to Llama Cloud Files API
+  const jobId = await runExtractionJob(apiKey, agentId, fileId); // 3 - Starts an extraction job (document + agent)
+  const status = await pollJobUntilDone(apiKey, jobId); // 4 - Polls until the job finishes
   if (status !== 'SUCCESS') {
     throw new Error(`Extraction job failed with status: ${status}`);
   }
