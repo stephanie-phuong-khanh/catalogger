@@ -1,15 +1,25 @@
 /**
- * Parse a PDF pricing sheet into JSON using text extraction only (no AI).
- * Uses pdf-parse to get raw text, then line-by-line parsing to produce one JSON
- * object per table row. Output is suitable for later scripts or LLMs to normalize.
+ * Parse a PDF pricing sheet into JSON: text extraction (no AI) then optional LLM
+ * step to split description_raw into product_name and color.
+ *
+ * 1. pdf-parse extracts text; we parse rows to get description_raw, price, barcode.
+ * 2. A cheap OpenAI call (batched) parses each description_raw → product_name + color.
  *
  * Usage:
  *   npm run parse-pdf-pricing-sheet-v2 -- --input-file="path/to/file.pdf"
  *   npm run parse-pdf-pricing-sheet-v2 -- --input-file="path/to/file.pdf" --out-dir="data/parsed-pricing-sheets"
+ *   npm run parse-pdf-pricing-sheet-v2 -- --input-file="path/to/file.pdf" --no-llm   # skip LLM; product_name/color left empty
  */
 
+import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import OpenAI from 'openai';
+import { zodTextFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
+
+dotenv.config();
+if (fs.existsSync('.env.local')) dotenv.config({ path: '.env.local', override: true });
 
 // pdf-parse v2 (mehmet-kozan): use PDFParse class + getText()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -18,13 +28,16 @@ const { PDFParse } = require('pdf-parse');
 const CONFIG = {
   inputFile: '',
   outDir: 'data/parsed-pricing-sheets',
+  useLlm: true,
 };
 
 export interface ParsedPricingRow {
-  article_ref: string;   // e.g. "USA 100006" or "100006"
-  description: string;
-  price_raw: string;     // as in PDF e.g. "$3.995,00"
-  price_usd: number;     // normalized number
+  article_ref: string;
+  description_raw: string;
+  product_name: string;   // title case, base name without color (filled by LLM or empty if --no-llm)
+  color: string | null;  // e.g. "BLACK", "GREY", or null (filled by LLM or null if --no-llm)
+  price_raw: string;
+  price_usd: number;
   barcode: string;
 }
 
@@ -68,13 +81,15 @@ function parseDataLine(line: string): ParsedPricingRow | null {
   if (!priceBarcode) return null;
 
   const priceStart = afterRef.search(/\s+\$[\d.,]+\s+\d{13}$/);
-  const description = (priceStart >= 0 ? afterRef.slice(0, priceStart) : afterRef).trim();
+  const description_raw = (priceStart >= 0 ? afterRef.slice(0, priceStart) : afterRef).trim();
   const priceRaw = '$' + priceBarcode[1];
   const priceUsd = parsePrice(priceRaw);
   const barcode = priceBarcode[2]!;
   return {
-    article_ref: `USA ${usaMatch[1]}`,
-    description,
+    article_ref: usaMatch[1]!,
+    description_raw,
+    product_name: '',
+    color: null as string | null,
     price_raw: priceRaw,
     price_usd: isNaN(priceUsd) ? 0 : priceUsd,
     barcode,
@@ -89,6 +104,70 @@ async function extractPdfText(buffer: Buffer): Promise<string> {
     return (result && (result as { text?: string }).text) ?? '';
   } finally {
     await parser.destroy();
+  }
+}
+
+const BATCH_SIZE = 30;
+
+const ParseDescriptionsSchema = z.object({
+  items: z.array(z.object({
+    product_name: z.string().describe('Product base name in Title Case, with no color word. E.g. "Reformer", "Reformer With Tower".'),
+    color: z.string().nullable().describe('Color in ALL CAPS if present (e.g. BLACK, GREY), or null if the description has no color.'),
+  })),
+});
+
+/** Call OpenAI to parse description_raw into product_name and color (batched). */
+async function parseDescriptionsWithLLM(
+  openai: OpenAI,
+  descriptions: string[],
+): Promise<{ product_name: string; color: string | null }[]> {
+  if (descriptions.length === 0) return [];
+  const response = await openai.responses.parse({
+    model: 'gpt-4o-mini',
+    temperature: 0,
+    input: [
+      {
+        role: 'system',
+        content: `You parse product description strings from a pricing sheet into a product name (no color) and an optional color.
+
+Rules:
+- product_name: Title Case, the base product name with the color word REMOVED. The color may appear at the end after an underscore (e.g. REFORMER_BLACK → "Reformer") or in the middle (e.g. REFORMER WITH BLACK TOWER → "Reformer With Tower"). Output the product name only, no color.
+- color: The color in ALL CAPS (BLACK, GREY, IVORY, etc.) if present, or null if there is no color in the description.
+
+Examples:
+- REFORMER_BLACK → product_name: "Reformer", color: "BLACK"
+- REFORMER MASTER INSTRUCTOR_BLACK → product_name: "Reformer Master Instructor", color: "BLACK"
+- REFORMER WITH BLACK TOWER → product_name: "Reformer With Tower", color: "BLACK"
+- REFORMER WITH TOWER_GREY → product_name: "Reformer With Tower", color: "GREY"
+- TOWER FOR ALUMINIUM REFORMER → product_name: "Tower For Aluminium Reformer", color: null
+
+Return one item per input description, in the same order.`,
+      },
+      {
+        role: 'user',
+        content: `Parse these ${descriptions.length} descriptions:\n\n${descriptions.map((d, i) => `${i + 1}. ${d}`).join('\n')}`,
+      },
+    ],
+    text: { format: zodTextFormat(ParseDescriptionsSchema, 'parse_descriptions') },
+  });
+  const parsed = response.output_parsed as z.infer<typeof ParseDescriptionsSchema> | undefined;
+  if (!parsed?.items || parsed.items.length !== descriptions.length) {
+    throw new Error(`LLM returned ${parsed?.items?.length ?? 0} items, expected ${descriptions.length}`);
+  }
+  return parsed.items;
+}
+
+/** Fill product_name and color on rows using batched LLM calls. */
+async function fillProductNameAndColor(rows: ParsedPricingRow[], openai: OpenAI): Promise<void> {
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const descriptions = batch.map((r) => r.description_raw);
+    const results = await parseDescriptionsWithLLM(openai, descriptions);
+    for (let j = 0; j < batch.length; j++) {
+      batch[j]!.product_name = results[j]!.product_name;
+      batch[j]!.color = results[j]!.color;
+    }
+    console.log(`  LLM parsed ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length} descriptions`);
   }
 }
 
@@ -116,9 +195,12 @@ async function main(): Promise<void> {
   if (outDirArg) {
     CONFIG.outDir = outDirArg.includes('=') ? outDirArg.split('=')[1]!.trim() : (process.argv[process.argv.indexOf('--out-dir') + 1] ?? CONFIG.outDir).trim();
   }
+  if (process.argv.includes('--no-llm')) {
+    CONFIG.useLlm = false;
+  }
 
   if (!CONFIG.inputFile?.endsWith('.pdf')) {
-    console.error('Usage: --input-file="path/to/file.pdf" [--out-dir="data/parsed-pricing-sheets"]');
+    console.error('Usage: --input-file="path/to/file.pdf" [--out-dir="data/parsed-pricing-sheets"] [--no-llm]');
     process.exit(1);
   }
 
@@ -130,6 +212,17 @@ async function main(): Promise<void> {
 
   const buffer = fs.readFileSync(inputPath);
   const rows = await parsePdfPricingToRows(buffer);
+  console.log(`Parsed ${rows.length} row(s) from PDF`);
+
+  if (CONFIG.useLlm) {
+    const apiKey = process.env.OPENAI_API_KEY?.trim();
+    if (!apiKey) {
+      console.error('OPENAI_API_KEY is not set. Add to .env or .env.local, or run with --no-llm to skip product_name/color.');
+      process.exit(1);
+    }
+    const openai = new OpenAI({ apiKey });
+    await fillProductNameAndColor(rows, openai);
+  }
 
   const outPath = path.join(CONFIG.outDir, `${path.basename(CONFIG.inputFile, '.pdf')}.json`);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
