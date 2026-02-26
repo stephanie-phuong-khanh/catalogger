@@ -56,37 +56,6 @@ function stripHtml(html: string): string {
 }
 
 /**
- * Extract the features array from body text by finding a "Features:" section and
- * collecting the following lines until an empty line (section boundary).
- * If no "Features:" heading is found, returns [].
- */
-function parseFeaturesFromBody(body: string): string[] {
-  const lines = body.split(/\r?\n/);
-  const features: string[] = [];
-  let inFeatures = false;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]!;
-    const trimmed = line.trim();
-
-    const featuresMatch = trimmed.match(/^Features\s*:\s*(.*)$/i);
-    if (featuresMatch) {
-      inFeatures = true;
-      const afterColon = featuresMatch[1]!.trim();
-      if (afterColon) features.push(afterColon);
-      continue;
-    }
-
-    if (inFeatures) {
-      if (trimmed === '') break; // end of section
-      features.push(trimmed);
-    }
-  }
-
-  return features;
-}
-
-/**
  * Search a Shopify vendor site for a product by SKU.
  * Only matches when a product title contains the EXACT SKU inside parentheses (e.g. "(GDI-6996-01)").
  * If no such product exists, returns null — no LLM fallback.
