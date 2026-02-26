@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
-import { generateListing, createIncompleteListing } from '../../../lib/generate-listing';
-import { isPricingDataIncomplete } from '../../../lib/pricing-sheet-groups';
+import { generateListing, createIncompleteListing } from '../../../lib/listings/generate-listing';
+import { isPricingDataIncomplete } from '../../../lib/listings/pricing-sheet-groups';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

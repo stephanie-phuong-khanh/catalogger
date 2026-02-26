@@ -7,8 +7,8 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { formatProductAsPricingSheetText } from '../lib/parse-sheet';
-import { formatProductAsVendorSiteText } from '../lib/search-vendor';
+import { formatProductAsPricingSheetText } from '../../lib/listings/parse-sheet';
+import { formatProductAsVendorSiteText } from '../../lib/listings/search-vendor';
 
 const SECTION_SEP = '========================================================================';
 

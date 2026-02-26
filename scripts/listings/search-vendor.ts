@@ -1,6 +1,6 @@
 /**
  * Entry point: search a Shopify vendor site for one product by SKU.
- * All search and LLM selection logic lives in lib/search-vendor.ts.
+ * All search logic lives in lib/listings/search-vendor.ts.
  *
  * Usage:
  *   npm run search-vendor              # search full sheet
@@ -8,7 +8,7 @@
  */
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import { searchVendorSite, formatProductAsVendorSiteText } from '../lib/search-vendor';
+import { searchVendorSite, formatProductAsVendorSiteText } from '../../lib/listings/search-vendor';
 
 dotenv.config();
 

@@ -32,8 +32,8 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import dotenv from 'dotenv';
-import { processImage, saveProcessedImage } from '../lib/edit-image';
-import { createVisionClient } from '../lib/vision-client';
+import { processImage, saveProcessedImage } from '../../lib/images/edit-image';
+import { createVisionClient } from '../../lib/images/vision-client';
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {

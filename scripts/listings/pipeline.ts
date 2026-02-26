@@ -1,6 +1,6 @@
 /**
  * Entry point: run the full pipeline (parse sheet, search vendor, generate listing).
- * All logic lives in lib/parse-sheet.ts, lib/search-vendor.ts, and lib/generate-listing.ts.
+ * All logic lives in lib/listings/ (parse-sheet, search-vendor, generate-listing).
  *
  * Usage:
  *   npm run pipeline              # run full pipeline
@@ -12,10 +12,10 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import { parseSheet } from '../lib/parse-sheet';
-import { searchVendorSite } from '../lib/search-vendor';
-import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../lib/generate-listing';
-import { isPricingDataIncomplete } from '../lib/pricing-sheet-groups';
+import { parseSheet } from '../../lib/listings/parse-sheet';
+import { searchVendorSite } from '../../lib/listings/search-vendor';
+import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../../lib/listings/generate-listing';
+import { isPricingDataIncomplete } from '../../lib/listings/pricing-sheet-groups';
 
 dotenv.config();
 

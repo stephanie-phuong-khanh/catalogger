@@ -1,6 +1,6 @@
 /**
  * Entry point: parse a pricing sheet and write products to JSON.
- * All parsing logic lives in lib/parse-sheet.ts.
+ * All parsing logic lives in lib/listings/parse-sheet.ts.
  *
  * Usage:
  *   npm run parse-sheet              # parse full sheet
@@ -13,7 +13,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { parseSheet, formatProductAsPricingSheetText } from '../lib/parse-sheet';
+import { parseSheet, formatProductAsPricingSheetText } from '../../lib/listings/parse-sheet';
 
 const CONFIG = {
   sheetFile: 'data/2025-2026 Ecommerce Saunas 08-01-2025 Final - Revised.xlsx',

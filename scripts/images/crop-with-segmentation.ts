@@ -11,8 +11,8 @@ import path from 'path';
 import os from 'os';
 import dotenv from 'dotenv';
 import sharp from 'sharp';
-import { findSegmentationWithMask, drawSegmentationOverlay } from '../lib/segmentation';
-import { saveProcessedImage } from '../lib/edit-image';
+import { findSegmentationWithMask, drawSegmentationOverlay } from '../../lib/images/segmentation';
+import { saveProcessedImage } from '../../lib/images/edit-image';
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {

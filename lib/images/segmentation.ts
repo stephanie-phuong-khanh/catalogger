@@ -2,7 +2,7 @@
  * Subject segmentation: mask → contours (polygons), find outline, and overlay drawing.
  * Uses rembg (via segmentation-rembg.ts) for the mask; d3-contour for outline extraction.
  */
-/// <reference path="../types/d3-contour.d.ts" />
+/// <reference path="../../types/d3-contour.d.ts" />
 
 import sharp from 'sharp';
 import { runRembgSegmentation } from './segmentation-rembg';
@@ -70,7 +70,7 @@ async function maskToPolygons(
 
 /**
  * Get subject outline as polygon coordinates (for crop proposal). Uses rembg subprocess + contour extraction.
- * Requires: Docker with danielgatis/rembg (see lib/segmentation-rembg.ts).
+ * Requires: Docker with danielgatis/rembg (see lib/images/segmentation-rembg.ts).
  */
 export async function findSegmentation(input: Buffer): Promise<SegmentationResult> {
   const out = await findSegmentationWithMask(input);

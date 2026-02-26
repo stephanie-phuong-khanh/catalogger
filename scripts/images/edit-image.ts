@@ -16,8 +16,8 @@ import {
   processImage,
   saveProcessedImage,
   drawCenterCropOverlay,
-} from '../lib/edit-image';
-import { createVisionClient } from '../lib/vision-client';
+} from '../../lib/images/edit-image';
+import { createVisionClient } from '../../lib/images/vision-client';
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {

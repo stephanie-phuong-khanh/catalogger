@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
-import { searchVendorSite } from '../../../lib/search-vendor';
+import { searchVendorSite } from '../../../lib/listings/search-vendor';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

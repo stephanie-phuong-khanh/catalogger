@@ -1,6 +1,6 @@
 /**
  * Entry point: generate a listing from sheet data only (no vendor site lookup).
- * All prompt and LLM logic lives in lib/generate-listing.ts.
+ * All prompt and LLM logic lives in lib/listings/generate-listing.ts.
  *
  * Run scripts/parse-sheet.ts first to produce the products JSON.
  */
@@ -8,9 +8,9 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import { RawProduct } from '../lib/parse-sheet';
-import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../lib/generate-listing';
-import { isPricingDataIncomplete } from '../lib/pricing-sheet-groups';
+import { RawProduct } from '../../lib/listings/parse-sheet';
+import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../../lib/listings/generate-listing';
+import { isPricingDataIncomplete } from '../../lib/listings/pricing-sheet-groups';
 
 dotenv.config();
 

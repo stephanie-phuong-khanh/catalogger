@@ -1,6 +1,6 @@
 /**
  * Pricing sheet field groups used for prompt formatting and UI display.
- * Matches the structure in lib/parse-sheet.ts (Golden Designs sheet).
+ * Matches the structure in lib/listings/parse-sheet.ts (Golden Designs sheet).
  * Client-safe (no Node/buffer deps).
  */
 

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { del } from '@vercel/blob';
-import { parseWorkbookFromBuffer } from '../../../lib/parse-sheet';
+import { parseWorkbookFromBuffer } from '../../../lib/listings/parse-sheet';
 
 /**
  * Parse the pricing sheet. Accepts either:
