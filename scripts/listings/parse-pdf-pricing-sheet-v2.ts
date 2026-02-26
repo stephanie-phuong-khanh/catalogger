@@ -26,7 +26,7 @@ if (fs.existsSync('.env.local')) dotenv.config({ path: '.env.local', override: t
 const { PDFParse } = require('pdf-parse');
 
 const CONFIG = {
-  inputFile: '',
+  inputFile: 'data/input/elina_pilates_pricing_sheet.pdf',
   outDir: 'data/parsed-pricing-sheets',
   useLlm: true,
 };
@@ -186,6 +186,21 @@ export async function parsePdfPricingToRows(buffer: Buffer): Promise<ParsedPrici
   return rows;
 }
 
+/** Group rows by product_name for downstream use (e.g. one search per product). */
+export function groupRowsByProductName(rows: ParsedPricingRow[]): { product_name: string; items: ParsedPricingRow[] }[] {
+  const byName = new Map<string, ParsedPricingRow[]>();
+  for (const row of rows) {
+    const name = (row.product_name ?? '').trim() || '(no name)';
+    if (!byName.has(name)) byName.set(name, []);
+    byName.get(name)!.push(row);
+  }
+  return Array.from(byName.entries()).map(([product_name, items]) => ({ product_name, items }));
+}
+
+export type ParsedPricingSheetGrouped = {
+  groups: { product_name: string; items: ParsedPricingRow[] }[];
+};
+
 async function main(): Promise<void> {
   const inputFileArg = process.argv.find((arg) => arg.startsWith('--input-file'));
   if (inputFileArg) {
@@ -224,10 +239,12 @@ async function main(): Promise<void> {
     await fillProductNameAndColor(rows, openai);
   }
 
+  const groups = groupRowsByProductName(rows);
+  const output: ParsedPricingSheetGrouped = { groups };
   const outPath = path.join(CONFIG.outDir, `${path.basename(CONFIG.inputFile, '.pdf')}.json`);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  fs.writeFileSync(outPath, JSON.stringify(rows, null, 2));
-  console.log(`Wrote ${rows.length} row(s) to ${outPath}`);
+  fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
+  console.log(`Wrote ${rows.length} row(s) in ${groups.length} group(s) to ${outPath}`);
 }
 
 main().catch((err) => {

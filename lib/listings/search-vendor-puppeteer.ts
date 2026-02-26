@@ -17,6 +17,8 @@ export interface SearchVendorPuppeteerOptions {
   headed?: boolean;
   /** Visit homepage first to pick up cookies. Default true. */
   visitHomepageFirst?: boolean;
+  /** Called after each product group is resolved (for resolveVendorUrlsForGroups). Use to persist incrementally. */
+  onGroupDone?: (groupUrls: Record<string, string>) => void;
 }
 
 /** PrestaShop product URLs: .../id-name.html or ...html#/variant */
@@ -84,6 +86,23 @@ function toAbsoluteUrl(href: string, origin: string): string {
   return s.startsWith('/') ? `${base}${s}` : `${base}/${s}`;
 }
 
+/** On a product page, read the currently displayed reference/SKU. Returns null if not found. */
+function getCurrentProductReference(page: Page): Promise<string | null> {
+  return page.evaluate(() => {
+    const skuEl = document.querySelector('[itemprop="sku"]') || document.getElementById('product_reference');
+    if (skuEl) {
+      const text = (skuEl.textContent || '').trim();
+      if (text) return text;
+    }
+    const refBlock = document.querySelector('.product-reference, [data-product-reference]');
+    if (refBlock) {
+      const text = (refBlock.textContent || refBlock.getAttribute('data-product-reference') || '').trim();
+      if (text) return text;
+    }
+    return null;
+  });
+}
+
 /** On a product page, return true if the displayed reference/SKU matches articleRef. */
 function productPageMatchesArticleRef(page: Page, articleRef: string): Promise<boolean> {
   return page.evaluate((ref: string) => {
@@ -137,6 +156,54 @@ async function findVariantMatchingRef(
     }
   }
   return null;
+}
+
+const VARIANT_RADIO_SELECTOR =
+  '.product-variants input.input-color, .variants-product input[type="radio"][name^="group"]';
+
+/**
+ * On a product page (single or multi-variant), collect URL for each article_ref in the set
+ * by reading the current SKU and clicking through variant options. Only records refs that
+ * appear on the page (site may have more colors than in our sheet – we ignore those).
+ */
+export async function collectVariantUrlsOnProductPage(
+  page: Page,
+  articleRefs: Set<string>,
+  options: { waitAfterVariantClickMs?: number } = {},
+): Promise<Record<string, string>> {
+  const waitMs = options.waitAfterVariantClickMs ?? 800;
+  const result: Record<string, string> = {};
+  if (articleRefs.size === 0) return result;
+
+  const recordCurrent = async (): Promise<void> => {
+    const ref = await getCurrentProductReference(page);
+    if (ref && articleRefs.has(ref)) result[ref] = page.url();
+  };
+
+  await recordCurrent();
+
+  const variantCount = await page.evaluate((sel: string) => {
+    return document.querySelectorAll<HTMLInputElement>(sel).length;
+  }, VARIANT_RADIO_SELECTOR);
+
+  for (let i = 0; i < variantCount; i++) {
+    const clicked = await page.evaluate(
+      (sel: string, index: number) => {
+        const radios = document.querySelectorAll<HTMLInputElement>(sel);
+        const el = radios[index];
+        if (!el || el.checked) return false;
+        (el as HTMLElement).click();
+        return true;
+      },
+      VARIANT_RADIO_SELECTOR,
+      i,
+    );
+    if (clicked) {
+      await new Promise((r) => setTimeout(r, waitMs));
+      await recordCurrent();
+    }
+  }
+  return result;
 }
 
 /**
@@ -203,6 +270,82 @@ export async function openSearchPage(
     }
 
     return { title, url, productHref, allProductHrefs };
+  } finally {
+    await browser.close();
+  }
+}
+
+/**
+ * Resolve vendor product URLs for many article_refs by grouping them (e.g. by product_name),
+ * running one search per group with the first ref, then on the product page clicking through
+ * variants and recording URL for each ref that appears. Only refs in the sheet are recorded;
+ * extra colors on the site are ignored.
+ *
+ * @param vendorBaseUrl - e.g. https://www.elinapilates.com
+ * @param groups - each group = list of article_refs for the same product (same page, different variants)
+ * @param options - same as openSearchPage; waitAfterVariantClickMs used in collectVariantUrlsOnProductPage
+ * @returns map article_ref → product URL (only for refs that were found on the site)
+ */
+export async function resolveVendorUrlsForGroups(
+  vendorBaseUrl: string,
+  groups: { articleRefs: string[] }[],
+  options: SearchVendorPuppeteerOptions = {},
+): Promise<Record<string, string>> {
+  const base = vendorBaseUrl.replace(/\/$/, '');
+  const searchPath = options.searchPath ?? '/eu/en/search';
+  const waitAfterLoadMs = options.waitAfterLoadMs ?? 8000;
+  const waitAfterProductMs = options.waitAfterProductLoadMs ?? 2000;
+  const waitAfterVariantClickMs = options.waitAfterVariantClickMs ?? 800;
+  const homepageUrl = base + searchPath.replace(/\/search$/, '');
+
+  const browser = await puppeteer.launch({
+    headless: !options.headed,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+
+  const total: Record<string, string> = {};
+
+  try {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1280, height: 800 });
+    await page.setUserAgent(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    );
+
+    if (options.visitHomepageFirst !== false) {
+      await page.goto(homepageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await dismissCookiePopup(page);
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+
+    for (const group of groups) {
+      const refs = group.articleRefs.filter((r) => r?.trim());
+      if (refs.length === 0) continue;
+
+      const firstRef = refs[0];
+      const searchUrl = `${base}${searchPath}?s=${encodeURIComponent(firstRef)}`;
+      await page.goto(searchUrl, { waitUntil: 'networkidle2', timeout: 35000 });
+      await dismissCookiePopup(page);
+      await new Promise((r) => setTimeout(r, waitAfterLoadMs));
+
+      const origin = new URL(page.url()).origin;
+      const rawLinks = await getProductLinksFromSearchPage(page);
+      const allProductHrefs = rawLinks.map((href) => toAbsoluteUrl(href, origin));
+      if (allProductHrefs.length === 0) continue;
+
+      const productUrl = allProductHrefs[0];
+      await page.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await dismissCookiePopup(page);
+      await new Promise((r) => setTimeout(r, waitAfterProductMs));
+
+      const groupUrls = await collectVariantUrlsOnProductPage(page, new Set(refs), {
+        waitAfterVariantClickMs,
+      });
+      Object.assign(total, groupUrls);
+      options.onGroupDone?.(groupUrls);
+    }
+
+    return total;
   } finally {
     await browser.close();
   }
