@@ -31,11 +31,36 @@ function parseArg(name: string, defaultValue: string): string {
   return arg ? arg.split('=').slice(1).join('=').trim() : defaultValue;
 }
 
+type NormalizedGroup = { articleRefs: string[]; product_name?: string };
+
+type NestedUrlOutput = {
+  groups: Array<{
+    product_name?: string;
+    items: Array<{ article_ref: string; url?: string | null; [k: string]: unknown }>;
+  }>;
+};
+
+/** Build article_ref -> { product_name, color } from input for logging. */
+function buildRefToInfo(input: unknown): Record<string, { product_name?: string; color?: string | null }> {
+  const out: Record<string, { product_name?: string; color?: string | null }> = {};
+  if (input && typeof input === 'object' && 'groups' in input && Array.isArray((input as { groups: unknown }).groups)) {
+    for (const g of (input as { groups: InputGroup[] }).groups) {
+      const productName = g.product_name;
+      for (const item of g.items ?? []) {
+        const ref = item.article_ref != null ? String(item.article_ref).trim() : '';
+        if (ref) out[ref] = { product_name: productName ?? item.product_name as string, color: item.color as string | null };
+      }
+    }
+  }
+  return out;
+}
+
 /** Normalize input: grouped format has .groups; legacy flat array we group by product_name. */
-function normalizeGroups(input: unknown): { articleRefs: string[] }[] {
+function normalizeGroups(input: unknown): NormalizedGroup[] {
   if (input && typeof input === 'object' && 'groups' in input && Array.isArray((input as { groups: unknown }).groups)) {
     const groups = (input as { groups: InputGroup[] }).groups;
     return groups.map((g) => ({
+      product_name: g.product_name,
       articleRefs: (g.items ?? [])
         .map((i) => (i.article_ref != null ? String(i.article_ref).trim() : ''))
         .filter(Boolean),
@@ -50,7 +75,7 @@ function normalizeGroups(input: unknown): { articleRefs: string[] }[] {
       if (!byName.has(name)) byName.set(name, []);
       byName.get(name)!.push(ref);
     }
-    return Array.from(byName.values()).map((articleRefs) => ({ articleRefs }));
+    return Array.from(byName.entries()).map(([product_name, articleRefs]) => ({ product_name, articleRefs }));
   }
   return [];
 }
@@ -67,7 +92,11 @@ async function main() {
   const outDir = path.dirname(outPath);
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-  let urlMap: Record<string, string> = {};
+  /** article_ref -> resolved url (null = tried but not found, for resume we skip groups where every ref is in urlMap). */
+  let urlMap: Record<string, string | null> = {};
+  /** When output file uses nested { groups: [...] } format, keep it so we can write back in same shape. */
+  let nestedOutput: NestedUrlOutput | null = null;
+
   if (fresh) {
     fs.writeFileSync(outPath, '{}', 'utf-8');
     console.log('--fresh: wiped output file.');
@@ -75,8 +104,22 @@ async function main() {
     try {
       const existing = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
       if (existing && typeof existing === 'object' && !Array.isArray(existing)) {
-        urlMap = { ...existing };
-        console.log(`Loaded ${Object.keys(urlMap).length} existing URL(s) from ${outPath}. Will skip done groups.\n`);
+        if (existing.groups && Array.isArray(existing.groups)) {
+          for (const g of existing.groups) {
+            for (const item of g.items ?? []) {
+              const ref = item.article_ref != null ? String(item.article_ref).trim() : '';
+              if (!ref) continue;
+              urlMap[ref] = typeof item.url === 'string' ? item.url.trim() : null;
+            }
+          }
+          nestedOutput = existing as NestedUrlOutput;
+          console.log(
+            `Loaded ${Object.keys(urlMap).length} existing URL(s) from nested format in ${outPath}. Will skip done groups.\n`,
+          );
+        } else {
+          urlMap = { ...existing };
+          console.log(`Loaded ${Object.keys(urlMap).length} existing URL(s) from ${outPath}. Will skip done groups.\n`);
+        }
       }
     } catch {
       console.log('Could not parse output file; starting with empty map.\n');
@@ -98,7 +141,8 @@ async function main() {
   }
 
   const allGroups = normalizeGroups(input);
-  const groupsToDo = allGroups.filter((g) => g.articleRefs.some((ref) => !urlMap[ref]));
+  const refToInfo = buildRefToInfo(input);
+  const groupsToDo = allGroups.filter((g) => g.articleRefs.some((ref) => !(ref in urlMap)));
 
   if (groupsToDo.length === 0) {
     console.log('All groups already resolved. Nothing to do.');
@@ -110,18 +154,85 @@ async function main() {
   );
   if (headed) console.log('(Running in headed mode.)\n');
 
-  const onGroupDone = (groupUrls: Record<string, string>) => {
-    Object.assign(urlMap, groupUrls);
-    fs.writeFileSync(outPath, JSON.stringify(urlMap, null, 2), 'utf-8');
+  const onGroupStart = (group: { articleRefs: string[] }, groupIndex: number) => {
+    const productName = groupsToDo[groupIndex]?.product_name ?? '?';
+    console.log(`\n--- Group ${groupIndex + 1}: ${productName} ---`);
+    console.log('Looking for article_refs:');
+    for (const ref of group.articleRefs) {
+      const info = refToInfo[ref];
+      const color = info?.color != null ? String(info.color) : '(no color)';
+      console.log(`  • ${ref}  →  ${productName}  /  ${color}`);
+    }
+    console.log('(Starting Puppeteer for this group...)\n');
+  };
+
+  const onVariantMatch = (ref: string, url: string) => {
+    const info = refToInfo[ref];
+    const color = info?.color != null ? String(info.color) : '?';
+    console.log(`  [MATCH] ${ref} (${color}) → ${url}`);
+  };
+
+  const onGroupDone = (groupUrls: Record<string, string>, articleRefs: string[]) => {
+    for (const ref of articleRefs) {
+      urlMap[ref] = groupUrls[ref] ?? null;
+    }
+    const found = articleRefs.filter((r) => groupUrls[r]).length;
+    console.log(`\n[resolve] Group done: ${found}/${articleRefs.length} URL(s) resolved. Writing to ${outPath}...`);
+
+    if (nestedOutput) {
+      const refSet = new Set(articleRefs);
+      let updated = false;
+      for (const g of nestedOutput.groups) {
+        const groupRefs = (g.items ?? []).map((i) => String(i.article_ref ?? '').trim());
+        if (articleRefs.every((r) => groupRefs.includes(r))) {
+          for (const item of g.items ?? []) {
+            const ref = String(item.article_ref ?? '').trim();
+            if (refSet.has(ref)) {
+              item.url = groupUrls[ref] ?? null;
+            }
+          }
+          updated = true;
+          break;
+        }
+      }
+      if (!updated && articleRefs.length > 0) {
+        const inputGroups = input && typeof input === 'object' && 'groups' in input && Array.isArray((input as { groups: unknown }).groups)
+          ? (input as { groups: InputGroup[] }).groups
+          : [];
+        const inputGroup = inputGroups.find(
+          (g) => (g.items ?? []).some((i) => refSet.has(String(i.article_ref ?? '').trim())),
+        );
+        const items: NestedUrlOutput['groups'][0]['items'] = inputGroup
+          ? (inputGroup.items ?? [])
+              .filter((i) => refSet.has(String(i.article_ref ?? '').trim()))
+              .map((i) => {
+                const ref = String(i.article_ref ?? '').trim();
+                return { ...i, article_ref: ref, url: groupUrls[ref] ?? null };
+              })
+          : articleRefs.map((article_ref) => ({ article_ref, url: groupUrls[article_ref] ?? null }));
+        nestedOutput.groups.push({
+          product_name: inputGroup?.product_name ?? allGroups.find((gr) => articleRefs.every((r) => gr.articleRefs.includes(r)))?.product_name,
+          items,
+        });
+      }
+      fs.writeFileSync(outPath, JSON.stringify(nestedOutput, null, 2), 'utf-8');
+    } else {
+      fs.writeFileSync(outPath, JSON.stringify(urlMap, null, 2), 'utf-8');
+    }
+    console.log(`[resolve] Wrote ${outPath}.\n`);
   };
 
   await resolveVendorUrlsForGroups(CONFIG.vendorBaseUrl, groupsToDo, {
     headed,
     visitHomepageFirst: true,
+    onGroupStart,
+    onVariantMatch,
     onGroupDone,
   });
 
-  console.log(`Done. ${Object.keys(urlMap).length} URL(s) in ${outPath}`);
+  const totalRefs = Object.keys(urlMap).length;
+  const foundRefs = Object.values(urlMap).filter((u): u is string => typeof u === 'string').length;
+  console.log(`Done. ${foundRefs}/${totalRefs} URL(s) in ${outPath}`);
 }
 
 main().catch((e) => {

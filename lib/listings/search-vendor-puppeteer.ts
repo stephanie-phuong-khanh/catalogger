@@ -17,8 +17,12 @@ export interface SearchVendorPuppeteerOptions {
   headed?: boolean;
   /** Visit homepage first to pick up cookies. Default true. */
   visitHomepageFirst?: boolean;
-  /** Called after each product group is resolved (for resolveVendorUrlsForGroups). Use to persist incrementally. */
-  onGroupDone?: (groupUrls: Record<string, string>) => void;
+  /** Called after each product group is resolved. groupUrls has refs that were found; articleRefs is the full list for the group (missing refs should be written with url: null). */
+  onGroupDone?: (groupUrls: Record<string, string>, articleRefs: string[]) => void;
+  /** Called before starting Puppeteer work for each group (for resolveVendorUrlsForGroups). */
+  onGroupStart?: (group: { articleRefs: string[] }, groupIndex: number) => void;
+  /** Called when a variant (e.g. color) on the product page matches an article_ref we're looking for. */
+  onVariantMatch?: (ref: string, url: string) => void;
 }
 
 /** PrestaShop product URLs: .../id-name.html or ...html#/variant */
@@ -86,40 +90,42 @@ function toAbsoluteUrl(href: string, origin: string): string {
   return s.startsWith('/') ? `${base}${s}` : `${base}/${s}`;
 }
 
-/** On a product page, read the currently displayed reference/SKU. Returns null if not found. */
+/** On a product page, read the displayed reference/SKU (e.g. ".product-reference" > span "ELN 700005"). Returns raw text or null. */
 function getCurrentProductReference(page: Page): Promise<string | null> {
   return page.evaluate(() => {
+    const refBlock = document.querySelector('.product-reference');
+    if (refBlock) {
+      const span = refBlock.querySelector('span');
+      const text = (span ? span.textContent : refBlock.textContent) || '';
+      const raw = text.replace(/\s+/g, ' ').trim();
+      if (raw) return raw;
+    }
     const skuEl = document.querySelector('[itemprop="sku"]') || document.getElementById('product_reference');
     if (skuEl) {
       const text = (skuEl.textContent || '').trim();
       if (text) return text;
     }
-    const refBlock = document.querySelector('.product-reference, [data-product-reference]');
-    if (refBlock) {
-      const text = (refBlock.textContent || refBlock.getAttribute('data-product-reference') || '').trim();
+    const dataBlock = document.querySelector('[data-product-reference]');
+    if (dataBlock) {
+      const text = (dataBlock.getAttribute('data-product-reference') || dataBlock.textContent || '').trim();
       if (text) return text;
     }
     return null;
   });
 }
 
-/** On a product page, return true if the displayed reference/SKU matches articleRef. */
+/** Which article_ref (if any) appears as a substring in the page's reference text. */
+function findMatchingArticleRef(pageText: string | null, articleRefs: Set<string>): string | null {
+  if (!pageText) return null;
+  for (const ref of articleRefs) {
+    if (pageText.includes(ref)) return ref;
+  }
+  return null;
+}
+
+/** On a product page, return true if the displayed reference contains articleRef as a substring (e.g. "ELN 700005" contains "700005"). */
 function productPageMatchesArticleRef(page: Page, articleRef: string): Promise<boolean> {
-  return page.evaluate((ref: string) => {
-    const needle = ref.trim();
-    if (!needle) return false;
-    const skuEl = document.querySelector('[itemprop="sku"]') || document.getElementById('product_reference');
-    if (skuEl) {
-      const text = (skuEl.textContent || '').trim();
-      if (text === needle || text.includes(needle)) return true;
-    }
-    const refBlock = document.querySelector('.product-reference, [data-product-reference]');
-    if (refBlock) {
-      const text = (refBlock.textContent || refBlock.getAttribute('data-product-reference') || '').trim();
-      if (text === needle || text.includes(needle)) return true;
-    }
-    return false;
-  }, articleRef);
+  return getCurrentProductReference(page).then((raw) => raw !== null && raw.includes(articleRef.trim()));
 }
 
 /**
@@ -158,8 +164,8 @@ async function findVariantMatchingRef(
   return null;
 }
 
-const VARIANT_RADIO_SELECTOR =
-  '.product-variants input.input-color, .variants-product input[type="radio"][name^="group"]';
+/** Upholstered Color swatches: .product-variants > .product-variants-item > ul > li > input.input-color (PrestaShop/Elina). */
+const VARIANT_RADIO_SELECTOR = '.product-variants input.input-color';
 
 /**
  * On a product page (single or multi-variant), collect URL for each article_ref in the set
@@ -169,15 +175,22 @@ const VARIANT_RADIO_SELECTOR =
 export async function collectVariantUrlsOnProductPage(
   page: Page,
   articleRefs: Set<string>,
-  options: { waitAfterVariantClickMs?: number } = {},
+  options: { waitAfterVariantClickMs?: number; onVariantMatch?: (ref: string, url: string) => void } = {},
 ): Promise<Record<string, string>> {
   const waitMs = options.waitAfterVariantClickMs ?? 800;
   const result: Record<string, string> = {};
   if (articleRefs.size === 0) return result;
 
   const recordCurrent = async (): Promise<void> => {
-    const ref = await getCurrentProductReference(page);
-    if (ref && articleRefs.has(ref)) result[ref] = page.url();
+    const pageText = await getCurrentProductReference(page);
+    const matchedRef = findMatchingArticleRef(pageText, articleRefs);
+    if (matchedRef) {
+      const url = page.url();
+      if (!result[matchedRef]) {
+        result[matchedRef] = url;
+        options.onVariantMatch?.(matchedRef, url);
+      }
+    }
   };
 
   await recordCurrent();
@@ -186,7 +199,11 @@ export async function collectVariantUrlsOnProductPage(
     return document.querySelectorAll<HTMLInputElement>(sel).length;
   }, VARIANT_RADIO_SELECTOR);
 
+  const needCount = articleRefs.size;
   for (let i = 0; i < variantCount; i++) {
+    if (Object.keys(result).length >= needCount) {
+      break; // found all refs we need, no need to click through the rest
+    }
     const clicked = await page.evaluate(
       (sel: string, index: number) => {
         const radios = document.querySelectorAll<HTMLInputElement>(sel);
@@ -302,8 +319,10 @@ export async function resolveVendorUrlsForGroups(
     headless: !options.headed,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
+  console.log('[resolve] Browser started.');
 
   const total: Record<string, string> = {};
+  const totalGroups = groups.length;
 
   try {
     const page = await browser.newPage();
@@ -313,38 +332,63 @@ export async function resolveVendorUrlsForGroups(
     );
 
     if (options.visitHomepageFirst !== false) {
+      console.log('[resolve] Loading homepage for session/cookies...');
       await page.goto(homepageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await dismissCookiePopup(page);
       await new Promise((r) => setTimeout(r, 2000));
+      console.log('[resolve] Homepage loaded.');
     }
 
-    for (const group of groups) {
+    for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+      const group = groups[groupIndex];
       const refs = group.articleRefs.filter((r) => r?.trim());
       if (refs.length === 0) continue;
 
+      options.onGroupStart?.({ articleRefs: refs }, groupIndex);
+
       const firstRef = refs[0];
       const searchUrl = `${base}${searchPath}?s=${encodeURIComponent(firstRef)}`;
+      console.log(`[resolve] Group ${groupIndex + 1}/${totalGroups}: Loading search page (s=${firstRef})...`);
       await page.goto(searchUrl, { waitUntil: 'networkidle2', timeout: 35000 });
       await dismissCookiePopup(page);
+      console.log(`[resolve] Waiting ${waitAfterLoadMs}ms for Cloudflare/JS...`);
       await new Promise((r) => setTimeout(r, waitAfterLoadMs));
 
       const origin = new URL(page.url()).origin;
       const rawLinks = await getProductLinksFromSearchPage(page);
       const allProductHrefs = rawLinks.map((href) => toAbsoluteUrl(href, origin));
-      if (allProductHrefs.length === 0) continue;
+      if (allProductHrefs.length === 0) {
+        console.log(`[resolve] Group ${groupIndex + 1}/${totalGroups}: No product links on search page, skipping.`);
+        continue;
+      }
 
       const productUrl = allProductHrefs[0];
+      console.log(`[resolve] Opening product page (${allProductHrefs.length} link(s) found)...`);
       await page.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
       await dismissCookiePopup(page);
       await new Promise((r) => setTimeout(r, waitAfterProductMs));
 
+      const variantCount = await page.evaluate((sel: string) => {
+        return document.querySelectorAll<HTMLInputElement>(sel).length;
+      }, VARIANT_RADIO_SELECTOR);
+      console.log(`[resolve] Checking variants (${variantCount} color(s))...`);
+
       const groupUrls = await collectVariantUrlsOnProductPage(page, new Set(refs), {
         waitAfterVariantClickMs,
+        onVariantMatch: options.onVariantMatch,
       });
+      const found = Object.keys(groupUrls).length;
+      const missing = refs.filter((r) => !groupUrls[r]);
+      if (missing.length > 0) {
+        console.log(
+          `[resolve] Group ${groupIndex + 1}/${totalGroups}: Found ${found}/${refs.length} refs; missing: ${missing.join(', ')}`,
+        );
+      }
       Object.assign(total, groupUrls);
-      options.onGroupDone?.(groupUrls);
+      options.onGroupDone?.(groupUrls, refs);
     }
 
+    console.log('[resolve] All groups done.');
     return total;
   } finally {
     await browser.close();
