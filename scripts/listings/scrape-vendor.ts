@@ -211,15 +211,30 @@ async function main() {
       const secondUrl = urlsWithValue[1];
       console.log(`[scrape] Group ${index + 1}: checking variant consistency with ${secondUrl}`);
       let secondData: ScrapedProductData;
-      try {
-        await page.goto(secondUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
+      const loadAndScrapeSecond = async () => {
+        await page.goto(secondUrl, { waitUntil: 'load', timeout: 25000 });
         await dismissCookiePopup(page);
         await new Promise((r) => setTimeout(r, 1500));
-        secondData = await scrapeElinaProductPage(page);
+        return scrapeElinaProductPage(page);
+      };
+      try {
+        secondData = await loadAndScrapeSecond();
       } catch (e) {
-        console.error(`[scrape] Failed to load or scrape second URL ${secondUrl}:`, e);
-        await browser.close();
-        process.exit(1);
+        const isDetached = String((e as Error).message).includes('detached');
+        if (isDetached) {
+          console.log(`[scrape] Detached frame on second URL, retrying once...`);
+          try {
+            secondData = await loadAndScrapeSecond();
+          } catch (e2) {
+            console.error(`[scrape] Failed on retry: ${secondUrl}:`, e2);
+            await browser.close();
+            process.exit(1);
+          }
+        } else {
+          console.error(`[scrape] Failed to load or scrape second URL ${secondUrl}:`, e);
+          await browser.close();
+          process.exit(1);
+        }
       }
       const norm1 = normalizeSharedContent(siteData);
       const norm2 = normalizeSharedContent(secondData);

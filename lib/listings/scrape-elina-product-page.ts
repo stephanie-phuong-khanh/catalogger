@@ -86,6 +86,17 @@ function extractProductDataInPage(): ScrapedProductData {
         lines.push('');
         return;
       }
+      if (tag === 'dl') {
+        const dts = el.querySelectorAll(':scope > dt');
+        const dds = el.querySelectorAll(':scope > dd');
+        for (let i = 0; i < dts.length && i < dds.length; i++) {
+          const label = getText(dts[i] as Element);
+          const value = getText(dds[i] as Element).replace(/\s+/g, ' ').trim();
+          if (label) lines.push('**' + label + '**: ' + value);
+        }
+        lines.push('');
+        return;
+      }
       el.childNodes.forEach(process);
     };
     process(root);
