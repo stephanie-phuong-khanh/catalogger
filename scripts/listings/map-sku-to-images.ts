@@ -1,26 +1,27 @@
 /**
- * Map ONE SKU to its image folder and selected images, using LLM tree-walk + vision.
- * Writes/merges into a single output file: SKU → vendor_site_images, folder_path,
- * selected_folder_images, missing_from_folder.
+ * Map ONE SKU to its image folder using LLM tree-walk (OpenAI gpt-4o-mini).
+ * Writes/merges into a single output file: SKU → folder_path.
  *
- * READ-ONLY on --image-root: This script never modifies, creates, or deletes anything
- * inside the image folder. It only reads directory structure and file contents (for vision).
- * All writes go to --out-file (e.g. elina_sku_to_images.json) only.
+ * READ-ONLY on --image-root: only reads directory structure. All writes go to --out-file.
  *
  * Usage:
  *   npm run map-sku-to-images -- --sku "100006" --image-root /path/to/elina_images
  *   npm run map-sku-to-images -- --sku "100006" --image-root ./data/elina_images --out-file data/parsed-pricing-sheets/elina_sku_to_images.json
- *   Add --review-dir data/review to write a per-SKU HTML + images for spot-check (open index.html in browser).
+ *   Add --output-dir <path> to create a per-SKU output folder and run the (placeholder) edit+write step after confirm.
+ *   Add --yes to skip the "Does this look correct? (y/n)" prompt and proceed as if yes.
  *
- * Requires: OPENAI_API_KEY (tree-walk, gpt-4o-mini) and GOOGLE_API_KEY (vision, Gemini). Images are resized before sending to save tokens.
+ * TODO: Vendor site photo strip — Fetch images from vendor site (from site input), resize to low-res,
+ * stack vertically with white spacing into one composite image, and save alongside output (e.g. in
+ * the per-SKU output folder). We do not yet implement any image editing or writing of processed
+ * folder images; that step is planned as a separate phase (possibly interactive CLI: confirm path
+ * then run edit+write + strip).
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as readline from 'readline';
 import dotenv from 'dotenv';
-import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
-import sharp from 'sharp';
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
@@ -31,7 +32,6 @@ const CONFIG = {
   inputFile: 'data/parsed-pricing-sheets/elina_pilates_products_site.json',
   outFile: 'data/parsed-pricing-sheets/elina_sku_to_images.json',
   imageRootDefault: '',
-  maxImageDimension: 512,
   imageExtensions: new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']),
 };
 
@@ -41,10 +41,7 @@ type Group = { product_name?: string; items: Item[]; site?: Site };
 type SiteInput = { groups: Group[] };
 
 export type SkuImageMapping = {
-  vendor_site_images: string[];
   folder_path: string;
-  selected_folder_images: string[];
-  missing_from_folder: string[];
 };
 
 export type SkuToImagesOutput = {
@@ -63,222 +60,46 @@ function parseFlag(name: string): boolean {
   return process.argv.includes(`--${name}`);
 }
 
-/**
- * Write review bundle: vendor + folder images and interactive index.html.
- * Reviewer can fix mappings and include extras, then Export to download JSON.
- * Read-only on imageRoot (copies only).
- */
-async function writeReviewBundle(
-  skuKey: string,
-  mapping: SkuImageMapping,
-  vendor_to_folder: VendorToFolderMapping,
-  folderImagePaths: string[],
-  imageRoot: string,
-  reviewDir: string,
-): Promise<string> {
-  const base = path.resolve(reviewDir.startsWith('/') ? reviewDir : path.join(process.cwd(), reviewDir));
-  const baseDir = path.join(base, skuKey.replace(/[/\\]/g, '_'));
-  const vendorDir = path.join(baseDir, 'vendor');
-  const folderDir = path.join(baseDir, 'folder');
-  const mode = 0o755;
-  fs.mkdirSync(vendorDir, { recursive: true, mode });
-  if (fs.existsSync(folderDir)) fs.rmSync(folderDir, { recursive: true });
-  fs.mkdirSync(folderDir, { recursive: true, mode });
-
-  const vendorFiles: string[] = [];
-  for (let i = 0; i < mapping.vendor_site_images.length; i++) {
-    const url = mapping.vendor_site_images[i];
-    try {
-      const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; catalogger/1.0)' } });
-      if (!res.ok) continue;
-      const ext = (res.headers.get('content-type')?.includes('png') || url.toLowerCase().includes('.png')) ? '.png' : '.jpg';
-      const name = `${i + 1}${ext}`;
-      const buf = Buffer.from(await res.arrayBuffer());
-      fs.writeFileSync(path.join(vendorDir, name), buf);
-      vendorFiles.push(`vendor/${name}`);
-    } catch {
-      // skip
-    }
-  }
-
-  const folderFiles: { index: number; relativePath: string; name: string }[] = [];
-  for (let i = 0; i < folderImagePaths.length; i++) {
-    const rel = folderImagePaths[i];
-    const src = path.join(imageRoot, rel);
-    if (!fs.existsSync(src)) continue;
-    const ext = path.extname(rel).toLowerCase() || '.jpg';
-    const name = `${i + 1}${ext}`;
-    const dest = path.join(folderDir, name);
-    try {
-      fs.writeFileSync(dest, fs.readFileSync(src));
-      folderFiles.push({ index: i + 1, relativePath: rel, name: `folder/${name}` });
-    } catch (err) {
-      console.warn('[map-sku] Could not copy to review folder:', src, (err as Error).message);
-    }
-  }
-
-  const matchedPaths = new Set(vendor_to_folder.filter((p): p is string => p != null));
-  const extras = folderImagePaths.filter((p) => !matchedPaths.has(p));
-
-  const pathToFolderIndex = new Map<string, number>();
-  folderImagePaths.forEach((p, i) => pathToFolderIndex.set(p, i + 1));
-
-  const vendor_to_folder_index: (number | null)[] = vendor_to_folder.map((p) =>
-    p != null && pathToFolderIndex.has(p) ? pathToFolderIndex.get(p)! : null,
-  );
-
-  const reviewData = {
-    skuKey,
-    folder_path: mapping.folder_path,
-    vendor_urls: mapping.vendor_site_images,
-    vendor_files: vendorFiles,
-    vendor_to_folder_index,
-    folder_files: folderFiles.map((f) => ({ index: f.index, relativePath: f.relativePath, name: f.name })),
-    extras,
-  };
-
-  const html = buildReviewHtml(skuKey, reviewData);
-  fs.writeFileSync(path.join(baseDir, 'index.html'), html, 'utf-8');
-  fs.writeFileSync(path.join(baseDir, 'review-data.json'), JSON.stringify(reviewData, null, 2), 'utf-8');
-  const indexPath = path.join(baseDir, 'index.html');
-  console.log('[map-sku] Review bundle:', indexPath);
-  return indexPath;
+function askConfirm(question: string): Promise<boolean> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      const normalized = answer.trim().toLowerCase();
+      resolve(normalized === 'y' || normalized === 'yes');
+    });
+  });
 }
 
-function buildReviewHtml(skuKey: string, d: {
-  skuKey: string;
-  folder_path: string;
-  vendor_urls: string[];
-  vendor_files: string[];
-  vendor_to_folder_index: (number | null)[];
-  folder_files: { index: number; relativePath: string; name: string }[];
-  extras: string[];
-}): string {
-  const escapeHtml = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const dataJson = JSON.stringify(d).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Review: ${escapeHtml(d.skuKey)}</title>
-  <style>
-    body { font-family: system-ui, sans-serif; padding: 1rem; max-width: 1200px; margin: 0 auto; }
-    .instructions { background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
-    .instructions h2 { margin-top: 0; }
-    .instructions ol { margin: 0.5rem 0; padding-left: 1.25rem; }
-    .instructions li { margin: 0.35rem 0; }
-    h2 { margin-top: 1.5rem; border-bottom: 1px solid #ccc; }
-    .vendor-block { display: flex; align-items: flex-start; gap: 1rem; margin: 0.75rem 0; padding: 0.5rem; border: 1px solid #eee; border-radius: 6px; }
-    .vendor-block img { height: 120px; width: auto; object-fit: contain; flex-shrink: 0; }
-    .vendor-block select { min-width: 180px; padding: 0.35rem; }
-    .extras-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
-    .extras-list label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
-    .extras-list img { height: 80px; width: auto; object-fit: contain; }
-    .folder-ref { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0.75rem 0; }
-    .folder-ref .thumb { text-align: center; }
-    .folder-ref .thumb img { height: 140px; width: auto; object-fit: contain; border: 2px solid #ccc; border-radius: 4px; display: block; }
-    .folder-ref .thumb span { display: block; margin-top: 0.25rem; font-weight: 600; font-size: 0.9rem; }
-    .export-btn { margin-top: 1rem; padding: 0.6rem 1.2rem; font-size: 1rem; cursor: pointer; background: #333; color: #fff; border: none; border-radius: 6px; }
-    .export-btn:hover { background: #555; }
-  </style>
-</head>
-<body>
-  <div class="instructions">
-    <h2>Instructions for reviewer</h2>
-    <ol>
-      <li><strong>Vendor → Folder mapping</strong> Below, each website (vendor) image has a dropdown. The script guessed which folder image is the <em>same photo</em>. Correct any wrong match: pick a different folder image or “Missing” if there is no matching photo in the folder.</li>
-      <li><strong>Extra folder images</strong> Some folder images were not matched to any vendor image. If they belong to this product (same SKU), check “Include” so they are added to the final result. Leave unchecked if they are a different product or duplicate.</li>
-      <li><strong>Export</strong> When done, click <strong>Export corrections</strong>. A JSON file will download. Run: <code>npm run apply-review -- --file &lt;path-to-downloaded.json&gt;</code> to update the main mapping file.</li>
-    </ol>
-  </div>
-
-  <h1>SKU ${escapeHtml(d.skuKey)}</h1>
-  <p><strong>Folder path:</strong> ${escapeHtml(d.folder_path)}</p>
-
-  <h2>Folder images (reference — use this to pick matches)</h2>
-  <p>These are the images in the folder. When you set the dropdown for each vendor image below, pick the folder number that shows the <em>same photo</em>.</p>
-  <div id="folder-reference" class="folder-ref"></div>
-
-  <h2>1. Vendor site images — set match (or Missing)</h2>
-  <p>For each vendor image, choose which folder image above is the <em>same photo</em>, or “Missing” if none.</p>
-  <div id="vendor-mapping"></div>
-
-  <h2>2. Extra folder images — include in result?</h2>
-  <p>These folder images were not matched to any vendor image. Check the box to include them for this SKU.</p>
-  <div id="extras" class="extras-list"></div>
-
-  <p><button class="export-btn" id="export-btn">Export corrections</button></p>
-
-  <script>
-    window.REVIEW_DATA = ${dataJson};
-    const d = window.REVIEW_DATA;
-    function opt(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
-    var folderRefEl = document.getElementById('folder-reference');
-    d.folder_files.forEach(function(f) {
-      var wrap = document.createElement('div');
-      wrap.className = 'thumb';
-      wrap.innerHTML = '<img src="'+opt(f.name)+'" alt="Folder '+f.index+'" /><span>Folder '+f.index+'</span>';
-      folderRefEl.appendChild(wrap);
-    });
-    const optsHtml = '<option value="">— Missing (no match in folder)</option>' + d.folder_files.map(function(f){ return '<option value="'+f.index+'">Folder '+f.index+'</option>'; }).join('');
-    const vendorEl = document.getElementById('vendor-mapping');
-    d.vendor_files.forEach(function(name, i) {
-      const current = d.vendor_to_folder_index[i];
-      const div = document.createElement('div');
-      div.className = 'vendor-block';
-      div.innerHTML = '<img src="'+opt(name)+'" alt="Vendor '+(i+1)+'" /><div><strong>Vendor '+(i+1)+'</strong><br/><select></select></div>';
-      const sel = div.querySelector('select');
-      sel.innerHTML = optsHtml;
-      sel.value = current != null ? String(current) : '';
-      sel.addEventListener('change', function() { d.vendor_to_folder_index[i] = sel.value ? parseInt(sel.value, 10) : null; });
-      vendorEl.appendChild(div);
-    });
-    const extrasEl = document.getElementById('extras');
-    const extrasInclude = {};
-    d.extras.forEach(function(rel) { extrasInclude[rel] = false; });
-    d.extras.forEach(function(rel) {
-      const f = d.folder_files.find(function(x) { return x.relativePath === rel; });
-      if (!f) return;
-      const label = document.createElement('label');
-      label.innerHTML = '<input type="checkbox" /> <img src="'+opt(f.name)+'" alt="" /> Include';
-      var cb = label.querySelector('input');
-      cb.addEventListener('change', function() { extrasInclude[rel] = cb.checked; });
-      extrasEl.appendChild(label);
-    });
-    document.getElementById('export-btn').addEventListener('click', function() {
-      var includeExtras = Object.keys(extrasInclude).filter(function(p) { return extrasInclude[p]; });
-      var payload = { skuKey: d.skuKey, folder_path: d.folder_path, vendor_to_folder_index: d.vendor_to_folder_index, include_extras: includeExtras, vendor_urls: d.vendor_urls, folder_files: d.folder_files };
-      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'review-' + d.skuKey + '.json';
-      a.click();
-    });
-  </script>
-</body>
-</html>
-`;
+/** Placeholder: later will process folder images (resize/crop) and write vendor strip. */
+function runEditAndWritePlaceholder(skuKey: string, folderPath: string, imageRoot: string, outputDir: string): void {
+  const skuOutDir = path.join(outputDir, skuKey);
+  if (!fs.existsSync(skuOutDir)) fs.mkdirSync(skuOutDir, { recursive: true });
+  const placeholderPath = path.join(skuOutDir, '.placeholder-edit-and-strip');
+  fs.writeFileSync(
+    placeholderPath,
+    `SKU: ${skuKey}\nfolder_path: ${folderPath}\nimage_root: ${imageRoot}\n\nTODO: Write processed folder images and vendor site photo strip here.\n`,
+    'utf-8',
+  );
+  console.log('[map-sku] Placeholder: created', skuOutDir);
+  console.log('[map-sku] (Edit + write + vendor strip not yet implemented.)');
 }
 
 function resolveSku(input: SiteInput, skuArg: string): {
   skuKey: string;
   productName: string;
-  vendorSiteImages: string[];
   productColor: string | null;
 } {
   const norm = (s: string) => s.replace(/^ELN\s+/i, '').trim();
   const want = norm(skuArg);
   for (const group of input.groups ?? []) {
     for (const item of group.items ?? []) {
-      if (norm(item.article_ref) === want && group.site?.image_urls) {
+      if (norm(item.article_ref) === want) {
         const raw = (item as unknown as { color?: string }).color;
         const color = typeof raw === 'string' ? raw.trim() : null;
         return {
           skuKey: item.article_ref,
-          productName: group.site.product_name ?? group.product_name ?? item.article_ref,
-          vendorSiteImages: group.site.image_urls,
+          productName: group.site?.product_name ?? group.product_name ?? item.article_ref,
           productColor: color || null,
         };
       }
@@ -336,7 +157,14 @@ function folderHasImages(imageRoot: string, folderPath: string): boolean {
   return listImageFilesUnder(imageRoot, folderPath).length > 0;
 }
 
-function treeWalkPrompt(productName: string, skuKey: string, productColor: string | null, currentPath: string, childNames: string[], currentHasImages: boolean): string {
+function treeWalkPrompt(
+  productName: string,
+  skuKey: string,
+  productColor: string | null,
+  currentPath: string,
+  childNames: string[],
+  currentHasImages: boolean,
+): string {
   const atRoot = currentPath === '';
   const canChooseCurrent = !atRoot && currentHasImages;
   const colorLine = productColor
@@ -358,31 +186,6 @@ ${currentHasImages ? 'This folder (or its descendants) has image files.' : 'No i
 ${instruction}
 
 Reply with only that one word or name, nothing else.`;
-}
-
-async function pickChildOrCurrent(
-  genai: GoogleGenAI,
-  productName: string,
-  skuKey: string,
-  productColor: string | null,
-  currentPath: string,
-  childNames: string[],
-  currentHasImages: boolean,
-): Promise<'CURRENT' | string> {
-  const prompt = treeWalkPrompt(productName, skuKey, productColor, currentPath, childNames, currentHasImages);
-
-  const response = await genai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: [{ text: prompt }],
-    config: { temperature: 0, maxOutputTokens: 100 },
-  });
-  const text = (response.text ?? '').trim();
-  const atRoot = currentPath === '';
-  if (!atRoot && /^CURRENT$/i.test(text)) return 'CURRENT';
-  const match = childNames.find((c) => c === text || c.toLowerCase() === text.toLowerCase());
-  if (match) return match;
-  if (childNames.length === 0) return 'CURRENT';
-  return childNames[0];
 }
 
 async function pickChildOrCurrentOpenAI(
@@ -436,8 +239,7 @@ async function treeWalkToFolder(
     const childNames = currentChildren.map((c) => c.name);
     const currentHasImages = folderHasImages(imageRoot, currentPath);
     const pathLabel = currentPath || '(root)';
-    const childrenLabel =
-      childNames.length > 0 ? childNames.join(', ') : '(none — leaf or empty)';
+    const childrenLabel = childNames.length > 0 ? childNames.join(', ') : '(none — leaf or empty)';
     console.log(`[map-sku] Step ${step}: At ${pathLabel}`);
     console.log(`[map-sku]   Children: ${childrenLabel}`);
     console.log(`[map-sku]   Has images here: ${currentHasImages ? 'yes' : 'no'}`);
@@ -459,158 +261,18 @@ async function treeWalkToFolder(
   }
 }
 
-async function resizeImageBuffer(buf: Buffer, mimeType: string): Promise<{ buffer: Buffer; mimeType: string }> {
-  const pipeline = sharp(buf);
-  const meta = await pipeline.metadata();
-  const w = meta.width ?? 0;
-  const h = meta.height ?? 0;
-  const max = CONFIG.maxImageDimension;
-  if (w <= max && h <= max) return { buffer: buf, mimeType };
-  const resized = await pipeline.resize(max, max, { fit: 'inside' }).toBuffer();
-  const outMime = mimeType.startsWith('image/png') ? 'image/png' : 'image/jpeg';
-  const out = await sharp(resized).toFormat(outMime === 'image/png' ? 'png' : 'jpeg', { quality: 85 }).toBuffer();
-  return { buffer: out, mimeType: outMime };
-}
-
-async function fetchAndResizeVendorImage(url: string): Promise<{ buffer: Buffer; mimeType: string } | null> {
-  try {
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; catalogger/1.0)' } });
-    if (!res.ok) return null;
-    const ab = await res.arrayBuffer();
-    const buf = Buffer.from(ab);
-    const mime = res.headers.get('content-type')?.split(';')[0]?.trim() || 'image/jpeg';
-    return resizeImageBuffer(buf, mime);
-  } catch {
-    return null;
-  }
-}
-
-/** One entry per vendor image: folder path that is the same photo, or null if missing. */
-export type VendorToFolderMapping = (string | null)[];
-
-async function visionSelectImages(
-  genai: GoogleGenAI,
-  vendorImages: { url: string; buffer: Buffer; mimeType: string }[],
-  folderImages: { relativePath: string; buffer: Buffer; mimeType: string }[],
-  productName: string,
-  skuKey: string,
-): Promise<VendorToFolderMapping> {
-  const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
-  parts.push({
-    text: `You are matching product images for a Pilates equipment SKU. Match only the SAME PHOTO (same angle, same crop). Same product in a different shot counts as NO match.
-
-Product: ${productName}
-SKU: ${skuKey}
-
-There are ${vendorImages.length} images from the VENDOR SITE (shown first, in order).
-There are ${folderImages.length} images from a LOCAL FOLDER (shown after, in order).
-
-For each VENDOR image (1 to ${vendorImages.length}), output the exact LOCAL FOLDER image path that is the SAME photo, or null if there is no matching photo in the folder. Use the exact relative path from the folder image captions.
-
-Reply with a JSON object only:
-{
-  "vendor_to_folder": ["path/to/folder/img.jpg", null, "path/to/folder/img2.jpg", ...]
-}
-The array must have exactly ${vendorImages.length} elements (one per vendor image).`,
-  });
-  vendorImages.forEach((v, i) => {
-    parts.push({ text: `[Vendor image ${i + 1}]` });
-    parts.push({ inlineData: { mimeType: v.mimeType, data: v.buffer.toString('base64') } });
-  });
-  folderImages.forEach((f) => {
-    parts.push({ text: `[Folder image: ${f.relativePath}]` });
-    parts.push({ inlineData: { mimeType: f.mimeType, data: f.buffer.toString('base64') } });
-  });
-  parts.push({
-    text: `Reply with only the JSON object: vendor_to_folder array of length ${vendorImages.length} (each element is a folder path string or null).`,
-  });
-
-  const response = await genai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: parts,
-    config: { temperature: 0, responseMimeType: 'application/json' },
-  });
-  const raw = (response.text ?? '').trim();
-  const parsed = JSON.parse(raw) as { vendor_to_folder?: (string | null)[] };
-  let arr = Array.isArray(parsed.vendor_to_folder) ? parsed.vendor_to_folder : [];
-  while (arr.length < vendorImages.length) arr.push(null);
-  return arr.slice(0, vendorImages.length) as VendorToFolderMapping;
-}
-
-async function visionSelectImagesOpenAI(
-  openai: OpenAI,
-  vendorImages: { url: string; buffer: Buffer; mimeType: string }[],
-  folderImages: { relativePath: string; buffer: Buffer; mimeType: string }[],
-  productName: string,
-  skuKey: string,
-): Promise<{ selected_folder_images: string[]; missing_from_folder: string[] }> {
-  const systemPrompt = `You are matching product images for a Pilates equipment SKU.
-
-Product: ${productName}
-SKU: ${skuKey}
-
-There are ${vendorImages.length} reference images from the VENDOR SITE (shown first, in order).
-There are ${folderImages.length} images from a LOCAL FOLDER (shown after the vendor images, in order).
-
-Tasks:
-1. Which of the LOCAL FOLDER images show this same product? (Include all that match — same product, different angles or color variants. Exclude images that are clearly a different product or only B&W duplicates of an already-selected image.)
-2. Which VENDOR SITE images have NO corresponding image in the folder? (List the 1-based index of each missing vendor image, e.g. 1, 3, 5.)
-
-Reply with a JSON object only, no markdown:
-{
-  "selected_folder_images": ["path/to/file1.jpg", "path/to/file2.jpg"],
-  "missing_vendor_indices": [1, 3]
-}
-
-Use the exact relative path for each selected folder image as provided in the captions below.`;
-
-  const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [
-    { type: 'text', text: systemPrompt },
-  ];
-  vendorImages.forEach((v, i) => {
-    content.push({ type: 'text', text: `[Vendor image ${i + 1}]` });
-    content.push({
-      type: 'image_url',
-      image_url: { url: `data:${v.mimeType};base64,${v.buffer.toString('base64')}`, detail: 'low' as const },
-    });
-  });
-  folderImages.forEach((f) => {
-    content.push({ type: 'text', text: `[Folder image: ${f.relativePath}]` });
-    content.push({
-      type: 'image_url',
-      image_url: { url: `data:${f.mimeType};base64,${f.buffer.toString('base64')}`, detail: 'low' as const },
-    });
-  });
-  content.push({
-    type: 'text',
-    text: 'Reply with only the JSON object: selected_folder_images (array of path strings) and missing_vendor_indices (array of 1-based integers).',
-  });
-
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [{ role: 'user', content }],
-    temperature: 0,
-    response_format: { type: 'json_object' },
-  });
-  const raw = (response.choices[0]?.message?.content ?? '').trim();
-  const parsed = JSON.parse(raw) as { selected_folder_images?: string[]; missing_vendor_indices?: number[] };
-  const selected = Array.isArray(parsed.selected_folder_images) ? parsed.selected_folder_images : [];
-  const indices = Array.isArray(parsed.missing_vendor_indices) ? parsed.missing_vendor_indices : [];
-  const missingUrls = indices
-    .filter((i) => i >= 1 && i <= vendorImages.length)
-    .map((i) => vendorImages[i - 1].url);
-  return { selected_folder_images: selected, missing_from_folder: missingUrls };
-}
-
 async function main() {
   const inputFile = parseArg('input-file', CONFIG.inputFile);
   const outFile = parseArg('out-file', CONFIG.outFile);
   const imageRoot = parseArg('image-root', CONFIG.imageRootDefault);
-  const reviewDir = parseArg('review-dir', '');
+  const outputDirArg = parseArg('output-dir', '');
   const skuArg = parseArg('sku', '');
+  const skipConfirm = parseFlag('yes');
 
   if (!skuArg) {
-    console.error('Usage: npx ts-node scripts/listings/map-sku-to-images.ts --sku <article_ref e.g. 100006> --image-root <path> [--input-file=...] [--out-file=...]');
+    console.error(
+      'Usage: npx ts-node scripts/listings/map-sku-to-images.ts --sku <article_ref> --image-root <path> [--input-file=...] [--out-file=...] [--output-dir=...] [--yes]',
+    );
     process.exit(1);
   }
   if (!imageRoot || !fs.existsSync(imageRoot)) {
@@ -619,13 +281,8 @@ async function main() {
   }
 
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
-  const googleKey = process.env.GOOGLE_API_KEY?.trim();
   if (!openaiKey) {
     console.error('OPENAI_API_KEY is required (tree-walk uses gpt-4o-mini).');
-    process.exit(1);
-  }
-  if (!googleKey) {
-    console.error('GOOGLE_API_KEY is required (vision step uses Gemini).');
     process.exit(1);
   }
 
@@ -636,63 +293,25 @@ async function main() {
   }
 
   const input: SiteInput = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
-  const { skuKey, productName, vendorSiteImages, productColor } = resolveSku(input, skuArg);
-  console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}, vendor images: ${vendorSiteImages.length}`);
+  const { skuKey, productName, productColor } = resolveSku(input, skuArg);
+  console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}`);
 
-  console.log('[map-sku] Tree-walk: OpenAI (gpt-4o-mini). Vision: Gemini (gemini-2.5-flash).');
   const openai = new OpenAI({ apiKey: openaiKey });
-  const genai = new GoogleGenAI({ apiKey: googleKey });
-
   const picker: TreeWalkPicker = (name, sku, color, curr, children, hasImg) =>
     pickChildOrCurrentOpenAI(openai, name, sku, color, curr, children, hasImg);
 
   console.log('[map-sku] Tree-walk to select folder...');
-  console.log('[map-sku] (Stops when the model replies CURRENT for a folder that has images, or when its choice does not match any child.)');
   const folderPath = await treeWalkToFolder(imageRoot, productName, skuKey, productColor, picker);
   console.log('[map-sku] Selected folder:', folderPath);
 
-  const folderImagePaths = listImageFilesUnder(imageRoot, folderPath);
-  console.log('[map-sku] Image files in folder:', folderImagePaths.length);
-
-  const vendorWithBuffers: { url: string; buffer: Buffer; mimeType: string }[] = [];
-  for (let i = 0; i < vendorSiteImages.length; i++) {
-    const r = await fetchAndResizeVendorImage(vendorSiteImages[i]);
-    if (r) vendorWithBuffers.push({ url: vendorSiteImages[i], buffer: r.buffer, mimeType: r.mimeType });
-    else console.warn('[map-sku] Could not fetch vendor image:', vendorSiteImages[i]);
+  const proceed =
+    skipConfirm || (await askConfirm('\nDoes this look correct? Continue (y) or halt (n)? '));
+  if (!proceed) {
+    console.log('[map-sku] Halting. No files written.');
+    process.exit(0);
   }
 
-  const folderWithBuffers: { relativePath: string; buffer: Buffer; mimeType: string }[] = [];
-  for (const rel of folderImagePaths) {
-    const full = path.join(imageRoot, rel);
-    const buf = fs.readFileSync(full);
-    const mime = rel.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-    const resized = await resizeImageBuffer(buf, mime);
-    folderWithBuffers.push({ relativePath: rel, buffer: resized.buffer, mimeType: resized.mimeType });
-  }
-
-  if (folderWithBuffers.length === 0) {
-    console.warn('[map-sku] No images in folder; selected_folder_images will be empty, missing_from_folder may be all vendor URLs.');
-  }
-
-  console.log('[map-sku] Vision: map each vendor image to folder image (same photo)...');
-  const vendor_to_folder = await visionSelectImages(
-    genai,
-    vendorWithBuffers,
-    folderWithBuffers,
-    productName,
-    skuKey,
-  );
-
-  const selected_folder_images = [...new Set(vendor_to_folder.filter((p): p is string => p != null))];
-  const missing_from_folder = vendorSiteImages.filter((_, i) => vendor_to_folder[i] == null);
-
-  const mapping: SkuImageMapping = {
-    vendor_site_images: vendorSiteImages,
-    folder_path: folderPath,
-    selected_folder_images,
-    missing_from_folder,
-  };
-
+  const mapping: SkuImageMapping = { folder_path: folderPath };
   const outPath = path.isAbsolute(outFile) ? outFile : path.join(process.cwd(), outFile);
   const outDir = path.dirname(outPath);
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
@@ -709,16 +328,16 @@ async function main() {
   existing.skus[skuKey] = mapping;
   fs.writeFileSync(outPath, JSON.stringify(existing, null, 2), 'utf-8');
   console.log('[map-sku] Wrote', outPath);
-  console.log('[map-sku] selected_folder_images:', selected_folder_images.length);
-  console.log('[map-sku] missing_from_folder:', missing_from_folder.length);
-  if (reviewDir) {
-    const htmlPath = await writeReviewBundle(skuKey, mapping, vendor_to_folder, folderImagePaths, imageRoot, reviewDir);
-    try {
-      const { execSync } = require('child_process');
-      execSync(`open "${htmlPath}"`, { stdio: 'inherit' });
-    } catch {
-      console.log('[map-sku] Open the review HTML manually:', htmlPath);
-    }
+
+  const outputDir = outputDirArg
+    ? path.isAbsolute(outputDirArg)
+      ? outputDirArg
+      : path.join(process.cwd(), outputDirArg)
+    : '';
+  if (outputDir) {
+    runEditAndWritePlaceholder(skuKey, folderPath, imageRoot, outputDir);
+  } else {
+    console.log('[map-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
   }
 }
 
