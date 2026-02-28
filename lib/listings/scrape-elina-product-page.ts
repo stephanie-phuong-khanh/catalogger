@@ -34,6 +34,8 @@ export interface ScrapedProductData {
   tabs: ScrapedTab[];
   /** All YouTube embed URLs found in any tab (deduplicated). */
   videos: string[];
+  /** Product gallery image URLs (e.g. from JSON-LD offers.image or gallery DOM). */
+  image_urls: string[];
 }
 
 /**
@@ -109,6 +111,7 @@ function extractProductDataInPage(): ScrapedProductData {
     text_under_images: null,
     tabs: [],
     videos: [],
+    image_urls: [],
   };
 
   const nameEl = document.querySelector('h1.product-detail-name, .h1.product-detail-name');
@@ -158,6 +161,49 @@ function extractProductDataInPage(): ScrapedProductData {
   }
 
   result.videos = [...new Set(result.videos)];
+
+  // Product gallery images: prefer JSON-LD offers.image (large_default), else gallery DOM.
+  (function extractImageUrls() {
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+    for (const s of scripts) {
+      try {
+        const raw = (s as HTMLScriptElement).textContent?.trim() || '';
+        if (!raw) continue;
+        const data = JSON.parse(raw);
+        const items = Array.isArray(data) ? data : [data];
+        for (const item of items) {
+          if (item['@type'] !== 'Product') continue;
+          const offerImages = item.offers?.image;
+          if (Array.isArray(offerImages) && offerImages.length > 0) {
+            result.image_urls = offerImages.filter((u: unknown) => typeof u === 'string');
+            return;
+          }
+          if (item.image) {
+            result.image_urls = Array.isArray(item.image)
+              ? item.image.filter((u: unknown) => typeof u === 'string')
+              : [item.image];
+            return;
+          }
+        }
+      } catch {
+        continue;
+      }
+    }
+    const seen = new Set<string>();
+    const nodes = document.querySelectorAll(
+      '.thumb-container a[data-image], #zoom_product .thumb-container a[data-image], a[data-image-large-src], img[data-image-large-src]',
+    );
+    for (const el of nodes) {
+      const url =
+        (el as HTMLAnchorElement).getAttribute('data-image') ||
+        (el as HTMLAnchorElement).getAttribute('data-image-large-src') ||
+        (el as HTMLImageElement).src;
+      if (url && !seen.has(url)) {
+        seen.add(url);
+        result.image_urls.push(url);
+      }
+    }
+  })();
 
   return result;
 }

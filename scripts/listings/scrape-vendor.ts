@@ -3,13 +3,14 @@
  *
  * Input:  elina_pilates_products_urls.json (groups with items, each item has url or null)
  * Output: elina_pilates_products_site.json — same structure + group-level "site" (product_name,
- *         text_under_images, tabs, videos). One file so listing generation doesn't reconcile two files.
+ *         text_under_images, tabs, videos, image_urls). One file so listing generation doesn't reconcile two files.
  *
  * - Writes after every product (group) so we can resume.
  * - When url is null for an item: don't hit the website; copy group from input as-is (no site).
  * - When all items in a group have null url: copy group as-is, no site.
  * - When multiple variant URLs exist in a group: scrape first, then scrape second and compare
  *   shared content; on mismatch HALT (throw + exit 1) so you can inspect.
+ * - If product page has no image_urls (JSON-LD/gallery empty or missing): HALT (exit 1) so you can inspect.
  *
  * Usage:
  *   npm run scrape-elina-site
@@ -86,6 +87,16 @@ function haltVariantMismatch(
     `Normalized content from URL 1 (first 200 chars): ${norm1.slice(0, 200)}...\n` +
     `Normalized content from URL 2 (first 200 chars): ${norm2.slice(0, 200)}...\n` +
     `Script halted. Inspect and fix before re-running.`;
+  console.error(msg);
+  process.exit(1);
+}
+
+function haltNoImages(productName: string, url: string): never {
+  const msg =
+    `[scrape] NO IMAGES: Product page has zero image URLs (JSON-LD and gallery not found or empty).\n` +
+    `Product: ${productName}\n` +
+    `URL: ${url}\n` +
+    `Script halted. Inspect the page and selectors before re-running.`;
   console.error(msg);
   process.exit(1);
 }
@@ -205,6 +216,11 @@ async function main() {
       console.error(`[scrape] Failed to load or scrape ${firstUrl}:`, e);
       await browser.close();
       process.exit(1);
+    }
+
+    if (!siteData.image_urls || siteData.image_urls.length === 0) {
+      await browser.close();
+      haltNoImages(productName, firstUrl);
     }
 
     if (urlsWithValue.length > 1) {
