@@ -60,28 +60,78 @@ function parseFlag(name: string): boolean {
   return process.argv.includes(`--${name}`);
 }
 
-function askConfirm(question: string): Promise<boolean> {
+function askLine(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) => {
     rl.question(question, (answer) => {
       rl.close();
-      const normalized = answer.trim().toLowerCase();
-      resolve(normalized === 'y' || normalized === 'yes');
+      resolve(answer.trim());
     });
   });
 }
 
+/** Reject = halt. Accept = proceed. Amend = prompt for new folder path, then proceed with it. */
+async function askConfirmWithAmend(options: {
+  productName: string;
+  productColor: string | null;
+  vendorUrl: string | null;
+  folderPath: string;
+  outputDirPathRelative: string | null;
+}): Promise<{ action: 'reject' | 'accept'; folderPath: string }> {
+  const { productName, productColor, vendorUrl, folderPath, outputDirPathRelative } = options;
+  console.log('\n' + '─'.repeat(60));
+  console.log('  Product:  ' + productName);
+  console.log('  Color:    ' + (productColor ?? '(none)'));
+  if (vendorUrl) {
+    console.log('  Vendor:   ' + vendorUrl);
+  } else {
+    console.log('  Vendor:   (no URL in data)');
+  }
+  console.log('');
+  console.log('  Mapped Folder:  ' + folderPath);
+  console.log('');
+  if (outputDirPathRelative) console.log('  Will write output to:  ' + outputDirPathRelative);
+  console.log('─'.repeat(60));
+
+  for (;;) {
+    const raw = await askLine('Reject (r), Accept (y), or Amend path (a)? ');
+    const choice = raw.toLowerCase().trim();
+    if (choice === 'r' || choice === 'reject' || choice === 'n' || choice === 'no') {
+      return { action: 'reject', folderPath };
+    }
+    if (choice === 'y' || choice === 'yes' || choice === 'accept') {
+      return { action: 'accept', folderPath };
+    }
+    if (choice === 'a' || choice === 'amend') {
+      const newPath = await askLine('Enter folder path: ');
+      if (newPath) {
+        console.log('Using amended path:', newPath);
+        return { action: 'accept', folderPath: newPath };
+      }
+      console.log('Empty path ignored. Choose r / y / a.');
+    } else {
+      console.log('Choose r (reject), y (accept), or a (amend path).');
+    }
+  }
+}
+
+/** All but the final segment of folder_path (e.g. "Reformers/Elite/Reformer Élite gris" -> "Reformers/Elite"). */
+function parentOfFolderPath(folderPath: string): string {
+  const segments = folderPath.split(/[/\\]/).filter(Boolean);
+  if (segments.length <= 1) return '';
+  return segments.slice(0, -1).join(path.sep);
+}
+
 /** Placeholder: later will process folder images (resize/crop) and write vendor strip. */
-function runEditAndWritePlaceholder(skuKey: string, folderPath: string, imageRoot: string, outputDir: string): void {
-  const skuOutDir = path.join(outputDir, skuKey);
-  if (!fs.existsSync(skuOutDir)) fs.mkdirSync(skuOutDir, { recursive: true });
-  const placeholderPath = path.join(skuOutDir, '.placeholder-edit-and-strip');
+function runEditAndWritePlaceholder(skuKey: string, folderPath: string, imageRoot: string, skuOutputDirFull: string): void {
+  if (!fs.existsSync(skuOutputDirFull)) fs.mkdirSync(skuOutputDirFull, { recursive: true });
+  const placeholderPath = path.join(skuOutputDirFull, '.placeholder-edit-and-strip');
   fs.writeFileSync(
     placeholderPath,
     `SKU: ${skuKey}\nfolder_path: ${folderPath}\nimage_root: ${imageRoot}\n\nTODO: Write processed folder images and vendor site photo strip here.\n`,
     'utf-8',
   );
-  console.log('[map-sku] Placeholder: created', skuOutDir);
+  console.log('[map-sku] Placeholder: created', skuOutputDirFull);
   console.log('[map-sku] (Edit + write + vendor strip not yet implemented.)');
 }
 
@@ -89,18 +139,21 @@ function resolveSku(input: SiteInput, skuArg: string): {
   skuKey: string;
   productName: string;
   productColor: string | null;
+  vendorUrl: string | null;
 } {
   const norm = (s: string) => s.replace(/^ELN\s+/i, '').trim();
   const want = norm(skuArg);
   for (const group of input.groups ?? []) {
     for (const item of group.items ?? []) {
       if (norm(item.article_ref) === want) {
-        const raw = (item as unknown as { color?: string }).color;
+        const raw = (item as unknown as { color?: string; url?: string }).color;
+        const url = (item as unknown as { url?: string }).url;
         const color = typeof raw === 'string' ? raw.trim() : null;
         return {
           skuKey: item.article_ref,
           productName: group.site?.product_name ?? group.product_name ?? item.article_ref,
           productColor: color || null,
+          vendorUrl: typeof url === 'string' ? url.trim() : null,
         };
       }
     }
@@ -293,7 +346,7 @@ async function main() {
   }
 
   const input: SiteInput = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
-  const { skuKey, productName, productColor } = resolveSku(input, skuArg);
+  const { skuKey, productName, productColor, vendorUrl } = resolveSku(input, skuArg);
   console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}`);
 
   const openai = new OpenAI({ apiKey: openaiKey });
@@ -301,18 +354,43 @@ async function main() {
     pickChildOrCurrentOpenAI(openai, name, sku, color, curr, children, hasImg);
 
   console.log('[map-sku] Tree-walk to select folder...');
-  const folderPath = await treeWalkToFolder(imageRoot, productName, skuKey, productColor, picker);
+  let folderPath = await treeWalkToFolder(imageRoot, productName, skuKey, productColor, picker);
   console.log('[map-sku] Selected folder:', folderPath);
 
-  const proceed =
-    skipConfirm || (await askConfirm('\nDoes this look correct? Continue (y) or halt (n)? '));
-  if (!proceed) {
-    console.log('[map-sku] Halting. No files written.');
-    process.exit(0);
+  const outPath = path.isAbsolute(outFile) ? outFile : path.join(process.cwd(), outFile);
+  const outputDirResolved = outputDirArg
+    ? path.isAbsolute(outputDirArg)
+      ? outputDirArg
+      : path.join(process.cwd(), outputDirArg)
+    : '';
+  const parentSegments = parentOfFolderPath(folderPath);
+  const skuOutputDirFull = outputDirResolved
+    ? path.join(outputDirResolved, parentSegments, skuKey)
+    : '';
+  const outputDirPathRelative = outputDirResolved
+    ? path.relative(outputDirResolved, skuOutputDirFull)
+    : null;
+
+  let result: { action: 'reject' | 'accept'; folderPath: string };
+  if (skipConfirm) {
+    result = { action: 'accept', folderPath };
+  } else {
+    result = await askConfirmWithAmend({
+      productName,
+      productColor,
+      vendorUrl,
+      folderPath,
+      outputDirPathRelative,
+    });
   }
 
+  if (result.action === 'reject') {
+    console.log('[map-sku] Rejected. No files written.');
+    process.exit(0);
+  }
+  folderPath = result.folderPath;
+
   const mapping: SkuImageMapping = { folder_path: folderPath };
-  const outPath = path.isAbsolute(outFile) ? outFile : path.join(process.cwd(), outFile);
   const outDir = path.dirname(outPath);
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
@@ -329,13 +407,8 @@ async function main() {
   fs.writeFileSync(outPath, JSON.stringify(existing, null, 2), 'utf-8');
   console.log('[map-sku] Wrote', outPath);
 
-  const outputDir = outputDirArg
-    ? path.isAbsolute(outputDirArg)
-      ? outputDirArg
-      : path.join(process.cwd(), outputDirArg)
-    : '';
-  if (outputDir) {
-    runEditAndWritePlaceholder(skuKey, folderPath, imageRoot, outputDir);
+  if (outputDirResolved && skuOutputDirFull) {
+    runEditAndWritePlaceholder(skuKey, folderPath, imageRoot, skuOutputDirFull);
   } else {
     console.log('[map-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
   }
