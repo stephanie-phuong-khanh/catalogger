@@ -10,8 +10,7 @@
  *   Output is written to --output-dir (default: data/elina/processed). Use that to create the per-SKU folder and run the (placeholder) edit+write step after confirm.
  *   Add --yes to skip the "Does this look correct? (y/n)" prompt and proceed as if yes.
  *
- * TODO: Vendor site photo strip — Fetch images from vendor site (from site input), resize to low-res,
- * stack vertically with white spacing into one composite image, and save in the per-SKU output folder.
+ * Writes vendor_site_photos.jpg (stacked vendor site images) to the per-SKU output folder.
  */
 
 import * as fs from 'fs';
@@ -19,6 +18,7 @@ import * as path from 'path';
 import * as readline from 'readline';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import sharp from 'sharp';
 import { processImage, saveProcessedImage } from '../../lib/images/edit-image';
 import { createVisionClient } from '../../lib/images/vision-client';
 
@@ -132,16 +132,19 @@ function outputExtForInput(relativePath: string): string {
 
 /**
  * Process folder images (crop/resize via lib/images) and write to output dir as SKU (N).ext.
+ * When productColor is set and filenames are not numeric, filters to images matching that color.
  * On process error, saves original as SKU (N) [ORIG].ext.
- * TODO: Vendor site photo strip — fetch vendor images, stack into one composite, save in skuOutputDirFull.
  */
 async function runEditAndWrite(
   skuKey: string,
   folderPath: string,
   imageRoot: string,
   skuOutputDirFull: string,
+  productColor: string | null,
 ): Promise<void> {
-  const imagePaths = listImageFilesUnder(imageRoot, folderPath);
+  const allPaths = listImageFilesUnder(imageRoot, folderPath);
+  const { paths: imagePaths, message: filterMessage } = filterImagesByColor(allPaths, productColor);
+  if (filterMessage) console.log('[map-sku] ' + filterMessage);
   if (imagePaths.length === 0) {
     console.log('[map-sku] No images in folder; nothing to write.');
     return;
@@ -181,11 +184,88 @@ async function runEditAndWrite(
   console.log(`[map-sku] Wrote ${processed} processed, ${savedOriginal} originals (on error) to ${skuOutputDirFull}`);
 }
 
+const VENDOR_STRIP_WIDTH = 400;
+const VENDOR_STRIP_GAP_PX = 16;
+
+/**
+ * Fetch vendor site images, resize to low-res, stack vertically with white gaps, save as vendor_site_photos.jpg.
+ */
+async function buildVendorStrip(vendorImageUrls: string[], skuOutputDirFull: string): Promise<void> {
+  if (vendorImageUrls.length === 0) {
+    console.log('[map-sku] No vendor site images; skipping vendor_site_photos.jpg');
+    return;
+  }
+
+  const resized: { buffer: Buffer; width: number; height: number }[] = [];
+  for (let i = 0; i < vendorImageUrls.length; i++) {
+    try {
+      const res = await fetch(vendorImageUrls[i], {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; catalogger/1.0)' },
+      });
+      if (!res.ok) continue;
+      const buf = Buffer.from(await res.arrayBuffer());
+      const meta = await sharp(buf).metadata();
+      const w = meta.width ?? 0;
+      const h = meta.height ?? 0;
+      if (w === 0 || h === 0) continue;
+      const out = await sharp(buf)
+        .resize(VENDOR_STRIP_WIDTH, undefined, { fit: 'inside' })
+        .jpeg({ quality: 80 })
+        .toBuffer();
+      const outMeta = await sharp(out).metadata();
+      resized.push({
+        buffer: out,
+        width: outMeta.width ?? VENDOR_STRIP_WIDTH,
+        height: outMeta.height ?? 0,
+      });
+    } catch {
+      // skip failed fetch
+    }
+  }
+
+  if (resized.length === 0) {
+    console.log('[map-sku] Could not fetch any vendor images; skipping vendor_site_photos.jpg');
+    return;
+  }
+
+  const totalHeight =
+    resized.reduce((sum, r) => sum + r.height, 0) + VENDOR_STRIP_GAP_PX * (resized.length - 1);
+  const stripWidth = Math.max(...resized.map((r) => r.width), VENDOR_STRIP_WIDTH);
+
+  const whiteBg = await sharp({
+    create: {
+      width: stripWidth,
+      height: Math.round(totalHeight),
+      channels: 3,
+      background: { r: 255, g: 255, b: 255 },
+    },
+  })
+    .jpeg({ quality: 90 })
+    .toBuffer();
+
+  const composites: { input: Buffer; top: number; left: number }[] = [];
+  let y = 0;
+  for (const r of resized) {
+    const left = Math.round((stripWidth - r.width) / 2);
+    composites.push({ input: r.buffer, top: y, left });
+    y += r.height + VENDOR_STRIP_GAP_PX;
+  }
+
+  const outPath = path.join(skuOutputDirFull, 'vendor_site_photos.jpg');
+  await sharp(whiteBg)
+    .composite(composites)
+    .jpeg({ quality: 90 })
+    .toFile(outPath);
+
+  console.log(`[map-sku] Wrote vendor_site_photos.jpg (${resized.length} images) to ${skuOutputDirFull}`);
+}
+
 function resolveSku(input: SiteInput, skuArg: string): {
   skuKey: string;
   productName: string;
   productColor: string | null;
   vendorUrl: string | null;
+  vendorSiteImages: string[];
 } {
   const norm = (s: string) => s.replace(/^ELN\s+/i, '').trim();
   const want = norm(skuArg);
@@ -195,11 +275,13 @@ function resolveSku(input: SiteInput, skuArg: string): {
         const raw = (item as unknown as { color?: string; url?: string }).color;
         const url = (item as unknown as { url?: string }).url;
         const color = typeof raw === 'string' ? raw.trim() : null;
+        const imageUrls = Array.isArray(group.site?.image_urls) ? group.site.image_urls : [];
         return {
           skuKey: item.article_ref,
           productName: group.site?.product_name ?? group.product_name ?? item.article_ref,
           productColor: color || null,
           vendorUrl: typeof url === 'string' ? url.trim() : null,
+          vendorSiteImages: imageUrls,
         };
       }
     }
@@ -250,6 +332,63 @@ function listImageFilesUnder(imageRoot: string, folderPath: string): string[] {
   }
   walk(full);
   return out.sort();
+}
+
+/** Product color (from site) → filename substrings that indicate that color (e.g. gris, negro). */
+const COLOR_FILENAME_TOKENS: Record<string, string[]> = {
+  GREY: ['gris', 'grey', 'gray'],
+  GRAY: ['gris', 'grey', 'gray'],
+  BLACK: ['negro', 'black'],
+  WHITE: ['blanco', 'white'],
+  RED: ['rojo', 'red'],
+  BLUE: ['azul', 'blue'],
+  GREEN: ['verde', 'green'],
+  IVORY: ['marfil', 'ivory'],
+  MOCHA: ['mocha'],
+};
+
+function isNumericBasename(relativePath: string): boolean {
+  const base = path.basename(relativePath, path.extname(relativePath));
+  return /^\d+$/.test(base.trim());
+}
+
+/**
+ * When folder has mixed colors, filter to images whose filename suggests this product's color.
+ * If filenames look numeric (e.g. 1.jpg) or no files match, return all and log so user can curate.
+ */
+function filterImagesByColor(
+  imagePaths: string[],
+  productColor: string | null,
+): { paths: string[]; message: string } {
+  if (!productColor || imagePaths.length === 0) {
+    return { paths: imagePaths, message: '' };
+  }
+  const tokens = COLOR_FILENAME_TOKENS[productColor.toUpperCase().trim()];
+  if (!tokens || tokens.length === 0) {
+    return { paths: imagePaths, message: `No filename tokens for color "${productColor}"; processing all ${imagePaths.length} images.` };
+  }
+  const numericCount = imagePaths.filter((p) => isNumericBasename(p)).length;
+  if (numericCount >= imagePaths.length / 2) {
+    return {
+      paths: imagePaths,
+      message: `Filenames look numeric; not filtering by color. Processing all ${imagePaths.length} images.`,
+    };
+  }
+  const lower = tokens.map((t) => t.toLowerCase());
+  const filtered = imagePaths.filter((rel) => {
+    const name = path.basename(rel, path.extname(rel)).toLowerCase();
+    return lower.some((t) => name.includes(t));
+  });
+  if (filtered.length === 0) {
+    return {
+      paths: imagePaths,
+      message: `No files matched color (${productColor}); processing all ${imagePaths.length} images. Check if folder has multiple colors.`,
+    };
+  }
+  return {
+    paths: filtered,
+    message: `Filtered to ${filtered.length} images by color (${productColor}).`,
+  };
 }
 
 function folderHasImages(imageRoot: string, folderPath: string): boolean {
@@ -392,7 +531,7 @@ async function main() {
   }
 
   const input: SiteInput = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
-  const { skuKey, productName, productColor, vendorUrl } = resolveSku(input, skuArg);
+  const { skuKey, productName, productColor, vendorUrl, vendorSiteImages } = resolveSku(input, skuArg);
   console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}`);
 
   const openai = new OpenAI({ apiKey: openaiKey });
@@ -457,7 +596,8 @@ async function main() {
   console.log('[map-sku] Wrote', outPath);
 
   if (outputDirResolved && skuOutputDirFull) {
-    await runEditAndWrite(skuKey, folderPath, imageRoot, skuOutputDirFull);
+    await runEditAndWrite(skuKey, folderPath, imageRoot, skuOutputDirFull, productColor);
+    await buildVendorStrip(vendorSiteImages, skuOutputDirFull);
   } else {
     console.log('[map-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
   }
