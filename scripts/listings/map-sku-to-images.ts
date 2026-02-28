@@ -1,20 +1,17 @@
 /**
  * Map ONE SKU to its image folder using LLM tree-walk (OpenAI gpt-4o-mini).
- * Writes/merges into a single output file: SKU → folder_path.
+ * Writes/merges into a single output file: SKU → input_folder_path, output_folder_path.
  *
  * READ-ONLY on --image-root: only reads directory structure. All writes go to --out-file.
  *
  * Usage:
  *   npm run map-sku-to-images -- --sku "100006" --image-root /path/to/elina_images
  *   npm run map-sku-to-images -- --sku "100006" --image-root ./data/elina_images --out-file data/parsed-pricing-sheets/elina_sku_to_images.json
- *   Add --output-dir <path> to create a per-SKU output folder and run the (placeholder) edit+write step after confirm.
+ *   Output is written to --output-dir (default: data/elina/processed). Use that to create the per-SKU folder and run the (placeholder) edit+write step after confirm.
  *   Add --yes to skip the "Does this look correct? (y/n)" prompt and proceed as if yes.
  *
  * TODO: Vendor site photo strip — Fetch images from vendor site (from site input), resize to low-res,
- * stack vertically with white spacing into one composite image, and save alongside output (e.g. in
- * the per-SKU output folder). We do not yet implement any image editing or writing of processed
- * folder images; that step is planned as a separate phase (possibly interactive CLI: confirm path
- * then run edit+write + strip).
+ * stack vertically with white spacing into one composite image, and save in the per-SKU output folder.
  */
 
 import * as fs from 'fs';
@@ -22,6 +19,8 @@ import * as path from 'path';
 import * as readline from 'readline';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import { processImage, saveProcessedImage } from '../../lib/images/edit-image';
+import { createVisionClient } from '../../lib/images/vision-client';
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
@@ -31,8 +30,9 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 const CONFIG = {
   inputFile: 'data/parsed-pricing-sheets/elina_pilates_products_site.json',
   outFile: 'data/parsed-pricing-sheets/elina_sku_to_images.json',
-  imageRootDefault: '',
-  imageExtensions: new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']),
+  imageRootDefault: '/Users/sdoan/Google Drive/My Drive/Elina Pilates',
+  outputDirDefault: '/Users/sdoan/Google Drive/My Drive/Prepared images: Elina Pilates <> Dansons',
+  imageExtensions: new Set(['.jpg', '.jpeg', '.png', '.webp']),
 };
 
 type Item = { article_ref: string; [k: string]: unknown };
@@ -41,7 +41,8 @@ type Group = { product_name?: string; items: Item[]; site?: Site };
 type SiteInput = { groups: Group[] };
 
 export type SkuImageMapping = {
-  folder_path: string;
+  input_folder_path: string;
+  output_folder_path?: string;
 };
 
 export type SkuToImagesOutput = {
@@ -94,13 +95,13 @@ async function askConfirmWithAmend(options: {
   console.log('─'.repeat(60));
 
   for (;;) {
-    const raw = await askLine('Reject (r), Accept (y), or Amend path (a)? ');
+    const raw = await askLine('Accept (y), Reject (n), Amend path (a)? [y] ');
     const choice = raw.toLowerCase().trim();
+    if (choice === '' || choice === 'y' || choice === 'yes' || choice === 'accept') {
+      return { action: 'accept', folderPath };
+    }
     if (choice === 'r' || choice === 'reject' || choice === 'n' || choice === 'no') {
       return { action: 'reject', folderPath };
-    }
-    if (choice === 'y' || choice === 'yes' || choice === 'accept') {
-      return { action: 'accept', folderPath };
     }
     if (choice === 'a' || choice === 'amend') {
       const newPath = await askLine('Enter folder path: ');
@@ -108,9 +109,9 @@ async function askConfirmWithAmend(options: {
         console.log('Using amended path:', newPath);
         return { action: 'accept', folderPath: newPath };
       }
-      console.log('Empty path ignored. Choose r / y / a.');
+      console.log('Empty path ignored. Accept (y), Reject (n), Amend path (a).');
     } else {
-      console.log('Choose r (reject), y (accept), or a (amend path).');
+      console.log('Accept (y), Reject (n), Amend path (a).');
     }
   }
 }
@@ -122,17 +123,62 @@ function parentOfFolderPath(folderPath: string): string {
   return segments.slice(0, -1).join(path.sep);
 }
 
-/** Placeholder: later will process folder images (resize/crop) and write vendor strip. */
-function runEditAndWritePlaceholder(skuKey: string, folderPath: string, imageRoot: string, skuOutputDirFull: string): void {
+/** Output extension: webp → jpg, else keep original (lowercase). */
+function outputExtForInput(relativePath: string): string {
+  const ext = path.extname(relativePath).toLowerCase();
+  if (ext === '.webp') return '.jpg';
+  return ext || '.jpg';
+}
+
+/**
+ * Process folder images (crop/resize via lib/images) and write to output dir as SKU (N).ext.
+ * On process error, saves original as SKU (N) [ORIG].ext.
+ * TODO: Vendor site photo strip — fetch vendor images, stack into one composite, save in skuOutputDirFull.
+ */
+async function runEditAndWrite(
+  skuKey: string,
+  folderPath: string,
+  imageRoot: string,
+  skuOutputDirFull: string,
+): Promise<void> {
+  const imagePaths = listImageFilesUnder(imageRoot, folderPath);
+  if (imagePaths.length === 0) {
+    console.log('[map-sku] No images in folder; nothing to write.');
+    return;
+  }
+
   if (!fs.existsSync(skuOutputDirFull)) fs.mkdirSync(skuOutputDirFull, { recursive: true });
-  const placeholderPath = path.join(skuOutputDirFull, '.placeholder-edit-and-strip');
-  fs.writeFileSync(
-    placeholderPath,
-    `SKU: ${skuKey}\nfolder_path: ${folderPath}\nimage_root: ${imageRoot}\n\nTODO: Write processed folder images and vendor site photo strip here.\n`,
-    'utf-8',
-  );
-  console.log('[map-sku] Placeholder: created', skuOutputDirFull);
-  console.log('[map-sku] (Edit + write + vendor strip not yet implemented.)');
+
+  const visionClient = createVisionClient();
+  let processed = 0;
+  let savedOriginal = 0;
+
+  for (let i = 0; i < imagePaths.length; i++) {
+    const rel = imagePaths[i];
+    const srcFull = path.join(imageRoot, rel);
+    const n = i + 1;
+    const outExt = outputExtForInput(rel);
+    const outName = `${skuKey} (${n})${outExt}`;
+    const outPath = path.join(skuOutputDirFull, outName);
+
+    console.log(`[map-sku] [${n}/${imagePaths.length}] ${path.basename(rel)} → ${outName}`);
+
+    const buffer = fs.readFileSync(srcFull);
+    try {
+      const processedBuffer = await processImage(buffer, 1500, 1500, visionClient);
+      saveProcessedImage(processedBuffer, outPath);
+      processed += 1;
+    } catch (err) {
+      const origName = `${skuKey} (${n}) [ORIG]${outExt}`;
+      const origPath = path.join(skuOutputDirFull, origName);
+      saveProcessedImage(buffer, origPath);
+      savedOriginal += 1;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[map-sku]   Error: ${msg}; saved original as ${origName}`);
+    }
+  }
+
+  console.log(`[map-sku] Wrote ${processed} processed, ${savedOriginal} originals (on error) to ${skuOutputDirFull}`);
 }
 
 function resolveSku(input: SiteInput, skuArg: string): {
@@ -318,7 +364,7 @@ async function main() {
   const inputFile = parseArg('input-file', CONFIG.inputFile);
   const outFile = parseArg('out-file', CONFIG.outFile);
   const imageRoot = parseArg('image-root', CONFIG.imageRootDefault);
-  const outputDirArg = parseArg('output-dir', '');
+  const outputDirArg = parseArg('output-dir', CONFIG.outputDirDefault);
   const skuArg = parseArg('sku', '');
   const skipConfirm = parseFlag('yes');
 
@@ -390,7 +436,10 @@ async function main() {
   }
   folderPath = result.folderPath;
 
-  const mapping: SkuImageMapping = { folder_path: folderPath };
+  const mapping: SkuImageMapping = {
+    input_folder_path: folderPath,
+    ...(outputDirPathRelative ? { output_folder_path: outputDirPathRelative } : {}),
+  };
   const outDir = path.dirname(outPath);
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
@@ -408,7 +457,7 @@ async function main() {
   console.log('[map-sku] Wrote', outPath);
 
   if (outputDirResolved && skuOutputDirFull) {
-    runEditAndWritePlaceholder(skuKey, folderPath, imageRoot, skuOutputDirFull);
+    await runEditAndWrite(skuKey, folderPath, imageRoot, skuOutputDirFull);
   } else {
     console.log('[map-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
   }
