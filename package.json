@@ -15,6 +15,7 @@
     "resolve-elina-urls": "npx ts-node scripts/listings/resolve-elina-urls-from-pricing-sheet.ts",
     "scrape-elina-site": "npx ts-node scripts/listings/scrape-vendor.ts",
     "map-sku-to-images": "npx ts-node scripts/listings/map-sku-to-images.ts",
+    "apply-review": "npx ts-node scripts/listings/apply-review.ts",
     "eval-specs": "npx ts-node scripts/listings/eval-specs.ts",
     "export-listing-for-review": "npx ts-node scripts/listings/export-listing-for-review.ts",
     "sync-listings-to-blob": "npx ts-node scripts/listings/sync-listings-to-blob.ts",

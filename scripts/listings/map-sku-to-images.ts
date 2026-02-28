@@ -64,18 +64,22 @@ function parseFlag(name: string): boolean {
 }
 
 /**
- * Write a spot-check bundle: vendor images + selected folder images + index.html.
- * Open index.html in a browser to compare side-by-side. Read-only on imageRoot (copies, does not move).
+ * Write review bundle: vendor + folder images and interactive index.html.
+ * Reviewer can fix mappings and include extras, then Export to download JSON.
+ * Read-only on imageRoot (copies only).
  */
 async function writeReviewBundle(
   skuKey: string,
   mapping: SkuImageMapping,
+  vendor_to_folder: VendorToFolderMapping,
+  folderImagePaths: string[],
   imageRoot: string,
   reviewDir: string,
-): Promise<void> {
+): Promise<string> {
   const base = path.resolve(reviewDir.startsWith('/') ? reviewDir : path.join(process.cwd(), reviewDir));
-  const vendorDir = path.join(base, 'vendor');
-  const folderDir = path.join(base, 'folder');
+  const baseDir = path.join(base, skuKey.replace(/[/\\]/g, '_'));
+  const vendorDir = path.join(baseDir, 'vendor');
+  const folderDir = path.join(baseDir, 'folder');
   const mode = 0o755;
   fs.mkdirSync(vendorDir, { recursive: true, mode });
   if (fs.existsSync(folderDir)) fs.rmSync(folderDir, { recursive: true });
@@ -97,9 +101,9 @@ async function writeReviewBundle(
     }
   }
 
-  const folderFiles: string[] = [];
-  for (let i = 0; i < mapping.selected_folder_images.length; i++) {
-    const rel = mapping.selected_folder_images[i];
+  const folderFiles: { index: number; relativePath: string; name: string }[] = [];
+  for (let i = 0; i < folderImagePaths.length; i++) {
+    const rel = folderImagePaths[i];
     const src = path.join(imageRoot, rel);
     if (!fs.existsSync(src)) continue;
     const ext = path.extname(rel).toLowerCase() || '.jpg';
@@ -107,50 +111,155 @@ async function writeReviewBundle(
     const dest = path.join(folderDir, name);
     try {
       fs.writeFileSync(dest, fs.readFileSync(src));
-      folderFiles.push(`folder/${name}`);
+      folderFiles.push({ index: i + 1, relativePath: rel, name: `folder/${name}` });
     } catch (err) {
       console.warn('[map-sku] Could not copy to review folder:', src, (err as Error).message);
     }
   }
 
-  const missingList = mapping.missing_from_folder
-    .map((url) => `<li><a href="${url}" target="_blank" rel="noopener">${url.replace(/^https?:\/\//, '')}</a></li>`)
-    .join('\n');
+  const matchedPaths = new Set(vendor_to_folder.filter((p): p is string => p != null));
+  const extras = folderImagePaths.filter((p) => !matchedPaths.has(p));
 
-  const vendorImgs = vendorFiles.map((f) => `<img src="${f}" alt="${f}" loading="lazy" />`).join('\n    ');
-  const folderImgs = folderFiles.map((f) => `<img src="${f}" alt="${f}" loading="lazy" />`).join('\n    ');
+  const pathToFolderIndex = new Map<string, number>();
+  folderImagePaths.forEach((p, i) => pathToFolderIndex.set(p, i + 1));
 
-  const html = `<!DOCTYPE html>
+  const vendor_to_folder_index: (number | null)[] = vendor_to_folder.map((p) =>
+    p != null && pathToFolderIndex.has(p) ? pathToFolderIndex.get(p)! : null,
+  );
+
+  const reviewData = {
+    skuKey,
+    folder_path: mapping.folder_path,
+    vendor_urls: mapping.vendor_site_images,
+    vendor_files: vendorFiles,
+    vendor_to_folder_index,
+    folder_files: folderFiles.map((f) => ({ index: f.index, relativePath: f.relativePath, name: f.name })),
+    extras,
+  };
+
+  const html = buildReviewHtml(skuKey, reviewData);
+  fs.writeFileSync(path.join(baseDir, 'index.html'), html, 'utf-8');
+  fs.writeFileSync(path.join(baseDir, 'review-data.json'), JSON.stringify(reviewData, null, 2), 'utf-8');
+  const indexPath = path.join(baseDir, 'index.html');
+  console.log('[map-sku] Review bundle:', indexPath);
+  return indexPath;
+}
+
+function buildReviewHtml(skuKey: string, d: {
+  skuKey: string;
+  folder_path: string;
+  vendor_urls: string[];
+  vendor_files: string[];
+  vendor_to_folder_index: (number | null)[];
+  folder_files: { index: number; relativePath: string; name: string }[];
+  extras: string[];
+}): string {
+  const escapeHtml = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const dataJson = JSON.stringify(d).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Spot-check: ${skuKey}</title>
+  <title>Review: ${escapeHtml(d.skuKey)}</title>
   <style>
-    body { font-family: system-ui, sans-serif; padding: 1rem; max-width: 1400px; margin: 0 auto; }
-    h1 { margin-top: 0; }
+    body { font-family: system-ui, sans-serif; padding: 1rem; max-width: 1200px; margin: 0 auto; }
+    .instructions { background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
+    .instructions h2 { margin-top: 0; }
+    .instructions ol { margin: 0.5rem 0; padding-left: 1.25rem; }
+    .instructions li { margin: 0.35rem 0; }
     h2 { margin-top: 1.5rem; border-bottom: 1px solid #ccc; }
-    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
-    .row img { height: 180px; width: auto; object-fit: contain; border: 1px solid #eee; }
-    ul { word-break: break-all; }
+    .vendor-block { display: flex; align-items: flex-start; gap: 1rem; margin: 0.75rem 0; padding: 0.5rem; border: 1px solid #eee; border-radius: 6px; }
+    .vendor-block img { height: 120px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .vendor-block select { min-width: 180px; padding: 0.35rem; }
+    .extras-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+    .extras-list label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+    .extras-list img { height: 80px; width: auto; object-fit: contain; }
+    .folder-ref { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0.75rem 0; }
+    .folder-ref .thumb { text-align: center; }
+    .folder-ref .thumb img { height: 140px; width: auto; object-fit: contain; border: 2px solid #ccc; border-radius: 4px; display: block; }
+    .folder-ref .thumb span { display: block; margin-top: 0.25rem; font-weight: 600; font-size: 0.9rem; }
+    .export-btn { margin-top: 1rem; padding: 0.6rem 1.2rem; font-size: 1rem; cursor: pointer; background: #333; color: #fff; border: none; border-radius: 6px; }
+    .export-btn:hover { background: #555; }
   </style>
 </head>
 <body>
-  <h1>SKU ${skuKey}</h1>
-  <p><strong>Folder path:</strong> ${mapping.folder_path}</p>
+  <div class="instructions">
+    <h2>Instructions for reviewer</h2>
+    <ol>
+      <li><strong>Vendor → Folder mapping</strong> Below, each website (vendor) image has a dropdown. The script guessed which folder image is the <em>same photo</em>. Correct any wrong match: pick a different folder image or “Missing” if there is no matching photo in the folder.</li>
+      <li><strong>Extra folder images</strong> Some folder images were not matched to any vendor image. If they belong to this product (same SKU), check “Include” so they are added to the final result. Leave unchecked if they are a different product or duplicate.</li>
+      <li><strong>Export</strong> When done, click <strong>Export corrections</strong>. A JSON file will download. Run: <code>npm run apply-review -- --file &lt;path-to-downloaded.json&gt;</code> to update the main mapping file.</li>
+    </ol>
+  </div>
 
-  <h2>Vendor site images (${vendorFiles.length})</h2>
-  <div class="row">${vendorImgs}</div>
+  <h1>SKU ${escapeHtml(d.skuKey)}</h1>
+  <p><strong>Folder path:</strong> ${escapeHtml(d.folder_path)}</p>
 
-  <h2>Selected folder images (${folderFiles.length})</h2>
-  <div class="row">${folderImgs}</div>
+  <h2>Folder images (reference — use this to pick matches)</h2>
+  <p>These are the images in the folder. When you set the dropdown for each vendor image below, pick the folder number that shows the <em>same photo</em>.</p>
+  <div id="folder-reference" class="folder-ref"></div>
 
-  <h2>Missing from folder (${mapping.missing_from_folder.length})</h2>
-  <ul>${missingList || '<li>None</li>'}</ul>
+  <h2>1. Vendor site images — set match (or Missing)</h2>
+  <p>For each vendor image, choose which folder image above is the <em>same photo</em>, or “Missing” if none.</p>
+  <div id="vendor-mapping"></div>
+
+  <h2>2. Extra folder images — include in result?</h2>
+  <p>These folder images were not matched to any vendor image. Check the box to include them for this SKU.</p>
+  <div id="extras" class="extras-list"></div>
+
+  <p><button class="export-btn" id="export-btn">Export corrections</button></p>
+
+  <script>
+    window.REVIEW_DATA = ${dataJson};
+    const d = window.REVIEW_DATA;
+    function opt(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+    var folderRefEl = document.getElementById('folder-reference');
+    d.folder_files.forEach(function(f) {
+      var wrap = document.createElement('div');
+      wrap.className = 'thumb';
+      wrap.innerHTML = '<img src="'+opt(f.name)+'" alt="Folder '+f.index+'" /><span>Folder '+f.index+'</span>';
+      folderRefEl.appendChild(wrap);
+    });
+    const optsHtml = '<option value="">— Missing (no match in folder)</option>' + d.folder_files.map(function(f){ return '<option value="'+f.index+'">Folder '+f.index+'</option>'; }).join('');
+    const vendorEl = document.getElementById('vendor-mapping');
+    d.vendor_files.forEach(function(name, i) {
+      const current = d.vendor_to_folder_index[i];
+      const div = document.createElement('div');
+      div.className = 'vendor-block';
+      div.innerHTML = '<img src="'+opt(name)+'" alt="Vendor '+(i+1)+'" /><div><strong>Vendor '+(i+1)+'</strong><br/><select></select></div>';
+      const sel = div.querySelector('select');
+      sel.innerHTML = optsHtml;
+      sel.value = current != null ? String(current) : '';
+      sel.addEventListener('change', function() { d.vendor_to_folder_index[i] = sel.value ? parseInt(sel.value, 10) : null; });
+      vendorEl.appendChild(div);
+    });
+    const extrasEl = document.getElementById('extras');
+    const extrasInclude = {};
+    d.extras.forEach(function(rel) { extrasInclude[rel] = false; });
+    d.extras.forEach(function(rel) {
+      const f = d.folder_files.find(function(x) { return x.relativePath === rel; });
+      if (!f) return;
+      const label = document.createElement('label');
+      label.innerHTML = '<input type="checkbox" /> <img src="'+opt(f.name)+'" alt="" /> Include';
+      var cb = label.querySelector('input');
+      cb.addEventListener('change', function() { extrasInclude[rel] = cb.checked; });
+      extrasEl.appendChild(label);
+    });
+    document.getElementById('export-btn').addEventListener('click', function() {
+      var includeExtras = Object.keys(extrasInclude).filter(function(p) { return extrasInclude[p]; });
+      var payload = { skuKey: d.skuKey, folder_path: d.folder_path, vendor_to_folder_index: d.vendor_to_folder_index, include_extras: includeExtras, vendor_urls: d.vendor_urls, folder_files: d.folder_files };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'review-' + d.skuKey + '.json';
+      a.click();
+    });
+  </script>
 </body>
 </html>
 `;
-  fs.writeFileSync(path.join(base, 'index.html'), html, 'utf-8');
-  console.log('[map-sku] Review bundle:', path.join(base, 'index.html'));
 }
 
 function resolveSku(input: SiteInput, skuArg: string): {
@@ -376,34 +485,33 @@ async function fetchAndResizeVendorImage(url: string): Promise<{ buffer: Buffer;
   }
 }
 
+/** One entry per vendor image: folder path that is the same photo, or null if missing. */
+export type VendorToFolderMapping = (string | null)[];
+
 async function visionSelectImages(
   genai: GoogleGenAI,
   vendorImages: { url: string; buffer: Buffer; mimeType: string }[],
   folderImages: { relativePath: string; buffer: Buffer; mimeType: string }[],
   productName: string,
   skuKey: string,
-): Promise<{ selected_folder_images: string[]; missing_from_folder: string[] }> {
+): Promise<VendorToFolderMapping> {
   const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
   parts.push({
-    text: `You are matching product images for a Pilates equipment SKU.
+    text: `You are matching product images for a Pilates equipment SKU. Match only the SAME PHOTO (same angle, same crop). Same product in a different shot counts as NO match.
 
 Product: ${productName}
 SKU: ${skuKey}
 
-There are ${vendorImages.length} reference images from the VENDOR SITE (shown first, in order).
-There are ${folderImages.length} images from a LOCAL FOLDER (shown after the vendor images, in order).
+There are ${vendorImages.length} images from the VENDOR SITE (shown first, in order).
+There are ${folderImages.length} images from a LOCAL FOLDER (shown after, in order).
 
-Tasks:
-1. Which of the LOCAL FOLDER images show this same product? (Include all that match — same product, different angles or color variants. Exclude images that are clearly a different product or only B&W duplicates of an already-selected image.)
-2. Which VENDOR SITE images have NO corresponding image in the folder? (List the 1-based index of each missing vendor image, e.g. 1, 3, 5.)
+For each VENDOR image (1 to ${vendorImages.length}), output the exact LOCAL FOLDER image path that is the SAME photo, or null if there is no matching photo in the folder. Use the exact relative path from the folder image captions.
 
-Reply with a JSON object only, no markdown:
+Reply with a JSON object only:
 {
-  "selected_folder_images": ["path/to/file1.jpg", "path/to/file2.jpg"],
-  "missing_vendor_indices": [1, 3]
+  "vendor_to_folder": ["path/to/folder/img.jpg", null, "path/to/folder/img2.jpg", ...]
 }
-
-Use the exact relative path for each selected folder image as provided in the captions below.`,
+The array must have exactly ${vendorImages.length} elements (one per vendor image).`,
   });
   vendorImages.forEach((v, i) => {
     parts.push({ text: `[Vendor image ${i + 1}]` });
@@ -414,7 +522,7 @@ Use the exact relative path for each selected folder image as provided in the ca
     parts.push({ inlineData: { mimeType: f.mimeType, data: f.buffer.toString('base64') } });
   });
   parts.push({
-    text: 'Reply with only the JSON object: selected_folder_images (array of path strings) and missing_vendor_indices (array of 1-based integers).',
+    text: `Reply with only the JSON object: vendor_to_folder array of length ${vendorImages.length} (each element is a folder path string or null).`,
   });
 
   const response = await genai.models.generateContent({
@@ -423,13 +531,10 @@ Use the exact relative path for each selected folder image as provided in the ca
     config: { temperature: 0, responseMimeType: 'application/json' },
   });
   const raw = (response.text ?? '').trim();
-  const parsed = JSON.parse(raw) as { selected_folder_images?: string[]; missing_vendor_indices?: number[] };
-  const selected = Array.isArray(parsed.selected_folder_images) ? parsed.selected_folder_images : [];
-  const indices = Array.isArray(parsed.missing_vendor_indices) ? parsed.missing_vendor_indices : [];
-  const missingUrls = indices
-    .filter((i) => i >= 1 && i <= vendorImages.length)
-    .map((i) => vendorImages[i - 1].url);
-  return { selected_folder_images: selected, missing_from_folder: missingUrls };
+  const parsed = JSON.parse(raw) as { vendor_to_folder?: (string | null)[] };
+  let arr = Array.isArray(parsed.vendor_to_folder) ? parsed.vendor_to_folder : [];
+  while (arr.length < vendorImages.length) arr.push(null);
+  return arr.slice(0, vendorImages.length) as VendorToFolderMapping;
 }
 
 async function visionSelectImagesOpenAI(
@@ -569,14 +674,17 @@ async function main() {
     console.warn('[map-sku] No images in folder; selected_folder_images will be empty, missing_from_folder may be all vendor URLs.');
   }
 
-  console.log('[map-sku] Vision: select folder images and identify missing vendor images...');
-  const { selected_folder_images, missing_from_folder } = await visionSelectImages(
+  console.log('[map-sku] Vision: map each vendor image to folder image (same photo)...');
+  const vendor_to_folder = await visionSelectImages(
     genai,
     vendorWithBuffers,
     folderWithBuffers,
     productName,
     skuKey,
   );
+
+  const selected_folder_images = [...new Set(vendor_to_folder.filter((p): p is string => p != null))];
+  const missing_from_folder = vendorSiteImages.filter((_, i) => vendor_to_folder[i] == null);
 
   const mapping: SkuImageMapping = {
     vendor_site_images: vendorSiteImages,
@@ -604,7 +712,13 @@ async function main() {
   console.log('[map-sku] selected_folder_images:', selected_folder_images.length);
   console.log('[map-sku] missing_from_folder:', missing_from_folder.length);
   if (reviewDir) {
-    await writeReviewBundle(skuKey, mapping, imageRoot, reviewDir);
+    const htmlPath = await writeReviewBundle(skuKey, mapping, vendor_to_folder, folderImagePaths, imageRoot, reviewDir);
+    try {
+      const { execSync } = require('child_process');
+      execSync(`open "${htmlPath}"`, { stdio: 'inherit' });
+    } catch {
+      console.log('[map-sku] Open the review HTML manually:', htmlPath);
+    }
   }
 }
 
