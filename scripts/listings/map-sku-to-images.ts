@@ -10,8 +10,9 @@
  * Usage:
  *   npm run map-sku-to-images -- --sku "100006" --image-root /path/to/elina_images
  *   npm run map-sku-to-images -- --sku "100006" --image-root ./data/elina_images --out-file data/parsed-pricing-sheets/elina_sku_to_images.json
+ *   Add --review-dir data/review to write a per-SKU HTML + images for spot-check (open index.html in browser).
  *
- * Requires: OPENAI_API_KEY (gpt-4o-mini) or GOOGLE_API_KEY (Gemini). Images are resized before sending to save tokens.
+ * Requires: OPENAI_API_KEY (tree-walk, gpt-4o-mini) and GOOGLE_API_KEY (vision, Gemini). Images are resized before sending to save tokens.
  */
 
 import * as fs from 'fs';
@@ -60,6 +61,96 @@ function parseArg(name: string, defaultValue: string): string {
 
 function parseFlag(name: string): boolean {
   return process.argv.includes(`--${name}`);
+}
+
+/**
+ * Write a spot-check bundle: vendor images + selected folder images + index.html.
+ * Open index.html in a browser to compare side-by-side. Read-only on imageRoot (copies, does not move).
+ */
+async function writeReviewBundle(
+  skuKey: string,
+  mapping: SkuImageMapping,
+  imageRoot: string,
+  reviewDir: string,
+): Promise<void> {
+  const base = path.resolve(reviewDir.startsWith('/') ? reviewDir : path.join(process.cwd(), reviewDir));
+  const vendorDir = path.join(base, 'vendor');
+  const folderDir = path.join(base, 'folder');
+  const mode = 0o755;
+  fs.mkdirSync(vendorDir, { recursive: true, mode });
+  if (fs.existsSync(folderDir)) fs.rmSync(folderDir, { recursive: true });
+  fs.mkdirSync(folderDir, { recursive: true, mode });
+
+  const vendorFiles: string[] = [];
+  for (let i = 0; i < mapping.vendor_site_images.length; i++) {
+    const url = mapping.vendor_site_images[i];
+    try {
+      const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; catalogger/1.0)' } });
+      if (!res.ok) continue;
+      const ext = (res.headers.get('content-type')?.includes('png') || url.toLowerCase().includes('.png')) ? '.png' : '.jpg';
+      const name = `${i + 1}${ext}`;
+      const buf = Buffer.from(await res.arrayBuffer());
+      fs.writeFileSync(path.join(vendorDir, name), buf);
+      vendorFiles.push(`vendor/${name}`);
+    } catch {
+      // skip
+    }
+  }
+
+  const folderFiles: string[] = [];
+  for (let i = 0; i < mapping.selected_folder_images.length; i++) {
+    const rel = mapping.selected_folder_images[i];
+    const src = path.join(imageRoot, rel);
+    if (!fs.existsSync(src)) continue;
+    const ext = path.extname(rel).toLowerCase() || '.jpg';
+    const name = `${i + 1}${ext}`;
+    const dest = path.join(folderDir, name);
+    try {
+      fs.writeFileSync(dest, fs.readFileSync(src));
+      folderFiles.push(`folder/${name}`);
+    } catch (err) {
+      console.warn('[map-sku] Could not copy to review folder:', src, (err as Error).message);
+    }
+  }
+
+  const missingList = mapping.missing_from_folder
+    .map((url) => `<li><a href="${url}" target="_blank" rel="noopener">${url.replace(/^https?:\/\//, '')}</a></li>`)
+    .join('\n');
+
+  const vendorImgs = vendorFiles.map((f) => `<img src="${f}" alt="${f}" loading="lazy" />`).join('\n    ');
+  const folderImgs = folderFiles.map((f) => `<img src="${f}" alt="${f}" loading="lazy" />`).join('\n    ');
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Spot-check: ${skuKey}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 1rem; max-width: 1400px; margin: 0 auto; }
+    h1 { margin-top: 0; }
+    h2 { margin-top: 1.5rem; border-bottom: 1px solid #ccc; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+    .row img { height: 180px; width: auto; object-fit: contain; border: 1px solid #eee; }
+    ul { word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h1>SKU ${skuKey}</h1>
+  <p><strong>Folder path:</strong> ${mapping.folder_path}</p>
+
+  <h2>Vendor site images (${vendorFiles.length})</h2>
+  <div class="row">${vendorImgs}</div>
+
+  <h2>Selected folder images (${folderFiles.length})</h2>
+  <div class="row">${folderImgs}</div>
+
+  <h2>Missing from folder (${mapping.missing_from_folder.length})</h2>
+  <ul>${missingList || '<li>None</li>'}</ul>
+</body>
+</html>
+`;
+  fs.writeFileSync(path.join(base, 'index.html'), html, 'utf-8');
+  console.log('[map-sku] Review bundle:', path.join(base, 'index.html'));
 }
 
 function resolveSku(input: SiteInput, skuArg: string): {
@@ -172,7 +263,7 @@ async function pickChildOrCurrent(
   const prompt = treeWalkPrompt(productName, skuKey, productColor, currentPath, childNames, currentHasImages);
 
   const response = await genai.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash',
     contents: [{ text: prompt }],
     config: { temperature: 0, maxOutputTokens: 100 },
   });
@@ -327,7 +418,7 @@ Use the exact relative path for each selected folder image as provided in the ca
   });
 
   const response = await genai.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash',
     contents: parts,
     config: { temperature: 0, responseMimeType: 'application/json' },
   });
@@ -410,6 +501,7 @@ async function main() {
   const inputFile = parseArg('input-file', CONFIG.inputFile);
   const outFile = parseArg('out-file', CONFIG.outFile);
   const imageRoot = parseArg('image-root', CONFIG.imageRootDefault);
+  const reviewDir = parseArg('review-dir', '');
   const skuArg = parseArg('sku', '');
 
   if (!skuArg) {
@@ -423,8 +515,12 @@ async function main() {
 
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
   const googleKey = process.env.GOOGLE_API_KEY?.trim();
-  if (!openaiKey && !googleKey) {
-    console.error('Set OPENAI_API_KEY or GOOGLE_API_KEY (for Gemini).');
+  if (!openaiKey) {
+    console.error('OPENAI_API_KEY is required (tree-walk uses gpt-4o-mini).');
+    process.exit(1);
+  }
+  if (!googleKey) {
+    console.error('GOOGLE_API_KEY is required (vision step uses Gemini).');
     process.exit(1);
   }
 
@@ -438,79 +534,78 @@ async function main() {
   const { skuKey, productName, vendorSiteImages, productColor } = resolveSku(input, skuArg);
   console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}, vendor images: ${vendorSiteImages.length}`);
 
-  const useOpenAI = Boolean(openaiKey);
-  if (useOpenAI) console.log('[map-sku] Using OpenAI (gpt-4o-mini).');
-  else console.log('[map-sku] Using Gemini (gemini-2.0-flash).');
+  console.log('[map-sku] Tree-walk: OpenAI (gpt-4o-mini). Vision: Gemini (gemini-2.5-flash).');
+  const openai = new OpenAI({ apiKey: openaiKey });
+  const genai = new GoogleGenAI({ apiKey: googleKey });
 
-  const openai = useOpenAI ? new OpenAI({ apiKey: openaiKey! }) : null;
-  const genai = !useOpenAI ? new GoogleGenAI({ apiKey: googleKey! }) : null;
-
-  const picker: TreeWalkPicker = useOpenAI
-    ? (name, sku, color, curr, children, hasImg) =>
-        pickChildOrCurrentOpenAI(openai!, name, sku, color, curr, children, hasImg)
-    : (name, sku, color, curr, children, hasImg) =>
-        pickChildOrCurrent(genai!, name, sku, color, curr, children, hasImg);
+  const picker: TreeWalkPicker = (name, sku, color, curr, children, hasImg) =>
+    pickChildOrCurrentOpenAI(openai, name, sku, color, curr, children, hasImg);
 
   console.log('[map-sku] Tree-walk to select folder...');
   console.log('[map-sku] (Stops when the model replies CURRENT for a folder that has images, or when its choice does not match any child.)');
   const folderPath = await treeWalkToFolder(imageRoot, productName, skuKey, productColor, picker);
   console.log('[map-sku] Selected folder:', folderPath);
-  console.log('[map-sku] (Exiting after tree-walk only. Remove this exit to run vision + write.)');
-  process.exit(0);
 
-  // const folderImagePaths = listImageFilesUnder(imageRoot, folderPath);
-  // console.log('[map-sku] Image files in folder:', folderImagePaths.length);
+  const folderImagePaths = listImageFilesUnder(imageRoot, folderPath);
+  console.log('[map-sku] Image files in folder:', folderImagePaths.length);
 
-  // const vendorWithBuffers: { url: string; buffer: Buffer; mimeType: string }[] = [];
-  // for (let i = 0; i < vendorSiteImages.length; i++) {
-  //   const r = await fetchAndResizeVendorImage(vendorSiteImages[i]);
-  //   if (r) vendorWithBuffers.push({ url: vendorSiteImages[i], buffer: r.buffer, mimeType: r.mimeType });
-  //   else console.warn('[map-sku] Could not fetch vendor image:', vendorSiteImages[i]);
-  // }
+  const vendorWithBuffers: { url: string; buffer: Buffer; mimeType: string }[] = [];
+  for (let i = 0; i < vendorSiteImages.length; i++) {
+    const r = await fetchAndResizeVendorImage(vendorSiteImages[i]);
+    if (r) vendorWithBuffers.push({ url: vendorSiteImages[i], buffer: r.buffer, mimeType: r.mimeType });
+    else console.warn('[map-sku] Could not fetch vendor image:', vendorSiteImages[i]);
+  }
 
-  // const folderWithBuffers: { relativePath: string; buffer: Buffer; mimeType: string }[] = [];
-  // for (const rel of folderImagePaths) {
-  //   const full = path.join(imageRoot, rel);
-  //   const buf = fs.readFileSync(full);
-  //   const mime = rel.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-  //   const resized = await resizeImageBuffer(buf, mime);
-  //   folderWithBuffers.push({ relativePath: rel, buffer: resized.buffer, mimeType: resized.mimeType });
-  // }
+  const folderWithBuffers: { relativePath: string; buffer: Buffer; mimeType: string }[] = [];
+  for (const rel of folderImagePaths) {
+    const full = path.join(imageRoot, rel);
+    const buf = fs.readFileSync(full);
+    const mime = rel.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+    const resized = await resizeImageBuffer(buf, mime);
+    folderWithBuffers.push({ relativePath: rel, buffer: resized.buffer, mimeType: resized.mimeType });
+  }
 
-  // if (folderWithBuffers.length === 0) {
-  //   console.warn('[map-sku] No images in folder; selected_folder_images will be empty, missing_from_folder may be all vendor URLs.');
-  // }
+  if (folderWithBuffers.length === 0) {
+    console.warn('[map-sku] No images in folder; selected_folder_images will be empty, missing_from_folder may be all vendor URLs.');
+  }
 
-  // console.log('[map-sku] Vision: select folder images and identify missing vendor images...');
-  // const { selected_folder_images, missing_from_folder } = useOpenAI
-  //   ? await visionSelectImagesOpenAI(openai!, vendorWithBuffers, folderWithBuffers, productName, skuKey)
-  //   : await visionSelectImages(genai!, vendorWithBuffers, folderWithBuffers, productName, skuKey);
+  console.log('[map-sku] Vision: select folder images and identify missing vendor images...');
+  const { selected_folder_images, missing_from_folder } = await visionSelectImages(
+    genai,
+    vendorWithBuffers,
+    folderWithBuffers,
+    productName,
+    skuKey,
+  );
 
-  // const mapping: SkuImageMapping = {
-  //   vendor_site_images: vendorSiteImages,
-  //   folder_path: folderPath,
-  //   selected_folder_images,
-  //   missing_from_folder,
-  // };
+  const mapping: SkuImageMapping = {
+    vendor_site_images: vendorSiteImages,
+    folder_path: folderPath,
+    selected_folder_images,
+    missing_from_folder,
+  };
 
-  // const outPath = path.isAbsolute(outFile) ? outFile : path.join(process.cwd(), outFile);
-  // const outDir = path.dirname(outPath);
-  // if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  const outPath = path.isAbsolute(outFile) ? outFile : path.join(process.cwd(), outFile);
+  const outDir = path.dirname(outPath);
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-  // let existing: SkuToImagesOutput = { skus: {} };
-  // if (fs.existsSync(outPath)) {
-  //   try {
-  //     existing = JSON.parse(fs.readFileSync(outPath, 'utf-8')) as SkuToImagesOutput;
-  //     if (!existing.skus) existing.skus = {};
-  //   } catch {
-  //     // start fresh
-  //   }
-  // }
-  // existing.skus[skuKey] = mapping;
-  // fs.writeFileSync(outPath, JSON.stringify(existing, null, 2), 'utf-8');
-  // console.log('[map-sku] Wrote', outPath);
-  // console.log('[map-sku] selected_folder_images:', selected_folder_images.length);
-  // console.log('[map-sku] missing_from_folder:', missing_from_folder.length);
+  let existing: SkuToImagesOutput = { skus: {} };
+  if (fs.existsSync(outPath)) {
+    try {
+      existing = JSON.parse(fs.readFileSync(outPath, 'utf-8')) as SkuToImagesOutput;
+      if (!existing.skus) existing.skus = {};
+    } catch {
+      // start fresh
+    }
+  }
+  existing.skus[skuKey] = mapping;
+  fs.writeFileSync(outPath, JSON.stringify(existing, null, 2), 'utf-8');
+  console.log('[map-sku] Wrote', outPath);
+  console.log('[map-sku] selected_folder_images:', selected_folder_images.length);
+  console.log('[map-sku] missing_from_folder:', missing_from_folder.length);
+  if (reviewDir) {
+    await writeReviewBundle(skuKey, mapping, imageRoot, reviewDir);
+  }
 }
 
 main().catch((e) => {
