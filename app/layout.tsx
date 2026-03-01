@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { RunProvider } from './run-context';
 
 export const metadata: Metadata = {
   title: 'Catalogger',
-  description: 'Assisted product listing for distributors',
+  description: 'Product listings',
 };
 
 export default function RootLayout({
@@ -14,9 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <RunProvider>{children}</RunProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
