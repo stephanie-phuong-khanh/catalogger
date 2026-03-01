@@ -33,8 +33,8 @@ import {
 puppeteer.use(StealthPlugin());
 
 const CONFIG = {
-  inputFile: 'data/parsed-pricing-sheets/elina_pilates_products_urls.json',
-  outFile: 'data/parsed-pricing-sheets/elina_pilates_products_site.json',
+  inputFile: 'data/elina/elina_pilates_products_urls.json',
+  outFile: 'data/elina/elina_pilates_products_site.json',
   vendorBaseUrl: 'https://www.elinapilates.com',
 };
 

@@ -6,7 +6,7 @@
  *
  * Usage:
  *   npm run map-sku-to-images -- --sku "100006" --image-root /path/to/elina_images
- *   npm run map-sku-to-images -- --sku "100006" --image-root ./data/elina_images --out-file data/parsed-pricing-sheets/elina_sku_to_images.json
+ *   npm run map-sku-to-images -- --sku "100006" --image-root ./data/elina_images --out-file data/elina/elina_sku_to_images.json
  *   Output is written to --output-dir (default: data/elina/processed). Use that to create the per-SKU folder and run the (placeholder) edit+write step after confirm.
  *   Add --yes to skip the "Does this look correct? (y/n)" prompt and proceed as if yes.
  *
@@ -31,8 +31,8 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 }
 
 const CONFIG = {
-  inputFile: 'data/parsed-pricing-sheets/elina_pilates_products_site.json',
-  outFile: 'data/parsed-pricing-sheets/elina_sku_to_images.json',
+  inputFile: 'data/elina/elina_pilates_products_site.json',
+  outFile: 'data/elina/elina_sku_to_images.json',
   imageRootDefault: '/Users/sdoan/Google Drive/My Drive/Elina Pilates',
   outputDirDefault: '/Users/sdoan/Google Drive/My Drive/Prepared images: Elina Pilates <> Dansons',
   imageExtensions: new Set(['.jpg', '.jpeg', '.png', '.webp']),

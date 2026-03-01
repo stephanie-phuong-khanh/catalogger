@@ -1,320 +1,250 @@
 /**
- * Parse a PDF pricing sheet via Llama Cloud (LlamaExtract) and write structured JSON.
- * Handles multi-page PDFs (e.g. Elina Pilates 3-page pricing sheet).
- * 
- * 1. Ensures an extraction agent exists: creates one with the pricing-sheet JSON schema if needed (or reuses an existing agent by name).
- * 2. Uploads your PDF to Llama Cloud Files API.
- * 3. Starts an extraction job (document + agent).
- * 4. Polls until the job finishes.
- * 5. Writes the extraction result to the output directory.
+ * Parse a PDF pricing sheet into JSON: text extraction (no AI) then optional LLM
+ * step to split description_raw into product_name and color.
  *
- * Prereq: LLAMA_CLOUD_API_KEY in .env
+ * 1. pdf-parse extracts text; we parse rows to get description_raw, price, barcode.
+ * 2. A cheap OpenAI call (batched) parses each description_raw → product_name + color.
  *
  * Usage:
- *   npm run parse-pdf-pricing-sheet -- --input-file="data/elina_pilates_pricing_sheet.pdf"
- *   npm run parse-pdf-pricing-sheet -- --input-file="data/foo.pdf" --out-dir="data/parsed-pricing-sheets"
+ *   npm run parse-pdf-pricing-sheet -- --input-file="path/to/file.pdf"
+ *   npm run parse-pdf-pricing-sheet -- --input-file="path/to/file.pdf" --out-dir="data/elina"
+ *   npm run parse-pdf-pricing-sheet -- --input-file="path/to/file.pdf" --no-llm   # skip LLM; product_name/color left empty
  */
 
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import OpenAI from 'openai';
+import { zodTextFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
 
 dotenv.config();
 if (fs.existsSync('.env.local')) dotenv.config({ path: '.env.local', override: true });
 
+// pdf-parse v2 (mehmet-kozan): use PDFParse class + getText()
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { PDFParse } = require('pdf-parse');
+
 const CONFIG = {
   inputFile: 'data/input/elina_pilates_pricing_sheet.pdf',
-  outDir: 'data/parsed-pricing-sheets',
+  outDir: 'data/elina',
+  useLlm: true,
 };
 
-const LLAMA_CLOUD_BASE = 'https://api.cloud.llamaindex.ai';
-const EXTRACTION_AGENT_NAME = 'catalogger_pricing_sheet';
-
-
-// const PRICING_SHEET_EXTRACTION_SCHEMA = {
-//   type: 'object',
-//   description: 'Pricing sheet with a list of products',
-//   properties: {
-//     products: {
-//       type: 'array',
-//       description: 'List of products from the pricing sheet',
-//       items: {
-//         type: 'object',
-//         properties: {
-//           description: {
-//             type: 'string',
-//             description: 'The product name, without the color of the product. In the document, this is spelled in all caps with spaces or underscores between words. In the extraction output, it should be spelled normally with only spaces between words.',
-//             example: 'Elite Reformer Tower',
-//           },
-//           variants: {
-//             type: 'array',
-//             description: 'The variants of the product. Each variant is a different color of the product.',
-//             items: {
-//               type: 'object',
-//               properties: {
-//                 article_ref: {
-//                   type: 'string',
-//                   description: 'The article reference number of the product variant. It is a combination of the country code and the 6-digit article number. Do not include the country code in the extraction output.',
-//                   example: '400004',
-//                 },
-//                 color: {
-//                   type: 'string',
-//                   description: 'The color of the product variant. In the document, the color is included in the product name. In the extraction output, it should be spelled in all caps. Do not include the color in the description.',
-//                   example: 'BLACK',
-//                 },
-//                 price_usd: {
-//                   type: 'number',
-//                   description: 'The price of the item as a numeric value. Note: The document uses European format where \'.\' is the thousand separator and \',\' is the decimal. Strip the currency symbol and normalize to a standard float (e.g., \'$3.995,00\' should become 3995.0).',
-//                   example: 2725.00,
-//                 },
-//                 barcode: {
-//                   type: 'string',
-//                   description: 'The barcode of the product variant. It is a 13-digit number that is unique to the product variant.',
-//                   example: '8421941006647',
-//                 }
-//               },
-//               required: ['article_ref', 'color', 'price_usd', 'barcode'],
-//             },
-//           },
-//         },
-//         required: ['description', 'variants'],
-//       },
-//     },
-//   },
-//   required: ['products'],
-// } as const;
-
-const PRICING_SHEET_EXTRACTION_SCHEMA = {
-  type: 'object',
-  properties: {
-    items: {
-      type: 'array',
-      description: 'A flat list of every individual row/item in the pricing table.',
-        items: {
-          type: 'object',
-          properties: {
-            product_base_name: {
-              type: 'string',
-              description: 'The product name, without the color of the product. Listed as part of the content of the "Description" column of the input table. In the document, this is spelled in all caps with spaces or underscores between words. Products of the same name but different colors are listed in consecutive rows. In the extraction output, it should be spelled normally with only spaces between words. DO NOT include the color in the product_base_name.',
-              example: 'Elite Reformer Tower',
-            },
-            color: {
-              type: 'string',
-              description: 'The color of the product variant. Listed as part of the content of the "Description" column of the input table. In the extraction output, it should be spelled in all caps. Do not include the color in the product_base_name.',
-              example: 'BLACK',
-            },
-            article_number: {
-              type: 'string',
-              description: 'The article reference number of the product variant. Listed in the "Article Ref." column of the input table, as a combination of the country code and the 6-digit article number. Do not include the country code in the extraction output.',
-              example: '400004',
-              pattern: '^[0-9]{6}$',
-            },
-            price_usd: {
-              type: 'number',
-              description: 'Numeric price. Listed in the "Prices / MAP Prices$" column of the input table. The value is the price of the item in USD. Note: The document uses European format where \'.\' is the thousand separator and \',\' is the decimal. Strip the currency symbol and normalize to a standard float (e.g., \'$3.995,00\' should become 3995.0).',
-              example: 2725.00,
-            },
-            barcode: {
-              type: 'string',
-              description: 'The 13-digit barcode of the product variant. Listed in the "Barcode" column of the input table.',
-              example: '8421941006647',
-              pattern: '^[0-9]{13}$',
-            }
-          },
-          required: ['product_base_name', 'color', 'article_number', 'price_usd', 'barcode'],
-        }
-    },
-  },
-  required: ['items']
-} as const;
-
-
-type ApiResponse = { id?: string; [k: string]: unknown };
-
-function getApiKey(): string {
-  const key = process.env.LLAMA_CLOUD_API_KEY?.trim();
-  if (!key) {
-    throw new Error(
-      'LLAMA_CLOUD_API_KEY is not set. Add it to .env or .env.local.'
-    );
-  }
-  return key;
+export interface ParsedPricingRow {
+  article_ref: string;
+  description_raw: string;
+  product_name: string;   // title case, base name without color (filled by LLM or empty if --no-llm)
+  color: string | null;  // e.g. "BLACK", "GREY", or null (filled by LLM or null if --no-llm)
+  price_raw: string;
+  price_usd: number;
+  barcode: string;
 }
 
-async function llamaCloudFetch(
-  apiKey: string,
-  path: string,
-  options: RequestInit = {}
-): Promise<Response> {
-  const url = `${LLAMA_CLOUD_BASE}${path}`;
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      ...(options.headers as Record<string, string>),
-    },
-  });
-  return res;
+/** Parse European-style price (e.g. $3.995,00 or $650,00) to number. */
+function parsePrice(raw: string): number {
+  const cleaned = raw.replace(/\$/g, '').trim();
+  if (!cleaned) return NaN;
+  // European: thousands = . or , and decimal = , (e.g. 3.995,00 or 1,521,00)
+  const lastComma = cleaned.lastIndexOf(',');
+  if (lastComma >= 0) {
+    const decimalPart = cleaned.slice(lastComma + 1);
+    const intPart = cleaned.slice(0, lastComma).replace(/[.,\s]/g, '');
+    const joined = `${intPart}.${decimalPart}`;
+    return parseFloat(joined);
+  }
+  return parseFloat(cleaned.replace(/\./g, '').replace(',', '.') || '0');
 }
 
-/** Create extraction agent or get existing by name. Returns agent id. */
-async function getOrCreateExtractionAgent(apiKey: string): Promise<string> {
-  const byNameRes = await llamaCloudFetch(
-    apiKey,
-    `/api/v1/extraction/extraction-agents/by-name/${encodeURIComponent(EXTRACTION_AGENT_NAME)}`,
-    { method: 'GET' }
-  );
-  if (byNameRes.ok) {
-    const data = (await byNameRes.json()) as ApiResponse;
-    if (data.id) {
-      console.log(`Using existing extraction agent: ${EXTRACTION_AGENT_NAME} (${data.id})`);
-      return data.id as string;
-    }
-  }
+/** True if line looks like a header or section marker we should skip. */
+function isNonDataLine(line: string): boolean {
+  const t = line.trim();
+  if (!t) return true;
+  if (/^Article Ref\./i.test(t) || /^Description Prices/i.test(t) || /^Prices \$ Barcodes/i.test(t)) return true;
+  if (/^PRICE LIST/i.test(t) || /^--\s*\d+\s+of\s+\d+\s*--/.test(t)) return true;
+  if (/^CLASSIC LINE$/i.test(t) || /^NEW MODELS$/i.test(t)) return true;
+  return false;
+}
 
-  const createRes = await llamaCloudFetch(apiKey, '/api/v1/extraction/extraction-agents', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: EXTRACTION_AGENT_NAME,
-      data_schema: PRICING_SHEET_EXTRACTION_SCHEMA,
-      config: {
-        extraction_target: 'PER_TABLE_ROW',
-        extraction_mode: 'BALANCED',
+/** Match a data row: USA + digits + description + price + barcode. Returns null if not a data row. */
+function parseDataLine(line: string): ParsedPricingRow | null {
+  const trimmed = line.trim();
+  if (!trimmed) return null;
+
+  // Article ref: "USA " or "USA" followed by 6+ digits (e.g. USA 100006 or USA300311)
+  const usaMatch = trimmed.match(/^USA\s*(\d{6,})\s+(.+)$/);
+  if (!usaMatch) return null;
+
+  const afterRef = usaMatch[2]!.trim();
+  // Price: $X.XXX,XX or $X,XX before barcode; barcode = 13 digits at end (allow tab/space before $)
+  const priceBarcode = afterRef.match(/\s+\$([\d.,]+)\s+(\d{13})$/);
+  if (!priceBarcode) return null;
+
+  const priceStart = afterRef.search(/\s+\$[\d.,]+\s+\d{13}$/);
+  const description_raw = (priceStart >= 0 ? afterRef.slice(0, priceStart) : afterRef).trim();
+  const priceRaw = '$' + priceBarcode[1];
+  const priceUsd = parsePrice(priceRaw);
+  const barcode = priceBarcode[2]!;
+  return {
+    article_ref: usaMatch[1]!,
+    description_raw,
+    product_name: '',
+    color: null as string | null,
+    price_raw: priceRaw,
+    price_usd: isNaN(priceUsd) ? 0 : priceUsd,
+    barcode,
+  };
+}
+
+/** Extract text from PDF buffer using pdf-parse (PDFParse + getText). */
+async function extractPdfText(buffer: Buffer): Promise<string> {
+  const parser = new PDFParse({ data: buffer });
+  try {
+    const result = await parser.getText();
+    return (result && (result as { text?: string }).text) ?? '';
+  } finally {
+    await parser.destroy();
+  }
+}
+
+const BATCH_SIZE = 30;
+
+const ParseDescriptionsSchema = z.object({
+  items: z.array(z.object({
+    product_name: z.string().describe('Product base name in Title Case, with no color word. E.g. "Reformer", "Reformer With Tower".'),
+    color: z.string().nullable().describe('Color in ALL CAPS if present (e.g. BLACK, GREY), or null if the description has no color.'),
+  })),
+});
+
+/** Call OpenAI to parse description_raw into product_name and color (batched). */
+async function parseDescriptionsWithLLM(
+  openai: OpenAI,
+  descriptions: string[],
+): Promise<{ product_name: string; color: string | null }[]> {
+  if (descriptions.length === 0) return [];
+  const response = await openai.responses.parse({
+    model: 'gpt-4o-mini',
+    temperature: 0,
+    input: [
+      {
+        role: 'system',
+        content: `You parse product description strings from a pricing sheet into a product name (no color) and an optional color.
+
+Rules:
+- product_name: Title Case, the base product name with the color word REMOVED. The color may appear at the end after an underscore (e.g. REFORMER_BLACK → "Reformer") or in the middle (e.g. REFORMER WITH BLACK TOWER → "Reformer With Tower"). Output the product name only, no color.
+- color: The color in ALL CAPS (BLACK, GREY, IVORY, etc.) if present, or null if there is no color in the description.
+
+Examples:
+- REFORMER_BLACK → product_name: "Reformer", color: "BLACK"
+- REFORMER MASTER INSTRUCTOR_BLACK → product_name: "Reformer Master Instructor", color: "BLACK"
+- REFORMER WITH BLACK TOWER → product_name: "Reformer With Tower", color: "BLACK"
+- REFORMER WITH TOWER_GREY → product_name: "Reformer With Tower", color: "GREY"
+- TOWER FOR ALUMINIUM REFORMER → product_name: "Tower For Aluminium Reformer", color: null
+
+Return one item per input description, in the same order.`,
       },
-    }),
+      {
+        role: 'user',
+        content: `Parse these ${descriptions.length} descriptions:\n\n${descriptions.map((d, i) => `${i + 1}. ${d}`).join('\n')}`,
+      },
+    ],
+    text: { format: zodTextFormat(ParseDescriptionsSchema, 'parse_descriptions') },
   });
-  if (!createRes.ok) {
-    const text = await createRes.text();
-    throw new Error(`Failed to create extraction agent: ${createRes.status} ${text}`);
+  const parsed = response.output_parsed as z.infer<typeof ParseDescriptionsSchema> | undefined;
+  if (!parsed?.items || parsed.items.length !== descriptions.length) {
+    throw new Error(`LLM returned ${parsed?.items?.length ?? 0} items, expected ${descriptions.length}`);
   }
-  const data = (await createRes.json()) as ApiResponse;
-  const id = data.id as string;
-  console.log(`Created extraction agent: ${EXTRACTION_AGENT_NAME} (${id})`);
-  return id;
+  return parsed.items;
 }
 
-/** Upload PDF to Llama Cloud Files. Returns file id. */
-async function uploadFile(apiKey: string, filePath: string): Promise<string> {
-  const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
-  const buffer = fs.readFileSync(absolutePath);
-  const name = path.basename(filePath);
-  const form = new FormData();
-  form.append('upload_file', new Blob([buffer], { type: 'application/pdf' }), name);
-
-  const res = await fetch(`${LLAMA_CLOUD_BASE}/api/v1/files`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}` },
-    body: form,
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Failed to upload file: ${res.status} ${text}`);
-  }
-  const data = (await res.json()) as ApiResponse;
-  const fileId = data.id as string;
-  console.log(`Uploaded file: ${name} (${fileId})`);
-  return fileId;
-}
-
-/** Start extraction job. Returns job id. */
-async function runExtractionJob(
-  apiKey: string,
-  extractionAgentId: string,
-  fileId: string
-): Promise<string> {
-  const res = await llamaCloudFetch(apiKey, '/api/v1/extraction/jobs', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      extraction_agent_id: extractionAgentId,
-      file_id: fileId,
-    }),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Failed to start extraction job: ${res.status} ${text}`);
-  }
-  const data = (await res.json()) as ApiResponse;
-  const jobId = data.id as string;
-  console.log(`Started extraction job: ${jobId}`);
-  return jobId;
-}
-
-type JobStatus = 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED';
-
-/** Poll job until SUCCESS or FAILED. Returns final status. */
-async function pollJobUntilDone(
-  apiKey: string,
-  jobId: string,
-  pollIntervalMs: number = 2000
-): Promise<JobStatus> {
-  for (;;) {
-    const res = await llamaCloudFetch(apiKey, `/api/v1/extraction/jobs/${jobId}`, {
-      method: 'GET',
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to get job status: ${res.status}`);
+/** Fill product_name and color on rows using batched LLM calls. */
+async function fillProductNameAndColor(rows: ParsedPricingRow[], openai: OpenAI): Promise<void> {
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const descriptions = batch.map((r) => r.description_raw);
+    const results = await parseDescriptionsWithLLM(openai, descriptions);
+    for (let j = 0; j < batch.length; j++) {
+      batch[j]!.product_name = results[j]!.product_name;
+      batch[j]!.color = results[j]!.color;
     }
-    const data = (await res.json()) as { status?: JobStatus; [k: string]: unknown };
-    const status = data.status ?? 'PENDING';
-    console.log(`  Job status: ${status}`);
-    if (status === 'SUCCESS' || status === 'FAILED') return status;
-    await new Promise((r) => setTimeout(r, pollIntervalMs));
+    console.log(`  LLM parsed ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length} descriptions`);
   }
 }
 
-/** Get extraction result (valid when job status is SUCCESS). */
-async function getJobResult(apiKey: string, jobId: string): Promise<unknown> {
-  const res = await llamaCloudFetch(apiKey, `/api/v1/extraction/jobs/${jobId}/result`, {
-    method: 'GET',
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Failed to get job result: ${res.status} ${text}`);
+/** Parse PDF buffer into array of row objects. */
+export async function parsePdfPricingToRows(buffer: Buffer): Promise<ParsedPricingRow[]> {
+  const text = await extractPdfText(buffer);
+  const lines = text.split(/\r?\n/);
+  const rows: ParsedPricingRow[] = [];
+
+  for (const line of lines) {
+    if (isNonDataLine(line)) continue;
+    const row = parseDataLine(line);
+    if (row) rows.push(row);
   }
-  const data = await res.json();
-  return data;
+
+  return rows;
 }
+
+/** Group rows by product_name for downstream use (e.g. one search per product). */
+export function groupRowsByProductName(rows: ParsedPricingRow[]): { product_name: string; items: ParsedPricingRow[] }[] {
+  const byName = new Map<string, ParsedPricingRow[]>();
+  for (const row of rows) {
+    const name = (row.product_name ?? '').trim() || '(no name)';
+    if (!byName.has(name)) byName.set(name, []);
+    byName.get(name)!.push(row);
+  }
+  return Array.from(byName.entries()).map(([product_name, items]) => ({ product_name, items }));
+}
+
+export type ParsedPricingSheetGrouped = {
+  groups: { product_name: string; items: ParsedPricingRow[] }[];
+};
 
 async function main(): Promise<void> {
   const inputFileArg = process.argv.find((arg) => arg.startsWith('--input-file'));
   if (inputFileArg) {
-    CONFIG.inputFile = inputFileArg.includes('=') ? inputFileArg.split('=')[1]! : process.argv[process.argv.indexOf('--input-file') + 1] ?? CONFIG.inputFile;
+    CONFIG.inputFile = inputFileArg.includes('=') ? inputFileArg.split('=')[1]!.trim() : (process.argv[process.argv.indexOf('--input-file') + 1] ?? '').trim();
   }
   const outDirArg = process.argv.find((arg) => arg.startsWith('--out-dir'));
   if (outDirArg) {
-    CONFIG.outDir = outDirArg.includes('=') ? outDirArg.split('=')[1]! : process.argv[process.argv.indexOf('--out-dir') + 1] ?? CONFIG.outDir;
+    CONFIG.outDir = outDirArg.includes('=') ? outDirArg.split('=')[1]!.trim() : (process.argv[process.argv.indexOf('--out-dir') + 1] ?? CONFIG.outDir).trim();
+  }
+  if (process.argv.includes('--no-llm')) {
+    CONFIG.useLlm = false;
   }
 
-  if (!CONFIG.inputFile.endsWith('.pdf')) {
-    throw new Error('Input file must be a PDF');
+  if (!CONFIG.inputFile?.endsWith('.pdf')) {
+    console.error('Usage: --input-file="path/to/file.pdf" [--out-dir="data/elina"] [--no-llm]');
+    process.exit(1);
   }
 
-  const apiKey = getApiKey();
   const inputPath = path.isAbsolute(CONFIG.inputFile) ? CONFIG.inputFile : path.join(process.cwd(), CONFIG.inputFile);
   if (!fs.existsSync(inputPath)) {
-    throw new Error(`Input file not found: ${inputPath}`);
+    console.error('Input file not found:', inputPath);
+    process.exit(1);
   }
 
-  const agentId = await getOrCreateExtractionAgent(apiKey); // 1 - Ensures an extraction agent exists
-  const fileId = await uploadFile(apiKey, inputPath); // 2 - Uploads PDF to Llama Cloud Files API
-  const jobId = await runExtractionJob(apiKey, agentId, fileId); // 3 - Starts an extraction job (document + agent)
-  const status = await pollJobUntilDone(apiKey, jobId); // 4 - Polls until the job finishes
-  if (status !== 'SUCCESS') {
-    throw new Error(`Extraction job failed with status: ${status}`);
+  const buffer = fs.readFileSync(inputPath);
+  const rows = await parsePdfPricingToRows(buffer);
+  console.log(`Parsed ${rows.length} row(s) from PDF`);
+
+  if (CONFIG.useLlm) {
+    const apiKey = process.env.OPENAI_API_KEY?.trim();
+    if (!apiKey) {
+      console.error('OPENAI_API_KEY is not set. Add to .env or .env.local, or run with --no-llm to skip product_name/color.');
+      process.exit(1);
+    }
+    const openai = new OpenAI({ apiKey });
+    await fillProductNameAndColor(rows, openai);
   }
 
-  const result = (await getJobResult(apiKey, jobId)) as Record<string, unknown>;
-  const raw = result?.result ?? result?.extraction ?? result;
-  const parsedData = raw ?? { products: [] };
-  const products = Array.isArray((parsedData as any).products) ? (parsedData as any).products : Array.isArray(parsedData) ? parsedData : [];
-  const count = Array.isArray(products) ? products.length : 0;
-
+  const groups = groupRowsByProductName(rows);
+  const output: ParsedPricingSheetGrouped = { groups };
   const outPath = path.join(CONFIG.outDir, `${path.basename(CONFIG.inputFile, '.pdf')}.json`);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  fs.writeFileSync(outPath, JSON.stringify(parsedData, null, 2));
-  console.log(`Wrote ${count} product(s) to ${outPath}`);
+  fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
+  console.log(`Wrote ${rows.length} row(s) in ${groups.length} group(s) to ${outPath}`);
 }
 
 main().catch((err) => {

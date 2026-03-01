@@ -2,11 +2,11 @@
  * Resolve Elina product URLs from the (grouped) pricing sheet: process groups one by one,
  * write article_ref → url to the output file after each group so we can resume.
  *
- * Input: JSON from parse-pdf-pricing-sheet-v2 (has .groups) or legacy flat array (we group by product_name).
+ * Input: JSON from parse-pdf-pricing-sheet (has .groups) or legacy flat array (we group by product_name).
  * Output: JSON object article_ref → url. Updated after each group; use --fresh to wipe and start over.
  *
  * Usage:
- *   npm run resolve-elina-urls -- --input-file=data/parsed-pricing-sheets/elina_pilates_pricing_sheet.json --out-file=data/elina-product-urls.json
+ *   npm run resolve-elina-urls -- --input-file=data/elina/elina_pilates_pricing_sheet.json --out-file=data/elina-product-urls.json
  *   npm run resolve-elina-urls -- --fresh   # wipe output and resolve all from scratch
  *   npm run resolve-elina-urls              # pick up where we left off (read output, skip done groups)
  *   npm run resolve-elina-urls -- --headed
@@ -17,8 +17,8 @@ import * as path from 'path';
 import { resolveVendorUrlsForGroups } from '../../lib/listings/search-vendor-puppeteer';
 
 const CONFIG = {
-  inputFile: 'data/parsed-pricing-sheets/elina_pilates_pricing_sheet.json',
-  outFile: 'data/parsed-pricing-sheets/elina_pilates_products_urls.json',
+  inputFile: 'data/elina/elina_pilates_pricing_sheet.json',
+  outFile: 'data/elina/elina_pilates_products_urls.json',
   vendorBaseUrl: 'https://www.elinapilates.com',
 };
 

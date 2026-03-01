@@ -20,7 +20,7 @@ const CONFIG = {
   sheetIndex: 3,       // 0-based tab index (0 = "Tab 1 - Most Popular")
   headerRow: 3,        // 0-based row where headers live (row 4 in Excel)
   skuColumn: 'GDINA Item #',
-  outputFile: 'data/parsed-pricing-sheets/golden_designs.json',
+  outputFile: 'data/elina/golden_designs.json',
 };
 
 function main() {
