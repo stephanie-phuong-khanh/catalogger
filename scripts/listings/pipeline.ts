@@ -3,9 +3,9 @@
  * All logic lives in lib/listings/ (parse-sheet, search-vendor-shopify, generate-listing).
  *
  * Usage:
- *   npm run pipeline              # run full pipeline
+ *   npm run pipeline                           # run full pipeline
  *   npm run pipeline -- --single DYN-6103-01   # run only this SKU
- *   npm run pipeline -- --print-only            # log to console only (no file write)
+ *   npm run pipeline -- --print-only           # log to console only (no file write)
  */
 
 import fs from 'fs';
