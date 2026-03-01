@@ -25,7 +25,10 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 }
 
 const SUPPORTED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png'];
-const DEFAULT_OUT_DIR = path.join(process.cwd(), 'data', 'segmentation-tests');
+
+const CONFIG = {
+  outDir: path.join(process.cwd(), 'data', 'segmentation-tests'),
+};
 
 function parseImagePath(): string | undefined {
   const argIndex = process.argv.findIndex((arg) => arg === '--image-path' || arg.startsWith('--image-path='));
@@ -37,10 +40,12 @@ function parseImagePath(): string | undefined {
 
 function parseOutDir(): string {
   const argIndex = process.argv.findIndex((arg) => arg === '--out-dir' || arg.startsWith('--out-dir='));
-  if (argIndex === -1) return DEFAULT_OUT_DIR;
-  const arg = process.argv[argIndex];
-  if (arg.includes('=')) return arg.split('=').slice(1).join('=').trim();
-  return process.argv[argIndex + 1] ?? DEFAULT_OUT_DIR;
+  if (argIndex !== -1) {
+    const arg = process.argv[argIndex];
+    const value = arg?.includes('=') ? arg.split('=').slice(1).join('=').trim() : process.argv[argIndex + 1];
+    if (value) CONFIG.outDir = value;
+  }
+  return CONFIG.outDir;
 }
 
 async function main() {
@@ -100,12 +105,12 @@ async function main() {
     console.log(`Mask ${mask.width}x${mask.height}, values in [${min.toFixed(3)}, ${max.toFixed(3)}]`);
   }
 
-  const outDir = parseOutDir();
+  parseOutDir();
   const base = path.basename(imagePath, path.extname(imagePath));
 
   const overlayBuffer = await drawSegmentationOverlay(imageBuffer, segmentation);
-  saveProcessedImage(overlayBuffer, path.join(outDir, `[segmentation] ${base}.png`));
-  console.log('Saved polygon overlay:', path.join(outDir, `[segmentation] ${base}.png`));
+  saveProcessedImage(overlayBuffer, path.join(CONFIG.outDir, `[segmentation] ${base}.png`));
+  console.log('Saved polygon overlay:', path.join(CONFIG.outDir, `[segmentation] ${base}.png`));
 
   if (mask) {
     const maskOverlayBuffer = await drawMaskOverlay(
@@ -114,8 +119,8 @@ async function main() {
       mask.width,
       mask.height,
     );
-    saveProcessedImage(maskOverlayBuffer, path.join(outDir, `[mask] ${base}.png`));
-    console.log('Saved mask overlay:', path.join(outDir, `[mask] ${base}.png`));
+    saveProcessedImage(maskOverlayBuffer, path.join(CONFIG.outDir, `[mask] ${base}.png`));
+    console.log('Saved mask overlay:', path.join(CONFIG.outDir, `[mask] ${base}.png`));
   }
 }
 

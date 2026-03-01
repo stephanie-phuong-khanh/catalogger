@@ -25,7 +25,10 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 }
 
 const SUPPORTED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png', 'webp'];
-const DEFAULT_OUT_DIR = path.join(process.cwd(), 'data', 'image-experiments');
+
+const CONFIG = {
+  outDir: path.join(process.cwd(), 'data', 'image-experiments'),
+};
 
 function parseImagePath(): string | undefined {
   const argIndex = process.argv.findIndex((arg) => arg === '--image-path' || arg.startsWith('--image-path='));
@@ -39,10 +42,12 @@ function parseImagePath(): string | undefined {
 
 function parseOutDir(): string {
   const argIndex = process.argv.findIndex((arg) => arg === '--out-dir' || arg.startsWith('--out-dir='));
-  if (argIndex === -1) return DEFAULT_OUT_DIR;
-  const arg = process.argv[argIndex];
-  if (arg.includes('=')) return arg.split('=').slice(1).join('=').trim();
-  return process.argv[argIndex + 1] ?? DEFAULT_OUT_DIR;
+  if (argIndex !== -1) {
+    const arg = process.argv[argIndex];
+    const value = arg?.includes('=') ? arg.split('=').slice(1).join('=').trim() : process.argv[argIndex + 1];
+    if (value) CONFIG.outDir = value;
+  }
+  return CONFIG.outDir;
 }
 
 async function main() {
@@ -68,11 +73,11 @@ async function main() {
 
   const imageBuffer = fs.readFileSync(imagePath);
   const overlayOnly = process.argv.includes('--overlay-only');
-  const outDir = parseOutDir();
+  parseOutDir();
   const ext = path.extname(imagePath).toLowerCase();
   const baseName = path.basename(imagePath, ext);
   const outputFileName = ext === '.webp' ? baseName + '.jpg' : path.basename(imagePath);
-  const outPathBase = path.join(outDir, outputFileName);
+  const outPathBase = path.join(CONFIG.outDir, outputFileName);
 
   if (overlayOnly) {
     const overlayBuffer = await drawCenterCropOverlay(imageBuffer);

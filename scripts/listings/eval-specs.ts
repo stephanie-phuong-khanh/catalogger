@@ -14,8 +14,10 @@ import { z } from 'zod';
 
 dotenv.config();
 
-const LISTINGS_DIR = path.join(__dirname, '../data/listings');
-const REFERENCE_DIR = path.join(__dirname, '../data/reference_golden');
+const CONFIG = {
+  listingsDir: path.join(process.cwd(), 'data', 'listings'),
+  referenceDir: path.join(process.cwd(), 'data', 'reference_golden'),
+};
 
 // --- Programmatic: extract all numeric values from a spec table for rough comparison ---
 function extractNumericValues(specs: { rows: { values: string[] }[] }): Set<string> {
@@ -111,8 +113,8 @@ async function main() {
     process.exit(1);
   }
 
-  const listingFiles = fs.readdirSync(LISTINGS_DIR).filter(f => f.endsWith('.json') && !f.startsWith('_'));
-  const referenceFiles = fs.readdirSync(REFERENCE_DIR).filter(
+  const listingFiles = fs.readdirSync(CONFIG.listingsDir).filter(f => f.endsWith('.json') && !f.startsWith('_'));
+  const referenceFiles = fs.readdirSync(CONFIG.referenceDir).filter(
     f => f.endsWith('.json') && !['index.json', 'template.json'].includes(f),
   );
 
@@ -137,8 +139,8 @@ async function main() {
 
   for (const sku of commonSkus) {
     try {
-      const genPath = path.join(LISTINGS_DIR, `${sku}.json`);
-      const refPath = path.join(REFERENCE_DIR, `${sku}.json`);
+      const genPath = path.join(CONFIG.listingsDir, `${sku}.json`);
+      const refPath = path.join(CONFIG.referenceDir, `${sku}.json`);
       const generated = JSON.parse(fs.readFileSync(genPath, 'utf-8'));
       const reference = JSON.parse(fs.readFileSync(refPath, 'utf-8'));
 

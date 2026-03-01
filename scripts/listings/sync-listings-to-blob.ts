@@ -29,8 +29,10 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
   dotenv.config({ path: '.env.local', override: true });
 }
 
-const LISTINGS_DIR = path.join(process.cwd(), 'data', 'listings');
-const BLOB_PREFIX = 'listings';
+const CONFIG = {
+  listingsDir: path.join(process.cwd(), 'data', 'listings'),
+  blobPrefix: 'listings',
+};
 
 const token = () => process.env.CATALOGGER_LISTINGS_READ_WRITE_TOKEN!;
 
@@ -71,7 +73,7 @@ function* walkListingFiles(
     if (ent.isDirectory()) {
       yield* walkListingFiles(abs, rel);
     } else if (ent.isFile() && (ent.name.endsWith('.json') || ent.name.endsWith('.txt'))) {
-      yield { absolutePath: abs, blobPathname: `${BLOB_PREFIX}/${rel}` };
+      yield { absolutePath: abs, blobPathname: `${CONFIG.blobPrefix}/${rel}` };
     }
   }
 }
@@ -88,7 +90,7 @@ async function main() {
 
   if (fullSync) {
     console.log('Full sync: listing existing blobs under listings/...');
-    const toDelete = await listAllPathnamesUnderPrefix(BLOB_PREFIX);
+    const toDelete = await listAllPathnamesUnderPrefix(CONFIG.blobPrefix);
     if (toDelete.length > 0) {
       console.log(`  Deleting ${toDelete.length} existing blob(s)...`);
       await del(toDelete, { token: token() });
@@ -98,19 +100,19 @@ async function main() {
     }
   }
 
-  if (!fs.existsSync(LISTINGS_DIR)) {
-    console.error('Listings dir not found:', LISTINGS_DIR);
+  if (!fs.existsSync(CONFIG.listingsDir)) {
+    console.error('Listings dir not found:', CONFIG.listingsDir);
     process.exit(1);
   }
 
   let files: { absolutePath: string; blobPathname: string }[] = [
-    ...walkListingFiles(LISTINGS_DIR),
+    ...walkListingFiles(CONFIG.listingsDir),
   ];
 
   if (singlePath) {
     const normalized = singlePath.replace(/^\.\//, '').replace(/\\/g, '/');
-    const blobPathname = `${BLOB_PREFIX}/${normalized}`;
-    const absolutePath = path.join(LISTINGS_DIR, normalized);
+    const blobPathname = `${CONFIG.blobPrefix}/${normalized}`;
+    const absolutePath = path.join(CONFIG.listingsDir, normalized);
     if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) {
       console.error(`File not found: data/listings/${normalized}`);
       process.exit(1);
@@ -129,7 +131,7 @@ async function main() {
   }
 
   if (!singlePath) {
-    console.log(`Uploading ${files.length} file(s) to Vercel Blob (prefix: ${BLOB_PREFIX}/)...\n`);
+    console.log(`Uploading ${files.length} file(s) to Vercel Blob (prefix: ${CONFIG.blobPrefix}/)...\n`);
   }
 
   for (const { absolutePath, blobPathname } of files) {

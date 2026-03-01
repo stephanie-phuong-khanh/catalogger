@@ -20,7 +20,10 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 }
 
 const SUPPORTED_IMAGE_FORMATS = ['jpg', 'jpeg', 'png'];
-const DEFAULT_OUT_DIR = path.join(process.cwd(), 'data', 'segmentation-tests');
+
+const CONFIG = {
+  outDir: path.join(process.cwd(), 'data', 'segmentation-tests'),
+};
 
 function parseImagePath(): string | undefined {
   const argIndex = process.argv.findIndex((arg) => arg === '--image-path' || arg.startsWith('--image-path='));
@@ -32,10 +35,12 @@ function parseImagePath(): string | undefined {
 
 function parseOutDir(): string {
   const argIndex = process.argv.findIndex((arg) => arg === '--out-dir' || arg.startsWith('--out-dir='));
-  if (argIndex === -1) return DEFAULT_OUT_DIR;
-  const arg = process.argv[argIndex];
-  if (arg.includes('=')) return arg.split('=').slice(1).join('=').trim();
-  return process.argv[argIndex + 1] ?? DEFAULT_OUT_DIR;
+  if (argIndex !== -1) {
+    const arg = process.argv[argIndex];
+    const value = arg?.includes('=') ? arg.split('=').slice(1).join('=').trim() : process.argv[argIndex + 1];
+    if (value) CONFIG.outDir = value;
+  }
+  return CONFIG.outDir;
 }
 
 function getBoundingBox(
@@ -124,7 +129,7 @@ async function main() {
     process.exit(1);
   }
 
-  const outDir = parseOutDir();
+  parseOutDir();
   const base = path.basename(imagePath, path.extname(imagePath));
 
   if (!SUPPORTED_IMAGE_FORMATS.includes(path.extname(imagePath).slice(1).toLowerCase())) {
@@ -180,7 +185,7 @@ async function main() {
     segBboxExt === '.jpg' || segBboxExt === '.jpeg'
       ? await segBboxPipeline.jpeg({ quality: 90 }).toBuffer()
       : await segBboxPipeline.png().toBuffer();
-  const segBboxOutPath = path.join(outDir, `[seg-bbox] ${base}${path.extname(imagePath).toLowerCase()}`);
+  const segBboxOutPath = path.join(CONFIG.outDir, `[seg-bbox] ${base}${path.extname(imagePath).toLowerCase()}`);
   saveProcessedImage(
     segBboxBuffer,
     segBboxOutPath,
@@ -214,7 +219,7 @@ async function main() {
     [cropOverlayBuffer],
     path.extname(imagePath).toLowerCase(),
   );
-  const segBboxCropOutPath = path.join(outDir, `[seg-bbox-crop] ${base}${path.extname(imagePath).toLowerCase()}`);
+  const segBboxCropOutPath = path.join(CONFIG.outDir, `[seg-bbox-crop] ${base}${path.extname(imagePath).toLowerCase()}`);
   saveProcessedImage(segBboxCropBuffer, segBboxCropOutPath);
   console.log('Saved image with segmentation, bbox, and proposed crop:', segBboxCropOutPath);
 
@@ -230,7 +235,7 @@ async function main() {
     ext === '.jpg' || ext === '.jpeg'
       ? await croppedPipeline.jpeg({ quality: 90 }).toBuffer()
       : await croppedPipeline.png().toBuffer();
-  const segBboxCroppedOutPath = path.join(outDir, `[seg-bbox-cropped] ${base}${path.extname(imagePath).toLowerCase()}`);
+  const segBboxCroppedOutPath = path.join(CONFIG.outDir, `[seg-bbox-cropped] ${base}${path.extname(imagePath).toLowerCase()}`);
   saveProcessedImage(croppedBuffer, segBboxCroppedOutPath);
   console.log('Saved cropped image:', segBboxCroppedOutPath);
 }
