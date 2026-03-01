@@ -7,18 +7,22 @@
  * 5. Finally, here we generate the listings from data saved from the previous steps.
  *
  * Input: data/elina/elina_pilates_products_site.json.
- * Output: data/listings/elina_pilates/{PRODUCT_GROUP_FOLDER}/{SKU}.json.
+ * Output: data/listings/elina_pilates/{ProductGroupSlug}.json (one file per product group; each file has variants[] for each SKU).
  *
  * Usage:
  *   npm run generate-listings-elina
- *   npm run generate-listings-elina -- --single 100002   # generate only for this SKU (article_ref)
+ *   npm run generate-listings-elina -- --single 100002   # generate only the product group that contains this SKU
  *   npm run generate-listings-elina -- --print-only     # print the listings to the console, no file write
  */
 
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import type { ElinaGeneratedListing } from '../../types/listings/elina-listing';
+import type {
+  ElinaGeneratedListing,
+  ElinaVariant,
+  ElinaListingSource,
+} from '../../types/listings/elina-listing';
 
 dotenv.config();
 
@@ -27,12 +31,13 @@ const CONFIG = {
   outputDir: 'data/listings/elina_pilates',
 };
 
-/** Normalize product group name for use as a folder name: trim, replace / with -, collapse spaces. */
-function productGroupToFolder(productName: string): string {
+/** Normalize product group name for use as a filename slug: trim, replace / with -, collapse spaces to single dash. */
+function productGroupToSlug(productName: string): string {
   return productName
     .replace(/\//g, '-')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    .replace(/\s+/g, '-');
 }
 
 function parseArgs(): { singleSku: string | null; printOnly: boolean } {
@@ -44,15 +49,36 @@ function parseArgs(): { singleSku: string | null; printOnly: boolean } {
   return { singleSku, printOnly };
 }
 
-/** Build a placeholder listing for one item (Part A: skeleton; content filled in later steps). */
-function buildPlaceholderListing(
-  articleRef: string,
+/** Build a placeholder listing for one product group (Part A: skeleton; content filled in later steps). */
+function buildPlaceholderListingForGroup(
   productName: string,
-  color: string | null,
-  vendorPageUrl: string | null,
+  items: Array<{
+    article_ref: string;
+    description_raw?: string;
+    price_usd?: number;
+    barcode?: string;
+    color?: string | null;
+    url?: string | null;
+  }>,
 ): ElinaGeneratedListing {
+  const variants: ElinaVariant[] = items.map((item) => {
+    const source: ElinaListingSource = {
+      articleRef: String(item.article_ref),
+      description: item.description_raw ?? '',
+      priceUsd: typeof item.price_usd === 'number' ? item.price_usd : 0,
+      barcode: item.barcode != null ? String(item.barcode) : '',
+      color: item.color != null ? String(item.color).trim() || null : null,
+    };
+    return {
+      sku: String(item.article_ref),
+      vendorPageUrl: item.url != null ? String(item.url).trim() || null : null,
+      googleDriveUrls: [],
+      _source: source,
+    };
+  });
+
   return {
-    sku: articleRef,
+    productName,
     title: '',
     overviewParagraph: '',
     features: [],
@@ -62,12 +88,8 @@ function buildPlaceholderListing(
       columns: [],
       rows: [],
     },
-    vendorPageUrl: vendorPageUrl ?? null,
-    _source: {
-      product_name: productName,
-      article_ref: articleRef,
-      color: color ?? undefined,
-    },
+    youtubeUrls: [],
+    variants,
   };
 }
 
@@ -93,40 +115,28 @@ async function main() {
   let count = 0;
   for (const group of groups) {
     const productName = group.product_name ?? 'Unknown';
-    const folderName = productGroupToFolder(productName);
     const items = group.items ?? [];
 
-    for (const item of items) {
-      const articleRef = item.article_ref;
-      if (!articleRef) continue;
-
-      if (singleSku != null && String(articleRef) !== singleSku) continue;
-
-      const color = item.color != null ? String(item.color).trim() || null : null;
-      const url = item.url != null ? String(item.url).trim() || null : null;
-
-      const listing = buildPlaceholderListing(
-        String(articleRef),
-        productName,
-        color,
-        url,
+    if (singleSku != null) {
+      const hasSku = items.some(
+        (item: { article_ref?: string }) => String(item.article_ref) === singleSku,
       );
-
-      if (printOnly) {
-        console.log(JSON.stringify(listing, null, 2));
-        count += 1;
-        continue;
-      }
-
-      const groupDir = path.join(outputDir, folderName);
-      if (!fs.existsSync(groupDir)) {
-        fs.mkdirSync(groupDir, { recursive: true });
-      }
-      const outPath = path.join(groupDir, `${articleRef}.json`);
-      fs.writeFileSync(outPath, JSON.stringify(listing, null, 2), 'utf-8');
-      console.log(`  → ${path.relative(process.cwd(), outPath)}`);
-      count += 1;
+      if (!hasSku) continue;
     }
+
+    const listing = buildPlaceholderListingForGroup(productName, items);
+
+    if (printOnly) {
+      console.log(JSON.stringify(listing, null, 2));
+      count += 1;
+      continue;
+    }
+
+    const slug = productGroupToSlug(productName);
+    const outPath = path.join(outputDir, `${slug}.json`);
+    fs.writeFileSync(outPath, JSON.stringify(listing, null, 2), 'utf-8');
+    console.log(`  → ${path.relative(process.cwd(), outPath)} (${items.length} variant(s))`);
+    count += 1;
   }
 
   console.log(`\nDone. ${count} listing(s) ${printOnly ? 'printed' : 'written'}.`);
