@@ -10,6 +10,9 @@
  *   Output is written to --output-dir (default: data/elina/processed). Use that to create the per-SKU folder and run the (placeholder) edit+write step after confirm.
  *   Add --yes to skip the "Does this look correct? (y/n)" prompt and proceed as if yes.
  *
+ * Without --sku: batch mode. Finds all SKUs in the input file that are not yet in the output file,
+ * then processes each one in order (tree-walk, confirm, edit+write, vendor strip). One continuous run.
+ *
  * Writes vendor_site_photos.jpg (stacked vendor site images) to the per-SKU output folder.
  */
 
@@ -20,7 +23,7 @@ import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import sharp from 'sharp';
 import { processImage, saveProcessedImage } from '../../lib/images/edit-image';
-import { createVisionClient } from '../../lib/images/vision-client';
+import { createVisionClient, type ImageVisionClient } from '../../lib/images/vision-client';
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
@@ -41,8 +44,8 @@ type Group = { product_name?: string; items: Item[]; site?: Site };
 type SiteInput = { groups: Group[] };
 
 export type SkuImageMapping = {
-  input_folder_path: string;
-  output_folder_path?: string;
+  input_folder_path: string | null;
+  output_folder_path?: string | null;
 };
 
 export type SkuToImagesOutput = {
@@ -71,47 +74,33 @@ function askLine(question: string): Promise<string> {
   });
 }
 
-/** Reject = halt. Accept = proceed. Amend = prompt for new folder path, then proceed with it. */
-async function askConfirmWithAmend(options: {
-  productName: string;
-  productColor: string | null;
-  vendorUrl: string | null;
-  folderPath: string;
-  outputDirPathRelative: string | null;
-}): Promise<{ action: 'reject' | 'accept'; folderPath: string }> {
-  const { productName, productColor, vendorUrl, folderPath, outputDirPathRelative } = options;
-  console.log('\n' + '─'.repeat(60));
-  console.log('  Product:  ' + productName);
-  console.log('  Color:    ' + (productColor ?? '(none)'));
-  if (vendorUrl) {
-    console.log('  Vendor:   ' + vendorUrl);
-  } else {
-    console.log('  Vendor:   (no URL in data)');
-  }
-  console.log('');
-  console.log('  Mapped Folder:  ' + folderPath);
-  console.log('');
-  if (outputDirPathRelative) console.log('  Will write output to:  ' + outputDirPathRelative);
-  console.log('─'.repeat(60));
+/** Single confirmation step: show label + value, then Accept / Reject / Amend. Returns action and (possibly amended) value. */
+async function askConfirmStep(options: {
+  label: string;
+  value: string;
+  amendPrompt: string;
+}): Promise<{ action: 'reject' | 'accept'; value: string }> {
+  const { label, value, amendPrompt } = options;
+  console.log('\n  ' + label + ':  ' + value);
 
   for (;;) {
-    const raw = await askLine('Accept (y), Reject (n), Amend path (a)? [y] ');
+    const raw = await askLine('  Accept (y), Reject (n), Amend (a)? [y] ');
     const choice = raw.toLowerCase().trim();
     if (choice === '' || choice === 'y' || choice === 'yes' || choice === 'accept') {
-      return { action: 'accept', folderPath };
+      return { action: 'accept', value };
     }
     if (choice === 'r' || choice === 'reject' || choice === 'n' || choice === 'no') {
-      return { action: 'reject', folderPath };
+      return { action: 'reject', value };
     }
     if (choice === 'a' || choice === 'amend') {
-      const newPath = await askLine('Enter folder path: ');
-      if (newPath) {
-        console.log('Using amended path:', newPath);
-        return { action: 'accept', folderPath: newPath };
+      const newValue = await askLine(amendPrompt);
+      if (newValue) {
+        console.log('  Using amended value:', newValue);
+        return { action: 'accept', value: newValue };
       }
-      console.log('Empty path ignored. Accept (y), Reject (n), Amend path (a).');
+      console.log('  Empty value ignored. Accept (y), Reject (n), Amend (a).');
     } else {
-      console.log('Accept (y), Reject (n), Amend path (a).');
+      console.log('  Accept (y), Reject (n), Amend (a).');
     }
   }
 }
@@ -134,6 +123,7 @@ function outputExtForInput(relativePath: string): string {
  * Process folder images (crop/resize via lib/images) and write to output dir as SKU (N).ext.
  * When productColor is set and filenames are not numeric, filters to images matching that color.
  * On process error, saves original as SKU (N) [ORIG].ext.
+ * Pass visionClient to reuse (e.g. in batch mode); otherwise creates one per call.
  */
 async function runEditAndWrite(
   skuKey: string,
@@ -141,8 +131,9 @@ async function runEditAndWrite(
   imageRoot: string,
   skuOutputDirFull: string,
   productColor: string | null,
+  visionClient?: ImageVisionClient,
 ): Promise<void> {
-  const allPaths = listImageFilesUnder(imageRoot, folderPath);
+  const allPaths = listImageFilesInFolderOnly(imageRoot, folderPath);
   const { paths: imagePaths, message: filterMessage } = filterImagesByColor(allPaths, productColor);
   if (filterMessage) console.log('[map-sku] ' + filterMessage);
   if (imagePaths.length === 0) {
@@ -152,7 +143,7 @@ async function runEditAndWrite(
 
   if (!fs.existsSync(skuOutputDirFull)) fs.mkdirSync(skuOutputDirFull, { recursive: true });
 
-  const visionClient = createVisionClient();
+  const client = visionClient ?? createVisionClient();
   let processed = 0;
   let savedOriginal = 0;
 
@@ -168,7 +159,7 @@ async function runEditAndWrite(
 
     const buffer = fs.readFileSync(srcFull);
     try {
-      const processedBuffer = await processImage(buffer, 1500, 1500, visionClient);
+      const processedBuffer = await processImage(buffer, 1500, 1500, client);
       saveProcessedImage(processedBuffer, outPath);
       processed += 1;
     } catch (err) {
@@ -228,6 +219,8 @@ async function buildVendorStrip(vendorImageUrls: string[], skuOutputDirFull: str
     return;
   }
 
+  if (!fs.existsSync(skuOutputDirFull)) fs.mkdirSync(skuOutputDirFull, { recursive: true });
+
   const totalHeight =
     resized.reduce((sum, r) => sum + r.height, 0) + VENDOR_STRIP_GAP_PX * (resized.length - 1);
   const stripWidth = Math.max(...resized.map((r) => r.width), VENDOR_STRIP_WIDTH);
@@ -275,7 +268,15 @@ function resolveSku(input: SiteInput, skuArg: string): {
         const raw = (item as unknown as { color?: string; url?: string }).color;
         const url = (item as unknown as { url?: string }).url;
         const color = typeof raw === 'string' ? raw.trim() : null;
-        const imageUrls = Array.isArray(group.site?.image_urls) ? group.site.image_urls : [];
+        const itemImages = (item as unknown as { image_urls?: string[] }).image_urls;
+        const imageUrls = Array.isArray(itemImages)
+          ? itemImages
+          : Array.isArray(group.site?.image_urls)
+            ? group.site.image_urls
+            : [];
+        if (imageUrls.length > 0 && !Array.isArray(itemImages) && (group.items?.length ?? 0) > 1) {
+          console.warn(`[map-sku] SKU ${item.article_ref}: using group-level images (no per-item image_urls). Re-run scraper for variant-specific images.`);
+        }
         return {
           skuKey: item.article_ref,
           productName: group.site?.product_name ?? group.product_name ?? item.article_ref,
@@ -287,6 +288,48 @@ function resolveSku(input: SiteInput, skuArg: string): {
     }
   }
   throw new Error(`SKU not found: ${skuArg}. Use article_ref (e.g. 100006).`);
+}
+
+/** All SKUs from the input file (order: as they appear in groups/items). */
+function getAllSkusFromInput(input: SiteInput): string[] {
+  const skus: string[] = [];
+  for (const group of input.groups ?? []) {
+    for (const item of group.items ?? []) {
+      if (item.article_ref) skus.push(item.article_ref);
+    }
+  }
+  return skus;
+}
+
+/** Write a single SKU entry to the output file (merge with existing). */
+function writeSkuMapping(outPath: string, skuKey: string, mapping: SkuImageMapping): void {
+  const outDir = path.dirname(outPath);
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  let existing: SkuToImagesOutput = { skus: {} };
+  if (fs.existsSync(outPath)) {
+    try {
+      existing = JSON.parse(fs.readFileSync(outPath, 'utf-8')) as SkuToImagesOutput;
+      if (!existing.skus) existing.skus = {};
+    } catch {
+      // start fresh
+    }
+  }
+  existing.skus[skuKey] = mapping;
+  fs.writeFileSync(outPath, JSON.stringify(existing, null, 2), 'utf-8');
+}
+
+/** SKUs that appear in input but are not yet in the output file. */
+function getUnmappedSkus(inputSkus: string[], outPath: string): string[] {
+  const mapped = new Set<string>();
+  if (fs.existsSync(outPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(outPath, 'utf-8')) as SkuToImagesOutput;
+      if (data.skus) Object.keys(data.skus).forEach((k) => mapped.add(k));
+    } catch {
+      // no existing mapping
+    }
+  }
+  return inputSkus.filter((sku) => !mapped.has(sku));
 }
 
 interface DirNode {
@@ -317,6 +360,7 @@ function buildFolderTree(imageRoot: string, relativeDir = ''): DirNode[] {
   return childTrees;
 }
 
+/** Lists image files under folderPath, recursively including all subfolders. Used for "has images here?" in tree-walk. */
 function listImageFilesUnder(imageRoot: string, folderPath: string): string[] {
   const full = path.join(imageRoot, folderPath);
   const out: string[] = [];
@@ -331,6 +375,20 @@ function listImageFilesUnder(imageRoot: string, folderPath: string): string[] {
     }
   }
   walk(full);
+  return out.sort();
+}
+
+/** Lists image files only in the given folder (no subfolders). Use this when processing so we don't pull from child dirs. */
+function listImageFilesInFolderOnly(imageRoot: string, folderPath: string): string[] {
+  const full = path.join(imageRoot, folderPath);
+  if (!fs.existsSync(full)) return [];
+  const entries = fs.readdirSync(full, { withFileTypes: true });
+  const out = entries
+    .filter((e) => e.isFile() && CONFIG.imageExtensions.has(path.extname(e.name).toLowerCase()))
+    .map((e) => {
+      const rel = path.relative(imageRoot, path.join(full, e.name));
+      return rel.replace(/\\/g, '/');
+    });
   return out.sort();
 }
 
@@ -352,43 +410,12 @@ function isNumericBasename(relativePath: string): boolean {
   return /^\d+$/.test(base.trim());
 }
 
-/**
- * When folder has mixed colors, filter to images whose filename suggests this product's color.
- * If filenames look numeric (e.g. 1.jpg) or no files match, return all and log so user can curate.
- */
+/** No color filtering: include all images in the folder. */
 function filterImagesByColor(
   imagePaths: string[],
-  productColor: string | null,
+  _productColor: string | null,
 ): { paths: string[]; message: string } {
-  if (!productColor || imagePaths.length === 0) {
-    return { paths: imagePaths, message: '' };
-  }
-  const tokens = COLOR_FILENAME_TOKENS[productColor.toUpperCase().trim()];
-  if (!tokens || tokens.length === 0) {
-    return { paths: imagePaths, message: `No filename tokens for color "${productColor}"; processing all ${imagePaths.length} images.` };
-  }
-  const numericCount = imagePaths.filter((p) => isNumericBasename(p)).length;
-  if (numericCount >= imagePaths.length / 2) {
-    return {
-      paths: imagePaths,
-      message: `Filenames look numeric; not filtering by color. Processing all ${imagePaths.length} images.`,
-    };
-  }
-  const lower = tokens.map((t) => t.toLowerCase());
-  const filtered = imagePaths.filter((rel) => {
-    const name = path.basename(rel, path.extname(rel)).toLowerCase();
-    return lower.some((t) => name.includes(t));
-  });
-  if (filtered.length === 0) {
-    return {
-      paths: imagePaths,
-      message: `No files matched color (${productColor}); processing all ${imagePaths.length} images. Check if folder has multiple colors.`,
-    };
-  }
-  return {
-    paths: filtered,
-    message: `Filtered to ${filtered.length} images by color (${productColor}).`,
-  };
+  return { paths: imagePaths, message: '' };
 }
 
 function folderHasImages(imageRoot: string, folderPath: string): boolean {
@@ -408,6 +435,8 @@ function treeWalkPrompt(
   const colorLine = productColor
     ? `Product color: ${productColor} — when child folder names include a color (e.g. gris, negro, grey, black), choose the folder that matches this product's color.\n\n`
     : '';
+  const variantLine =
+    `Match the FULL product name to a folder. Variant words matter: e.g. PHYSIO → folder with "Fisio" or "Physio"; ELITE → "Elite". Do NOT pick a folder that drops the variant.\n\n`;
   const instruction = atRoot
     ? 'You are at the ROOT. Do NOT reply CURRENT. Reply with the exact name of ONE child folder from the list above to descend into.'
     : canChooseCurrent
@@ -417,7 +446,7 @@ function treeWalkPrompt(
 
 Product name: ${productName}
 SKU: ${skuKey}
-${colorLine}Current folder path: ${currentPath || '(root)'}
+${variantLine}${colorLine}Current folder path: ${currentPath || '(root)'}
 Direct child folder names: ${childNames.length ? childNames.join(', ') : '(none)'}
 ${currentHasImages ? 'This folder (or its descendants) has image files.' : 'No images here.'}
 
@@ -499,6 +528,92 @@ async function treeWalkToFolder(
   }
 }
 
+/** Process a single SKU: tree-walk, confirm, write mapping, edit+write, vendor strip. Returns 'rejected' | 'done'. */
+async function processOneSku(
+  skuArg: string,
+  input: SiteInput,
+  outPath: string,
+  imageRoot: string,
+  outputDirResolved: string,
+  skipConfirm: boolean,
+  openai: OpenAI,
+  picker: TreeWalkPicker,
+  visionClient?: ImageVisionClient,
+): Promise<'rejected' | 'done'> {
+  const { skuKey, productName, productColor, vendorUrl, vendorSiteImages } = resolveSku(input, skuArg);
+  console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}`);
+
+  console.log('[map-sku] Tree-walk to select folder...');
+  let folderPath = await treeWalkToFolder(imageRoot, productName, skuKey, productColor, picker);
+  console.log('[map-sku] Selected folder:', folderPath);
+
+  let outputDirPathRelative: string | null = null;
+  let skuOutputDirFull = '';
+
+  if (!skipConfirm) {
+    console.log('\n' + '─'.repeat(60));
+    console.log('  Product:  ' + productName);
+    console.log('  Color:    ' + (productColor ?? '(none)'));
+    if (vendorUrl) {
+      console.log('  Vendor:   ' + vendorUrl);
+    } else {
+      console.log('  Vendor:   (no URL in data)');
+    }
+    console.log('─'.repeat(60));
+
+    const step1 = await askConfirmStep({
+      label: '1. Mapped folder (input)',
+      value: folderPath,
+      amendPrompt: '  Enter mapped folder path: ',
+    });
+    if (step1.action === 'reject') {
+      writeSkuMapping(outPath, skuKey, { input_folder_path: null, output_folder_path: null });
+      console.log('[map-sku] Rejected. Wrote null mapping for this SKU to', outPath);
+      return 'rejected';
+    }
+    folderPath = step1.value;
+
+    if (outputDirResolved) {
+      const defaultOutputRelative = path.join(parentOfFolderPath(folderPath), skuKey).replace(/\\/g, '/');
+      const step2 = await askConfirmStep({
+        label: '2. Will write output to',
+        value: defaultOutputRelative,
+        amendPrompt: '  Enter output path (relative to output-dir): ',
+      });
+      if (step2.action === 'reject') {
+        writeSkuMapping(outPath, skuKey, { input_folder_path: null, output_folder_path: null });
+        console.log('[map-sku] Rejected. Wrote null mapping for this SKU to', outPath);
+        return 'rejected';
+      }
+      outputDirPathRelative = step2.value.replace(/\\/g, '/');
+      skuOutputDirFull = path.join(outputDirResolved, outputDirPathRelative);
+    }
+  } else {
+    const parentSegments = parentOfFolderPath(folderPath);
+    outputDirPathRelative = outputDirResolved
+      ? path.join(parentSegments, skuKey).replace(/\\/g, '/')
+      : null;
+    skuOutputDirFull = outputDirResolved
+      ? path.join(outputDirResolved, parentSegments, skuKey)
+      : '';
+  }
+
+  const mapping: SkuImageMapping = {
+    input_folder_path: folderPath,
+    ...(outputDirPathRelative ? { output_folder_path: outputDirPathRelative } : {}),
+  };
+  writeSkuMapping(outPath, skuKey, mapping);
+  console.log('[map-sku] Wrote', outPath);
+
+  if (outputDirResolved && skuOutputDirFull) {
+    await buildVendorStrip(vendorSiteImages, skuOutputDirFull);
+    await runEditAndWrite(skuKey, folderPath, imageRoot, skuOutputDirFull, productColor, visionClient);
+  } else {
+    console.log('[map-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
+  }
+  return 'done';
+}
+
 async function main() {
   const inputFile = parseArg('input-file', CONFIG.inputFile);
   const outFile = parseArg('out-file', CONFIG.outFile);
@@ -507,12 +622,6 @@ async function main() {
   const skuArg = parseArg('sku', '');
   const skipConfirm = parseFlag('yes');
 
-  if (!skuArg) {
-    console.error(
-      'Usage: npx ts-node scripts/listings/map-sku-to-images.ts --sku <article_ref> --image-root <path> [--input-file=...] [--out-file=...] [--output-dir=...] [--yes]',
-    );
-    process.exit(1);
-  }
   if (!imageRoot || !fs.existsSync(imageRoot)) {
     console.error('--image-root must be an existing directory.');
     process.exit(1);
@@ -531,76 +640,58 @@ async function main() {
   }
 
   const input: SiteInput = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
-  const { skuKey, productName, productColor, vendorUrl, vendorSiteImages } = resolveSku(input, skuArg);
-  console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}`);
-
-  const openai = new OpenAI({ apiKey: openaiKey });
-  const picker: TreeWalkPicker = (name, sku, color, curr, children, hasImg) =>
-    pickChildOrCurrentOpenAI(openai, name, sku, color, curr, children, hasImg);
-
-  console.log('[map-sku] Tree-walk to select folder...');
-  let folderPath = await treeWalkToFolder(imageRoot, productName, skuKey, productColor, picker);
-  console.log('[map-sku] Selected folder:', folderPath);
-
   const outPath = path.isAbsolute(outFile) ? outFile : path.join(process.cwd(), outFile);
   const outputDirResolved = outputDirArg
     ? path.isAbsolute(outputDirArg)
       ? outputDirArg
       : path.join(process.cwd(), outputDirArg)
     : '';
-  const parentSegments = parentOfFolderPath(folderPath);
-  const skuOutputDirFull = outputDirResolved
-    ? path.join(outputDirResolved, parentSegments, skuKey)
-    : '';
-  const outputDirPathRelative = outputDirResolved
-    ? path.relative(outputDirResolved, skuOutputDirFull)
-    : null;
 
-  let result: { action: 'reject' | 'accept'; folderPath: string };
-  if (skipConfirm) {
-    result = { action: 'accept', folderPath };
-  } else {
-    result = await askConfirmWithAmend({
-      productName,
-      productColor,
-      vendorUrl,
-      folderPath,
-      outputDirPathRelative,
-    });
+  const openai = new OpenAI({ apiKey: openaiKey });
+  const picker: TreeWalkPicker = (name, sku, color, curr, children, hasImg) =>
+    pickChildOrCurrentOpenAI(openai, name, sku, color, curr, children, hasImg);
+
+  if (skuArg) {
+    await processOneSku(skuArg, input, outPath, imageRoot, outputDirResolved, skipConfirm, openai, picker);
+    return;
   }
 
-  if (result.action === 'reject') {
-    console.log('[map-sku] Rejected. No files written.');
-    process.exit(0);
+  const allSkus = getAllSkusFromInput(input);
+  const unmapped = getUnmappedSkus(allSkus, outPath);
+  if (unmapped.length === 0) {
+    console.log('[map-sku] All SKUs already mapped. Nothing to do.');
+    return;
   }
-  folderPath = result.folderPath;
 
-  const mapping: SkuImageMapping = {
-    input_folder_path: folderPath,
-    ...(outputDirPathRelative ? { output_folder_path: outputDirPathRelative } : {}),
-  };
-  const outDir = path.dirname(outPath);
-  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  console.log(`[map-sku] Batch mode: ${unmapped.length} SKU(s) not yet mapped. Processing in order.\n`);
+  const visionClient = createVisionClient();
+  let done = 0;
+  let rejected = 0;
 
-  let existing: SkuToImagesOutput = { skus: {} };
-  if (fs.existsSync(outPath)) {
-    try {
-      existing = JSON.parse(fs.readFileSync(outPath, 'utf-8')) as SkuToImagesOutput;
-      if (!existing.skus) existing.skus = {};
-    } catch {
-      // start fresh
-    }
+  for (let i = 0; i < unmapped.length; i++) {
+    const sku = unmapped[i];
+    const n = i + 1;
+    const total = unmapped.length;
+    console.log('\n' + '═'.repeat(60));
+    console.log(`  SKU ${sku}  (${n}/${total})`);
+    console.log('═'.repeat(60));
+    const outcome = await processOneSku(
+      sku,
+      input,
+      outPath,
+      imageRoot,
+      outputDirResolved,
+      skipConfirm,
+      openai,
+      picker,
+      visionClient,
+    );
+    if (outcome === 'done') done += 1;
+    else rejected += 1;
   }
-  existing.skus[skuKey] = mapping;
-  fs.writeFileSync(outPath, JSON.stringify(existing, null, 2), 'utf-8');
-  console.log('[map-sku] Wrote', outPath);
 
-  if (outputDirResolved && skuOutputDirFull) {
-    await runEditAndWrite(skuKey, folderPath, imageRoot, skuOutputDirFull, productColor);
-    await buildVendorStrip(vendorSiteImages, skuOutputDirFull);
-  } else {
-    console.log('[map-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
-  }
+  console.log('\n' + '═'.repeat(60));
+  console.log(`[map-sku] Done. Processed ${done} SKU(s), skipped (rejected) ${rejected}.`);
 }
 
 main().catch((e) => {

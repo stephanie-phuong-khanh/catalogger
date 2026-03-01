@@ -203,64 +203,70 @@ async function main() {
       continue;
     }
 
-    const firstUrl = urlsWithValue[0];
-    console.log(`[scrape] Group ${index + 1}: ${productName} — scraping ${firstUrl}`);
+    // Unique URLs in order (so we scrape first variant, then second, etc.)
+    const uniqueUrls: string[] = [];
+    for (const u of urlsWithValue) {
+      if (!uniqueUrls.includes(u)) uniqueUrls.push(u);
+    }
 
-    let siteData: ScrapedProductData;
-    try {
-      await page.goto(firstUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    const scrapedByUrl: Record<string, ScrapedProductData> = {};
+
+    const loadAndScrape = async (url: string): Promise<ScrapedProductData> => {
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
       await dismissCookiePopup(page);
       await new Promise((r) => setTimeout(r, 1500));
-      siteData = await scrapeElinaProductPage(page);
-    } catch (e) {
-      console.error(`[scrape] Failed to load or scrape ${firstUrl}:`, e);
-      await browser.close();
-      process.exit(1);
-    }
+      return scrapeElinaProductPage(page);
+    };
 
-    if (!siteData.image_urls || siteData.image_urls.length === 0) {
-      await browser.close();
-      haltNoImages(productName, firstUrl);
-    }
-
-    if (urlsWithValue.length > 1) {
-      const secondUrl = urlsWithValue[1];
-      console.log(`[scrape] Group ${index + 1}: checking variant consistency with ${secondUrl}`);
-      let secondData: ScrapedProductData;
-      const loadAndScrapeSecond = async () => {
-        await page.goto(secondUrl, { waitUntil: 'load', timeout: 25000 });
-        await dismissCookiePopup(page);
-        await new Promise((r) => setTimeout(r, 1500));
-        return scrapeElinaProductPage(page);
-      };
+    for (let i = 0; i < uniqueUrls.length; i++) {
+      const url = uniqueUrls[i];
+      const label = uniqueUrls.length > 1 ? ` variant ${i + 1}/${uniqueUrls.length}` : '';
+      console.log(`[scrape] Group ${index + 1}: ${productName} — scraping${label} ${url}`);
+      let data: ScrapedProductData;
       try {
-        secondData = await loadAndScrapeSecond();
+        data = await loadAndScrape(url);
       } catch (e) {
-        const isDetached = String((e as Error).message).includes('detached');
+        const isDetached = String((e as Error).message).includes('detached') && i > 0;
         if (isDetached) {
-          console.log(`[scrape] Detached frame on second URL, retrying once...`);
+          console.log(`[scrape] Detached frame, retrying once...`);
           try {
-            secondData = await loadAndScrapeSecond();
+            data = await loadAndScrape(url);
           } catch (e2) {
-            console.error(`[scrape] Failed on retry: ${secondUrl}:`, e2);
+            console.error(`[scrape] Failed on retry: ${url}:`, e2);
             await browser.close();
             process.exit(1);
           }
         } else {
-          console.error(`[scrape] Failed to load or scrape second URL ${secondUrl}:`, e);
+          console.error(`[scrape] Failed to load or scrape ${url}:`, e);
           await browser.close();
           process.exit(1);
         }
       }
-      const norm1 = normalizeSharedContent(siteData);
-      const norm2 = normalizeSharedContent(secondData);
-      if (norm1 !== norm2) {
-        haltVariantMismatch(productName, firstUrl, secondUrl, norm1, norm2);
+      if (!data.image_urls || data.image_urls.length === 0) {
+        await browser.close();
+        haltNoImages(productName, url);
       }
-      console.log(`[scrape] Variant content match OK.`);
+      scrapedByUrl[url] = data;
+      // Variant consistency: compare shared content between first and second URL only
+      if (i === 1) {
+        const norm1 = normalizeSharedContent(scrapedByUrl[uniqueUrls[0]]);
+        const norm2 = normalizeSharedContent(data);
+        if (norm1 !== norm2) {
+          haltVariantMismatch(productName, uniqueUrls[0], url, norm1, norm2);
+        }
+        console.log(`[scrape] Variant content match OK.`);
+      }
     }
 
-    output.groups[index] = { ...input.groups[index], items: [...input.groups[index].items], site: siteData };
+    const firstUrl = uniqueUrls[0];
+    const siteData = scrapedByUrl[firstUrl];
+    const itemsWithImages = input.groups[index].items.map((item) => {
+      const url = typeof item.url === 'string' && item.url.trim() ? item.url.trim() : null;
+      const image_urls = url ? (scrapedByUrl[url]?.image_urls ?? []) : undefined;
+      return { ...item, ...(image_urls !== undefined ? { image_urls } : {}) };
+    });
+
+    output.groups[index] = { ...input.groups[index], items: itemsWithImages, site: siteData };
     fs.writeFileSync(outPath, JSON.stringify(output, null, 2), 'utf-8');
     console.log(`[scrape] Wrote ${outPath}.\n`);
   }
