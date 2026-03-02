@@ -25,6 +25,7 @@ import type {
   ElinaListing,
   ElinaListingFull,
   ElinaListingStub,
+  ElinaSpecifications,
   ElinaVariant,
   ElinaListingSource,
 } from '../../types/listings/elina-listing';
@@ -42,6 +43,14 @@ const WarrantyBulletOutput = z.object({
 });
 const OverviewParagraphOutput = z.object({
   overviewParagraph: z.string().describe('The generated overview paragraph for the product listing'),
+});
+const SpecsTableOutput = z.object({
+  rows: z.array(
+    z.object({
+      label: z.string().describe('Left column: specification name (e.g. Reformer Length)'),
+      value: z.string().describe('Right column: measurement value, imperial only when both given'),
+    }),
+  ),
 });
 const CONFIG = {
   inputFile: 'data/elina/elina_pilates_products_site.json',
@@ -282,6 +291,15 @@ function getWarrantySectionBody(
   return section.body.trim();
 }
 
+/** Return the body of the DIMENSIONS section if present; otherwise null. */
+function getDimensionsSectionBody(
+  sections: Array<{ name: string; body: string }>,
+): string | null {
+  const section = sections.find((s) => s.name.toUpperCase() === 'DIMENSIONS');
+  if (!section?.body?.trim()) return null;
+  return section.body.trim();
+}
+
 function getTextUnderImages(site: unknown): string {
   if (!site || typeof site !== 'object') return '';
   const s = (site as { text_under_images?: unknown }).text_under_images;
@@ -385,6 +403,50 @@ ${warrantyBody}`;
   });
   const bullet = response.output_parsed?.bullet?.trim();
   return bullet ?? '';
+}
+
+/**
+ * Generate a two-column specs table (key, value) from the DIMENSIONS section.
+ * Keeps imperial only when both in/cm or lb/kg are given; excludes EAN/Reference.
+ */
+async function generateSpecsTableElina(
+  openai: OpenAI,
+  dimensionsBody: string,
+  productTitle: string,
+): Promise<ElinaSpecifications> {
+  const prompt = `You are creating a two-column specifications table for a product listing. The table has a title, and each row has a key (left column) and a value (right column).
+
+DIMENSIONS SECTION (from vendor):
+${dimensionsBody}
+
+RULES:
+- Output a two-column table: left column = specification name (key), right column = measurement value only.
+- When a line gives both imperial and metric, keep ONLY imperial for lengths (inches, feet) and exclude metric. For weights, keep both imperial and metric (lb, kg)
+- Separate imperial and metric values with a slash (/) instead of a pipe (|). e.g. "187.40 lb / 85 kg".
+- Include only actual measurements (length, width, height, weight, capacity, box dimensions). Exclude reference codes, EAN, barcodes.
+- Labels: Use clear names exactly as given in the source.
+- Values: Use the inch symbol (") for inch dimensions so values are compact (e.g. "94.88"" for length; "20.50\" x 10.75\" x 15.00\"" for three-part box dimensions). Use "lb" for weight. Do not put qualifiers or notes in the value cell—only the number(s) and unit(s).
+- DO NOT DROP ANY QUALIFIERS FROM THE SOURCE, e.g. "without accessories", "incl. tower", "incl. jump board", etc.
+`;
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    temperature: 0,
+    input: [{ role: 'user', content: prompt }],
+    text: { format: zodTextFormat(SpecsTableOutput, 'specs_table_output') },
+  });
+  const parsed = response.output_parsed;
+  if (!parsed?.rows?.length) {
+    return { tableTitle: '', columns: [], rows: [] };
+  }
+  return {
+    tableTitle: `Key dimensions of ${productTitle}`,
+    columns: ['Specification', 'Value'],
+    rows: parsed.rows.map((r) => ({
+      label: r.label.trim(),
+      values: [r.value.trim()],
+    })),
+  };
 }
 
 type ItemInput = {
@@ -527,6 +589,14 @@ async function main() {
           featuresSource,
           getTextUnderImages(site),
         );
+        const dimensionsBody = getDimensionsSectionBody(sections);
+        if (dimensionsBody) {
+          listing.specifications = await generateSpecsTableElina(
+            openai,
+            dimensionsBody,
+            title, // should exclude "Elina Pilates " prefix
+          );
+        }
       }
     }
 
