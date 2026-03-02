@@ -297,26 +297,24 @@ async function generateFeaturesElina(
   const optionalContext = textUnderImages
     ? `\n\nSHORT TEXT (may have repeated info from vendor content):\n${textUnderImages}`
     : '';
-  const prompt = `You are writing a concise list of features for a product listing for an eCommerce store that that sells Pilates equipment and accessories.
+  const prompt = `You are writing a clear, concise list of features for a product listing.
 
-The following content may repeat the same points across sections. Output a single consolidated list of features: merge overlapping or redundant points into one clear bullet per distinct feature. Do not repeat the same point in different words.
-
-VENDOR CONTENT:
+PRODUCT CONTENT:
 ${featuresSourceText || '(none)'}${optionalContext}
 
-Generate a list of 8-12 feature bullets that are straightforward and concise. Do not drop any key information, but condense aggressively and merge related points into bullet points. Drop minor or repetitive details.
 RULES:
-- Include every distinct, important feature. DE-DUPLICATE: if the same point appears in multiple sections, output one bullet only.
-- Combine only very related points into one bullet. Do not combine unrelated points into one bullet.
-- State facts plainly. No filler. Preserve specifics.
-- Do not include the SKU, disclaimers, or quotation marks in the bullets.
-- Use plain language. No marketing fluff.
-- Output only the list of feature strings. No preamble or explanation. Do not number the bullets.
-`;
+- Compose concise, articulate bullets.
+- The product content above may repeat content. DEDUPLICATE repeated content. Combine only when closely related. Do not combine unrelated points into one bullet.
+- DO NOT DROP ANY INFORMATION FROM THE PRODUCT CONTENT, ESPECIALLY MATERIAL AND NUMBERS. KEEP NUMBERS AS DIGITS, NOT WORDS.
+- Aim for fewer than 12 total bullets. There is no minimum. If the vendor content is short, use fewer than 5 bullets.
+- Use plain language. No filler, no marketing fluff, no SKU/disclaimers/quotes.
+- Output only the list of feature strings. No preamble or numbering.`;
+
+  console.log('[FEATURES PROMPT]\n' + prompt + '\n[END FEATURES PROMPT]');
 
   const response = await openai.responses.parse({
-    model: 'gpt-5.2',
-    // temperature: 0,
+    model: 'gpt-4o',
+    temperature: 0,
     input: [{ role: 'user', content: prompt }],
     text: { format: zodTextFormat(FeaturesOutput, 'features_output') },
   });
@@ -475,6 +473,7 @@ async function main() {
           const warrantyBullet = await generateWarrantyBullet(openai, warrantyBody);
           if (warrantyBullet) listing.features.push(warrantyBullet);
         }
+        listing.features = listing.features.map((f) => f.replace(/\.$/, ''));
       }
     }
 
