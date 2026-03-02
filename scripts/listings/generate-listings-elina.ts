@@ -34,7 +34,9 @@ dotenv.config();
 const TitleOutput = z.object({
   title: z.string().describe('The generated product title only, with no preamble or explanation'),
 });
-
+const FeaturesOutput = z.object({
+  features: z.array(z.string()).describe('The list of features for the product listing'),
+});
 const CONFIG = {
   inputFile: 'data/elina/elina_pilates_products_site.json',
   outputDir: 'data/listings/elina_pilates',
@@ -152,65 +154,159 @@ function collectYouTubeUrls(site: unknown): string[] {
   return out;
 }
 
-function extractInclusionsFromDescription(site: unknown): string[] {
-  if (!site || typeof site !== 'object') return [];
-
+/** Get description tab content from site, or null if missing. */
+function getDescriptionContent(site: unknown): string | null {
+  if (!site || typeof site !== 'object') return null;
   const tabs = (site as { tabs?: unknown }).tabs;
-  if (!Array.isArray(tabs)) return [];
-
+  if (!Array.isArray(tabs)) return null;
   const descTab = tabs.find((t) => {
     if (!t || typeof t !== 'object') return false;
     const id = String((t as { id?: unknown }).id ?? '').trim().toLowerCase();
     const title = String((t as { title?: unknown }).title ?? '').trim().toLowerCase();
     return id === 'description' || title === 'description';
   }) as { content?: unknown } | undefined;
-
   const content = descTab?.content;
-  if (typeof content !== 'string' || content.trim() === '') return [];
+  return typeof content === 'string' && content.trim() ? content.trim() : null;
+}
 
-  const lines = content.split(/\r?\n/);
-  const out: string[] = [];
-  let inIncludes = false;
-
-  const isHeader = (line: string): boolean => {
-    const s = line.trim();
-    if (!s) return false;
-    // Common section headers on Elina pages (often all-caps, sometimes markdown ###).
-    return /^(#{1,6}\s*)?(FEATURES|INCLUDES|COLORS|DIMENSIONS|WARRANTY|SHIPPING|ASSEMBLY|VIDEOS|REVIEWS)\b/i.test(
-      s,
+/**
+ * Split description into sections. Header = line that is all caps and surrounded by \n\n.
+ */
+function parseDescriptionIntoSections(
+  content: string,
+): Array<{ name: string; body: string }> {
+  const chunks = content.split(/\n\n+/).map((c) => c.trim()).filter(Boolean);
+  function isHeaderChunk(chunk: string): boolean {
+    return (
+      !chunk.includes('\n') &&
+      chunk === chunk.toUpperCase() &&
+      chunk.length > 0 &&
+      chunk.length < 120
     );
-  };
-
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-    if (!inIncludes) {
-      if (/^(#{1,6}\s*)?INCLUDES\b/i.test(line)) {
-        inIncludes = true;
+  }
+  const sections: Array<{ name: string; body: string }> = [];
+  let currentName = '';
+  const currentBody: string[] = [];
+  for (const chunk of chunks) {
+    if (isHeaderChunk(chunk)) {
+      if (currentName !== '' || currentBody.length > 0) {
+        sections.push({ name: currentName, body: currentBody.join('\n\n') });
       }
-      continue;
+      currentName = chunk;
+      currentBody.length = 0;
+    } else {
+      currentBody.push(chunk);
     }
+  }
+  if (currentName !== '' || currentBody.length > 0) {
+    sections.push({ name: currentName, body: currentBody.join('\n\n') });
+  }
+  return sections;
+}
 
-    if (line === '') continue;
-    // Stop when next section starts (but ignore the INCLUDES header itself, which we already consumed).
-    if (isHeader(line) && !/^(#{1,6}\s*)?INCLUDES\b/i.test(line)) break;
-
-    // Bullets are usually "- ..."; keep content as-is otherwise.
-    const bulletMatch = line.match(/^[-•*]\s+(.*)$/);
-    let text = (bulletMatch?.[1] ?? line).trim();
+/** Parse INCLUDES section body into list of inclusion strings (bullets, strip trailing period). */
+function parseInclusionsFromBody(body: string): string[] {
+  const lines = body.split(/\r?\n/);
+  const out: string[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const bulletMatch = trimmed.match(/^[-•*]\s+(.*)$/);
+    let text = (bulletMatch?.[1] ?? trimmed).trim();
     if (!text) continue;
     if (text.endsWith('.')) text = text.slice(0, -1);
     out.push(text);
   }
-
-  // Dedupe, preserve order.
   const seen = new Set<string>();
-  const deduped: string[] = [];
-  for (const x of out) {
-    if (seen.has(x)) continue;
+  return out.filter((x) => {
+    if (seen.has(x)) return false;
     seen.add(x);
-    deduped.push(x);
+    return true;
+  });
+}
+
+function extractInclusionsFromSections(
+  sections: Array<{ name: string; body: string }>,
+): string[] {
+  const includesSection = sections.find(
+    (s) => s.name.toUpperCase() === 'INCLUDES',
+  );
+  if (!includesSection) return [];
+  return parseInclusionsFromBody(includesSection.body);
+}
+
+function extractInclusionsFromDescription(site: unknown): string[] {
+  const content = getDescriptionContent(site);
+  if (!content) return [];
+  return extractInclusionsFromSections(parseDescriptionIntoSections(content));
+}
+
+/**
+ * Get the text to send to the features LLM. Uses strict headers (\n\n + all caps).
+ * When FEATURES section exists: pass INTRO + FEATURES (caller adds text_under_images).
+ * When no FEATURES: pass entire description (fallback).
+ */
+function getFeaturesSourceFromSections(
+  sections: Array<{ name: string; body: string }>,
+  fullContent: string,
+): string {
+  const featuresSection = sections.find(
+    (s) => s.name.toUpperCase() === 'FEATURES',
+  );
+  if (featuresSection) {
+    const introSection = sections.find((s) => s.name === '');
+    const introBlock =
+      introSection?.body?.trim() ?? '';
+    const featuresBlock = featuresSection.body.trim();
+    if (introBlock) {
+      return `INTRO (optional context):\n\n${introBlock}\n\nFEATURES:\n\n${featuresBlock}`;
+    }
+    return `FEATURES:\n\n${featuresBlock}`;
   }
-  return deduped;
+
+  return `DESCRIPTION (full):\n\n${fullContent}`;
+}
+
+function getTextUnderImages(site: unknown): string {
+  if (!site || typeof site !== 'object') return '';
+  const s = (site as { text_under_images?: unknown }).text_under_images;
+  return typeof s === 'string' ? s.trim() : '';
+}
+
+/**
+ * Generate concise features list for Dansons. Pass intro + FEATURES + text_under_images when FEATURES exists;
+ * otherwise full description + text_under_images. LLM de-dupes overlapping points.
+ */
+async function generateFeaturesElina(
+  openai: OpenAI,
+  featuresSourceText: string,
+  textUnderImages: string,
+): Promise<string[]> {
+  const optionalContext = textUnderImages
+    ? `\n\nSHORT TEXT (may have repeated info from vendor content):\n${textUnderImages}`
+    : '';
+  const prompt = `You are writing a list of features for a product listing for an eCommerce store that that sells Pilates equipment and accessories.
+
+The following content may repeat the same points across sections. Output a single consolidated list of features: merge overlapping or redundant points into one clear bullet per distinct feature. Do not repeat the same point in different words.
+
+VENDOR CONTENT:
+${featuresSourceText || '(none)'}${optionalContext}
+
+Generate a list of features that are straightforward and concise, but do not drop any information. State the features plainly, and avoid marketing fluff.
+RULES:
+- Include every distinct, important feature. DE-DUPLICATE: if the same point appears in multiple sections, output one bullet only.
+- Combine only very related points into one bullet. Do not combine unrelated points into one bullet.
+- State facts plainly. No filler. Preserve specifics.
+- Do not include the SKU, disclaimers, or quotation marks in the bullets.
+- Output only the list of feature strings. No preamble or explanation.`;
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    temperature: 0,
+    input: [{ role: 'user', content: prompt }],
+    text: { format: zodTextFormat(FeaturesOutput, 'features_output') },
+  });
+  return response.output_parsed?.features ?? [];
 }
 
 type ItemInput = {
@@ -324,6 +420,21 @@ async function main() {
           ELINA_PREFIX + (await generateTitleFromPricingSheet(openai, productName));
       } else {
         listing.title = ELINA_PREFIX + productName;
+      }
+      if (openai) {
+        const descContent = getDescriptionContent(site);
+        const featuresSource =
+          descContent != null
+            ? getFeaturesSourceFromSections(
+                parseDescriptionIntoSections(descContent),
+                descContent,
+              )
+            : '';
+        listing.features = await generateFeaturesElina(
+          openai,
+          featuresSource,
+          getTextUnderImages(site),
+        );
       }
     }
 
