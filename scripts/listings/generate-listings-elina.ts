@@ -11,7 +11,7 @@
  *
  * Usage:
  *   npm run generate-listings-elina
- *   npm run generate-listings-elina -- --single 100002   # generate only the product group that contains this SKU
+ *   npm run generate-listings-elina -- --single "Reformer Elite"   # generate only this product group (by name)
  *   npm run generate-listings-elina -- --print-only     # print the listings to the console, no file write
  */
 
@@ -40,13 +40,13 @@ function productGroupToSlug(productName: string): string {
     .replace(/\s+/g, '-');
 }
 
-function parseArgs(): { singleSku: string | null; printOnly: boolean } {
+function parseArgs(): { singleProductName: string | null; printOnly: boolean } {
   const args = process.argv.slice(2);
   const singleIdx = args.indexOf('--single');
-  const singleSku =
+  const singleProductName =
     singleIdx !== -1 && args[singleIdx + 1] ? args[singleIdx + 1].trim() : null;
   const printOnly = args.includes('--print-only');
-  return { singleSku, printOnly };
+  return { singleProductName, printOnly };
 }
 
 /** Build a placeholder listing for one product group (Part A: skeleton; content filled in later steps). */
@@ -94,7 +94,7 @@ function buildPlaceholderListingForGroup(
 }
 
 async function main() {
-  const { singleSku, printOnly } = parseArgs();
+  const { singleProductName, printOnly } = parseArgs();
 
   const inputPath = path.isAbsolute(CONFIG.inputFile)
     ? CONFIG.inputFile
@@ -117,11 +117,11 @@ async function main() {
     const productName = group.product_name ?? 'Unknown';
     const items = group.items ?? [];
 
-    if (singleSku != null) {
-      const hasSku = items.some(
-        (item: { article_ref?: string }) => String(item.article_ref) === singleSku,
-      );
-      if (!hasSku) continue;
+    if (singleProductName != null) {
+      const nameMatch =
+        productName.trim().toLowerCase() ===
+        singleProductName.trim().toLowerCase();
+      if (!nameMatch) continue;
     }
 
     const listing = buildPlaceholderListingForGroup(productName, items);
