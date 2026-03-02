@@ -1,6 +1,6 @@
 /**
  * Schema and types for Elina Pilates generated listings.
- * One JSON file per product group: data/listings/elina_pilates/{ProductGroupSlug}.json
+ * One JSON file per product group: data/listings/elina_pilates/{productGroupSlug}.json
  * Product-level content (title, overview, features, inclusions, specs, youtube) is shared;
  * variant-level data (sku, vendor URL, Google Drive images, _source) lives in variants[].
  */
@@ -28,23 +28,31 @@ export interface ElinaListingSource {
 
 /** One variant (SKU) within a product group. */
 export interface ElinaVariant {
-  sku: string;  // Pass through from source
-  vendorPageUrl: string | null;  // Pass through from source
-  googleDriveUrls: string[];  // TODO LATER - for now. leave empty
-  _source: ElinaListingSource;  // Pass through from source
+  sku: string;
+  vendorPageUrl: string | null;
+  googleDriveUrls: string[];
+  _source: ElinaListingSource;
 }
 
-/**
- * Generated listing for one Elina Pilates product group (one file, multiple variants).
- * Written to data/listings/elina_pilates/{productGroupSlug}.json
- */
-export interface ElinaGeneratedListing {
+/** Full listing when vendor site was available and content was generated. */
+export interface ElinaListingFull {
+  status: 'full';
   productName: string;
-  title: string;  // LLM
-  overviewParagraph: string; // LLM
-  features: string[]; // LLM
-  inclusions: string[]; // Pass-through from source
-  specifications: ElinaSpecifications; // LLM
-  youtubeUrls: string[]; // Pass-through from source
+  title: string;
+  overviewParagraph: string;
+  features: string[];
+  inclusions: string[];
+  specifications: ElinaSpecifications;
+  youtubeUrls: string[];
   variants: ElinaVariant[];
 }
+
+/** Stub listing when no vendor site; no generated content. */
+export interface ElinaListingStub {
+  status: 'vendor_site_unavailable';
+  productName: string;
+  variants: ElinaVariant[];
+}
+
+/** Discriminated union: full listing or stub (no vendor site). */
+export type ElinaListing = ElinaListingFull | ElinaListingStub;

@@ -18,13 +18,22 @@
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
+import OpenAI from 'openai';
+import { zodTextFormat } from 'openai/helpers/zod';
+import { z } from 'zod';
 import type {
-  ElinaGeneratedListing,
+  ElinaListing,
+  ElinaListingFull,
+  ElinaListingStub,
   ElinaVariant,
   ElinaListingSource,
 } from '../../types/listings/elina-listing';
 
 dotenv.config();
+
+const TitleOutput = z.object({
+  title: z.string().describe('The generated product title only, with no preamble or explanation'),
+});
 
 const CONFIG = {
   inputFile: 'data/elina/elina_pilates_products_site.json',
@@ -47,6 +56,50 @@ function parseArgs(): { singleProductName: string | null; printOnly: boolean } {
     singleIdx !== -1 && args[singleIdx + 1] ? args[singleIdx + 1].trim() : null;
   const printOnly = args.includes('--print-only');
   return { singleProductName, printOnly };
+}
+
+const ELINA_PREFIX = 'Elina Pilates ';
+
+/**
+ * Format vendor site product name for title: strip ™®©, title-case words, collapse spaces.
+ * Returns only the product part (no "Elina Pilates " prefix).
+ */
+function formatTitleFromSiteName(siteProductName: string): string {
+  let s = String(siteProductName ?? '')
+    .replace(/[™®©]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!s) return s;
+  s = s
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+  return s;
+}
+
+/**
+ * LLM fallback when no vendor site: fix awkward word order from pricing sheet and normalize casing.
+ * Returns only the product part (no "Elina Pilates " prefix).
+ */
+async function generateTitleFromPricingSheet(
+  openai: OpenAI,
+  productNameFromGroup: string,
+): Promise<string> {
+  const prompt = `You are writing the product name part of a listing title for an eCommerce store (Pilates equipment and accessories).
+  The product name from the pricing sheet is: "${productNameFromGroup.trim()}"
+  This wording may be awkward or in an unnatural order. Output a clear product title with words in a natural, customer-friendly order and proper capitalization (first letter of each word capitalized).
+  Output ONLY the product name part. Do not include "Elina Pilates" or any prefix. Do not include SKU, quotation marks, or extra explanation.
+  Example: "Physio Reformer Master Instructor" → "Master Instructor Physio Reformer"
+  `;
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    temperature: 0,
+    input: [{ role: 'user', content: prompt }],
+    text: { format: zodTextFormat(TitleOutput, 'title_output') },
+  });
+  const productPart = response.output_parsed?.title?.trim() ?? productNameFromGroup.trim();
+  return productPart;
 }
 
 function normalizeYouTubeUrl(raw: string): string {
@@ -143,8 +196,9 @@ function extractInclusionsFromDescription(site: unknown): string[] {
 
     // Bullets are usually "- ..."; keep content as-is otherwise.
     const bulletMatch = line.match(/^[-•*]\s+(.*)$/);
-    const text = (bulletMatch?.[1] ?? line).trim();
+    let text = (bulletMatch?.[1] ?? line).trim();
     if (!text) continue;
+    if (text.endsWith('.')) text = text.slice(0, -1);
     out.push(text);
   }
 
@@ -159,20 +213,16 @@ function extractInclusionsFromDescription(site: unknown): string[] {
   return deduped;
 }
 
-/** Build a placeholder listing for one product group (Part A: skeleton; content filled in later steps). */
-function buildPlaceholderListingForGroup(
-  productName: string,
-  site: unknown,
-  items: Array<{
-    article_ref: string;
-    description_raw?: string;
-    price_usd?: number;
-    barcode?: string;
-    color?: string | null;
-    url?: string | null;
-  }>,
-): ElinaGeneratedListing {
-  const variants: ElinaVariant[] = items.map((item) => {
+type ItemInput = {
+  article_ref: string;
+  description_raw?: string;
+  price_usd?: number;
+  barcode?: string;
+  url?: string | null;
+};
+
+function buildVariantsFromItems(items: ItemInput[]): ElinaVariant[] {
+  return items.map((item) => {
     const source: ElinaListingSource = {
       articleRef: String(item.article_ref),
       description: item.description_raw ?? '',
@@ -186,8 +236,26 @@ function buildPlaceholderListingForGroup(
       _source: source,
     };
   });
+}
 
+/** Stub when no vendor site; no generated content. */
+function buildStubListing(productName: string, items: ItemInput[]): ElinaListingStub {
   return {
+    status: 'vendor_site_unavailable',
+    productName,
+    variants: buildVariantsFromItems(items),
+  };
+}
+
+/** Full listing when vendor site exists; placeholder content filled in later steps. */
+function buildFullListingPlaceholder(
+  productName: string,
+  site: unknown,
+  items: ItemInput[],
+): ElinaListingFull {
+  const variants = buildVariantsFromItems(items);
+  return {
+    status: 'full',
     productName,
     title: '',
     overviewParagraph: '',
@@ -222,6 +290,9 @@ async function main() {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+  const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
+
   let count = 0;
   for (const group of groups) {
     const productName = group.product_name ?? 'Unknown';
@@ -235,7 +306,26 @@ async function main() {
       if (!nameMatch) continue;
     }
 
-    const listing = buildPlaceholderListingForGroup(productName, site, items);
+    let listing: ElinaListing;
+
+    if (!site) {
+      listing = buildStubListing(productName, items);
+    } else {
+      listing = buildFullListingPlaceholder(productName, site, items);
+      const siteProductName =
+        typeof site === 'object' && (site as { product_name?: string }).product_name
+          ? String((site as { product_name: string }).product_name).trim()
+          : null;
+
+      if (siteProductName) {
+        listing.title = ELINA_PREFIX + formatTitleFromSiteName(siteProductName);
+      } else if (openai) {
+        listing.title =
+          ELINA_PREFIX + (await generateTitleFromPricingSheet(openai, productName));
+      } else {
+        listing.title = ELINA_PREFIX + productName;
+      }
+    }
 
     if (printOnly) {
       console.log(JSON.stringify(listing, null, 2));
@@ -246,7 +336,11 @@ async function main() {
     const slug = productGroupToSlug(productName);
     const outPath = path.join(outputDir, `${slug}.json`);
     fs.writeFileSync(outPath, JSON.stringify(listing, null, 2), 'utf-8');
-    console.log(`  → ${path.relative(process.cwd(), outPath)} (${items.length} variant(s))`);
+    const label =
+      listing.status === 'vendor_site_unavailable'
+        ? 'stub (no vendor site)'
+        : `${items.length} variant(s)`;
+    console.log(`  → ${path.relative(process.cwd(), outPath)} (${label})`);
     count += 1;
   }
 
