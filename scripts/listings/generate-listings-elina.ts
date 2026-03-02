@@ -37,6 +37,9 @@ const TitleOutput = z.object({
 const FeaturesOutput = z.object({
   features: z.array(z.string()).describe('The list of features for the product listing'),
 });
+const WarrantyBulletOutput = z.object({
+  bullet: z.string().describe('One concise warranty bullet point'),
+});
 const CONFIG = {
   inputFile: 'data/elina/elina_pilates_products_site.json',
   outputDir: 'data/listings/elina_pilates',
@@ -267,6 +270,15 @@ function getFeaturesSourceFromSections(
   return `DESCRIPTION (full):\n\n${fullContent}`;
 }
 
+/** Return the body of the WARRANTY section if present; otherwise null. */
+function getWarrantySectionBody(
+  sections: Array<{ name: string; body: string }>,
+): string | null {
+  const section = sections.find((s) => s.name.toUpperCase() === 'WARRANTY');
+  if (!section?.body?.trim()) return null;
+  return section.body.trim();
+}
+
 function getTextUnderImages(site: unknown): string {
   if (!site || typeof site !== 'object') return '';
   const s = (site as { text_under_images?: unknown }).text_under_images;
@@ -307,6 +319,28 @@ RULES:
     text: { format: zodTextFormat(FeaturesOutput, 'features_output') },
   });
   return response.output_parsed?.features ?? [];
+}
+
+/**
+ * Turn warranty section text into a single concise bullet for the features list.
+ * Uses gpt-4o-mini for cost.
+ */
+async function generateWarrantyBullet(
+  openai: OpenAI,
+  warrantyBody: string,
+): Promise<string> {
+  const prompt = `Turn this warranty text into a single concise bullet point for a product features list. Output only the bullet text, no preamble or numbering.
+
+WARRANTY TEXT:
+${warrantyBody}`;
+  const response = await openai.responses.parse({
+    model: 'gpt-4o-mini',
+    temperature: 0,
+    input: [{ role: 'user', content: prompt }],
+    text: { format: zodTextFormat(WarrantyBulletOutput, 'warranty_bullet') },
+  });
+  const bullet = response.output_parsed?.bullet?.trim();
+  return bullet ?? '';
 }
 
 type ItemInput = {
@@ -423,18 +457,22 @@ async function main() {
       }
       if (openai) {
         const descContent = getDescriptionContent(site);
+        const sections =
+          descContent != null ? parseDescriptionIntoSections(descContent) : [];
         const featuresSource =
           descContent != null
-            ? getFeaturesSourceFromSections(
-                parseDescriptionIntoSections(descContent),
-                descContent,
-              )
+            ? getFeaturesSourceFromSections(sections, descContent)
             : '';
         listing.features = await generateFeaturesElina(
           openai,
           featuresSource,
           getTextUnderImages(site),
         );
+        const warrantyBody = getWarrantySectionBody(sections);
+        if (warrantyBody) {
+          const warrantyBullet = await generateWarrantyBullet(openai, warrantyBody);
+          if (warrantyBullet) listing.features.push(warrantyBullet);
+        }
       }
     }
 
