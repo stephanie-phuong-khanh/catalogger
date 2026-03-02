@@ -24,15 +24,14 @@ export interface ElinaListingSource {
   description: string;
   priceUsd: number;
   barcode: string;
-  color?: string | null;
 }
 
 /** One variant (SKU) within a product group. */
 export interface ElinaVariant {
-  sku: string;
-  vendorPageUrl: string | null;
-  googleDriveUrls: string[];
-  _source: ElinaListingSource;
+  sku: string;  // Pass through from source
+  vendorPageUrl: string | null;  // Pass through from source
+  googleDriveUrls: string[];  // TODO LATER - for now. leave empty
+  _source: ElinaListingSource;  // Pass through from source
 }
 
 /**
@@ -41,11 +40,11 @@ export interface ElinaVariant {
  */
 export interface ElinaGeneratedListing {
   productName: string;
-  title: string;
-  overviewParagraph: string;
-  features: string[];
-  inclusions: string[];
-  specifications: ElinaSpecifications;
-  youtubeUrls: string[];
+  title: string;  // LLM
+  overviewParagraph: string; // LLM
+  features: string[]; // LLM
+  inclusions: string[]; // Pass-through from source
+  specifications: ElinaSpecifications; // LLM
+  youtubeUrls: string[]; // Pass-through from source
   variants: ElinaVariant[];
 }

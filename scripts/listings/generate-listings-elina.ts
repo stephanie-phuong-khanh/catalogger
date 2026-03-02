@@ -49,9 +49,120 @@ function parseArgs(): { singleProductName: string | null; printOnly: boolean } {
   return { singleProductName, printOnly };
 }
 
+function normalizeYouTubeUrl(raw: string): string {
+  const s = String(raw ?? '').trim();
+  if (!s) return '';
+
+  // Convert embed URLs to watch URLs (keep id, drop extra params).
+  const embedMatch = s.match(/youtube\.com\/embed\/([^?&#/]+)/i);
+  if (embedMatch?.[1]) {
+    return `https://www.youtube.com/watch?v=${embedMatch[1]}`;
+  }
+
+  // Normalize youtu.be short links to watch.
+  const shortMatch = s.match(/youtu\.be\/([^?&#/]+)/i);
+  if (shortMatch?.[1]) {
+    return `https://www.youtube.com/watch?v=${shortMatch[1]}`;
+  }
+
+  return s;
+}
+
+function collectYouTubeUrls(site: unknown): string[] {
+  const urls: string[] = [];
+  if (!site || typeof site !== 'object') return urls;
+
+  const siteObj = site as {
+    videos?: unknown;
+    tabs?: Array<{ id?: unknown; title?: unknown; content?: unknown; videos?: unknown }>;
+  };
+
+  const pushAll = (v: unknown) => {
+    if (!Array.isArray(v)) return;
+    for (const x of v) {
+      const u = normalizeYouTubeUrl(String(x ?? ''));
+      if (u) urls.push(u);
+    }
+  };
+
+  pushAll(siteObj.videos);
+  for (const tab of siteObj.tabs ?? []) pushAll(tab?.videos);
+
+  // Dedupe, preserve order.
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const u of urls) {
+    if (seen.has(u)) continue;
+    seen.add(u);
+    out.push(u);
+  }
+  return out;
+}
+
+function extractInclusionsFromDescription(site: unknown): string[] {
+  if (!site || typeof site !== 'object') return [];
+
+  const tabs = (site as { tabs?: unknown }).tabs;
+  if (!Array.isArray(tabs)) return [];
+
+  const descTab = tabs.find((t) => {
+    if (!t || typeof t !== 'object') return false;
+    const id = String((t as { id?: unknown }).id ?? '').trim().toLowerCase();
+    const title = String((t as { title?: unknown }).title ?? '').trim().toLowerCase();
+    return id === 'description' || title === 'description';
+  }) as { content?: unknown } | undefined;
+
+  const content = descTab?.content;
+  if (typeof content !== 'string' || content.trim() === '') return [];
+
+  const lines = content.split(/\r?\n/);
+  const out: string[] = [];
+  let inIncludes = false;
+
+  const isHeader = (line: string): boolean => {
+    const s = line.trim();
+    if (!s) return false;
+    // Common section headers on Elina pages (often all-caps, sometimes markdown ###).
+    return /^(#{1,6}\s*)?(FEATURES|INCLUDES|COLORS|DIMENSIONS|WARRANTY|SHIPPING|ASSEMBLY|VIDEOS|REVIEWS)\b/i.test(
+      s,
+    );
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!inIncludes) {
+      if (/^(#{1,6}\s*)?INCLUDES\b/i.test(line)) {
+        inIncludes = true;
+      }
+      continue;
+    }
+
+    if (line === '') continue;
+    // Stop when next section starts (but ignore the INCLUDES header itself, which we already consumed).
+    if (isHeader(line) && !/^(#{1,6}\s*)?INCLUDES\b/i.test(line)) break;
+
+    // Bullets are usually "- ..."; keep content as-is otherwise.
+    const bulletMatch = line.match(/^[-•*]\s+(.*)$/);
+    const text = (bulletMatch?.[1] ?? line).trim();
+    if (!text) continue;
+    out.push(text);
+  }
+
+  // Dedupe, preserve order.
+  const seen = new Set<string>();
+  const deduped: string[] = [];
+  for (const x of out) {
+    if (seen.has(x)) continue;
+    seen.add(x);
+    deduped.push(x);
+  }
+  return deduped;
+}
+
 /** Build a placeholder listing for one product group (Part A: skeleton; content filled in later steps). */
 function buildPlaceholderListingForGroup(
   productName: string,
+  site: unknown,
   items: Array<{
     article_ref: string;
     description_raw?: string;
@@ -67,7 +178,6 @@ function buildPlaceholderListingForGroup(
       description: item.description_raw ?? '',
       priceUsd: typeof item.price_usd === 'number' ? item.price_usd : 0,
       barcode: item.barcode != null ? String(item.barcode) : '',
-      color: item.color != null ? String(item.color).trim() || null : null,
     };
     return {
       sku: String(item.article_ref),
@@ -82,13 +192,13 @@ function buildPlaceholderListingForGroup(
     title: '',
     overviewParagraph: '',
     features: [],
-    inclusions: [],
+    inclusions: extractInclusionsFromDescription(site),
     specifications: {
       tableTitle: '',
       columns: [],
       rows: [],
     },
-    youtubeUrls: [],
+    youtubeUrls: collectYouTubeUrls(site),
     variants,
   };
 }
@@ -115,6 +225,7 @@ async function main() {
   let count = 0;
   for (const group of groups) {
     const productName = group.product_name ?? 'Unknown';
+    const site = group.site ?? null;
     const items = group.items ?? [];
 
     if (singleProductName != null) {
@@ -124,7 +235,7 @@ async function main() {
       if (!nameMatch) continue;
     }
 
-    const listing = buildPlaceholderListingForGroup(productName, items);
+    const listing = buildPlaceholderListingForGroup(productName, site, items);
 
     if (printOnly) {
       console.log(JSON.stringify(listing, null, 2));
