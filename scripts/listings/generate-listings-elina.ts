@@ -40,6 +40,9 @@ const FeaturesOutput = z.object({
 const WarrantyBulletOutput = z.object({
   bullet: z.string().describe('One concise warranty bullet point'),
 });
+const OverviewParagraphOutput = z.object({
+  overviewParagraph: z.string().describe('The generated overview paragraph for the product listing'),
+});
 const CONFIG = {
   inputFile: 'data/elina/elina_pilates_products_site.json',
   outputDir: 'data/listings/elina_pilates',
@@ -310,8 +313,6 @@ RULES:
 - Use plain language. No filler, no marketing fluff, no SKU/disclaimers/quotes.
 - Output only the list of feature strings. No preamble or numbering.`;
 
-  console.log('[FEATURES PROMPT]\n' + prompt + '\n[END FEATURES PROMPT]');
-
   const response = await openai.responses.parse({
     model: 'gpt-4o',
     temperature: 0,
@@ -319,6 +320,49 @@ RULES:
     text: { format: zodTextFormat(FeaturesOutput, 'features_output') },
   });
   return response.output_parsed?.features ?? [];
+}
+
+/**
+ * Generate overview paragraph for Elina listing. Uses same prompt rules as Golden Designs
+ * (conversion- and search-optimized, 3–4 sentences). Input: title + raw vendor content
+ * (description intro + FEATURES if present, else full description; plus text_under_images if present).
+ */
+async function generateOverviewParagraphElina(
+  openai: OpenAI,
+  productTitle: string,
+  featuresSourceText: string,
+  textUnderImages: string,
+): Promise<string> {
+  const optionalContext = textUnderImages
+    ? `\n\nTEXT UNDER IMAGES (optional context):\n${textUnderImages}`
+    : '';
+  const prompt = `You are writing an overview paragraph for a product listing for an eCommerce store.
+You have information about the product from its title and from the vendor's description and features below.
+
+PRODUCT TITLE:
+${productTitle}
+
+VENDOR CONTENT (description intro and features if present, or full description; use as source material):
+${featuresSourceText || '(none)'}${optionalContext}
+
+Write a 3-4 sentence product overview optimized for conversion and search relevance.
+RULES:
+- Open with the product title and clearly state what the product is and its primary purpose.
+- Clearly explain what the product is for, how to use it, and why the customer would care to buy the product.
+- Highlight tangible health/wellness benefits if supported by source material.
+- Incorporate 1-2 specific differentiators naturally within the narrative.
+- Write in a confident, benefit-driven tone. Do NOT list features mechanically. Include features that are most relevant to the product's appeal.
+- No pricing. Do NOT fabricate or infer unsupported claims.
+- Do not use repetitive language. Vary sentence structure and word choice.
+- DO NOT USE MARKETING FLUFF OR FILLER WORDS.`;
+
+  const response = await openai.responses.parse({
+    model: 'gpt-4o',
+    temperature: 0,
+    input: [{ role: 'user', content: prompt }],
+    text: { format: zodTextFormat(OverviewParagraphOutput, 'overview_paragraph_output') },
+  });
+  return response.output_parsed?.overviewParagraph ?? '';
 }
 
 /**
@@ -447,14 +491,17 @@ async function main() {
           ? String((site as { product_name: string }).product_name).trim()
           : null;
 
+      // Title: use formatted title from site, or generate from pricing sheet, or use product name
+      let title = '';
       if (siteProductName) {
-        listing.title = ELINA_PREFIX + formatTitleFromSiteName(siteProductName);
+        title = formatTitleFromSiteName(siteProductName);
       } else if (openai) {
-        listing.title =
-          ELINA_PREFIX + (await generateTitleFromPricingSheet(openai, productName));
+        title = await generateTitleFromPricingSheet(openai, productName);
       } else {
-        listing.title = ELINA_PREFIX + productName;
+        title = productName;
       }
+      listing.title = ELINA_PREFIX + title;
+
       if (openai) {
         const descContent = getDescriptionContent(site);
         const sections =
@@ -474,6 +521,12 @@ async function main() {
           if (warrantyBullet) listing.features.push(warrantyBullet);
         }
         listing.features = listing.features.map((f) => f.replace(/\.$/, ''));
+        listing.overviewParagraph = await generateOverviewParagraphElina(
+          openai,
+          title,
+          featuresSource,
+          getTextUnderImages(site),
+        );
       }
     }
 
