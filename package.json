@@ -22,7 +22,8 @@
     "rename-sku-images": "npx ts-node scripts/images/rename-sku-images.ts",
     "test-segmentation": "npx ts-node scripts/images/test-segmentation.ts",
     "crop-with-segmentation": "npx ts-node scripts/images/crop-with-segmentation.ts",
-    "parse-pdf-pricing-sheet": "npx ts-node scripts/listings/parse-pdf-pricing-sheet.ts"
+    "parse-pdf-pricing-sheet": "npx ts-node scripts/listings/parse-pdf-pricing-sheet.ts",
+    "generate-listings-elina": "npx ts-node scripts/listings/generate-listings-elina.ts"
   },
   "keywords": [],
   "author": "",
