@@ -101,9 +101,8 @@ function ElinaListingView({ listing, path: pathSegments }: { listing: ElinaListi
           <table style={{ width: '100%', fontSize: '0.875rem', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #ddd' }}>
-                <th style={{ padding: '0.375rem 0.75rem 0.375rem 0', textAlign: 'left', fontWeight: 600 }}></th>
                 {(spec.columns ?? []).map((col, i) => (
-                  <th key={i} style={{ padding: '0.375rem 0.75rem', textAlign: 'left', fontWeight: 600 }}>{col}</th>
+                  <th key={i} style={{ padding: '0.375rem 0.75rem 0.375rem 0', textAlign: 'left', fontWeight: 600 }}>{col}</th>
                 ))}
               </tr>
             </thead>
