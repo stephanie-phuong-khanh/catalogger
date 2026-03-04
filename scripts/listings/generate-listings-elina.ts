@@ -341,9 +341,9 @@ RULES:
 }
 
 /**
- * Generate overview paragraph for Elina listing. Uses same prompt rules as Golden Designs
- * (conversion- and search-optimized, 3–4 sentences). Input: title + raw vendor content
- * (description intro + FEATURES if present, else full description; plus text_under_images if present).
+ * Generate overview paragraph for Elina listing (conversion- and search-optimized, 3–4 sentences).
+ * - When text_under_images is available: uses only product title + that content (supplier's prioritization).
+ * - When not available: uses product title + full vendor content; prompt asks model to extract strongest features.
  */
 async function generateOverviewParagraphElina(
   openai: OpenAI,
@@ -351,32 +351,53 @@ async function generateOverviewParagraphElina(
   featuresSourceText: string,
   textUnderImages: string,
 ): Promise<string> {
-  const optionalContext = textUnderImages
-    ? `\n\nTEXT UNDER IMAGES (optional context):\n${textUnderImages}`
-    : '';
-  const prompt = `You are writing an overview paragraph for a product listing for an eCommerce store.
-You have information about the product from its title and from the vendor's description and features below.
+  const hasTextUnderImages = textUnderImages.trim().length > 0;
+
+  const commonRules = `- For key features you mention, briefly state the outcome or benefit (what the feature enables for the user). State what it allows them to do or achieve, rather than only naming the feature.
+- Write in a confident, benefit-driven tone. Do NOT list features mechanically.
+- No pricing. Do NOT fabricate or infer unsupported claims.
+- Do not use repetitive language. Vary sentence structure and word choice.
+- DO NOT USE MARKETING FLUFF OR FILLER WORDS. BE EXTREMELY CONCISE AND TO THE POINT.`;
+
+  const prompt = hasTextUnderImages
+    ? `You are writing an overview paragraph for a product listing for an eCommerce store.
+You have the product title and the supplier-highlighted content (text the supplier chose to show under product images). This content represents what the supplier considers the main differentiators.
 
 PRODUCT TITLE:
 ${productTitle}
 
-VENDOR CONTENT (description intro and features if present, or full description; use as source material):
-${featuresSourceText || '(none)'}${optionalContext}
+SUPPLIER-HIGHLIGHTED CONTENT (text under product images; use as primary source):
+${textUnderImages.trim()}
 
-Write a 3-4 sentence product overview optimized for conversion and search relevance.
+Write a 3-4 sentence product overview optimized for conversion and search relevance. Customers should immediately understand what makes this product stand out.
 RULES:
-- Open with the product title and clearly state what the product is and its primary purpose.
+- Always start the first sentence with the product title verbatim. Use the sentence structure "The [product title]..."
+- Lead with the strongest, most important features so the reader immediately sees what makes this product stand out; then add supporting details as needed.
+- Clearly explain what the product is for and why the customer would care to buy it.
+- Highlight tangible health/wellness benefits if supported by the source.
+- Do not mention shipping date or stock availability in the overview paragraph.
+
+${commonRules}`
+
+    : `You are writing an overview paragraph for a product listing for an eCommerce store.
+You have the product title and the vendor's full description and features. From this you must extract the strongest, most important features so customers immediately understand what makes this product stand out.
+
+PRODUCT TITLE:
+${productTitle}
+
+VENDOR CONTENT (description intro and features if present, or full description):
+${featuresSourceText || '(none)'}
+
+Write a 3-4 sentence product overview optimized for conversion and search relevance. Your job is to identify what truly differentiates this product and lead with that—customers should immediately understand what makes it stand out.
+RULES:
+- First mentally identify the 1-2 strongest differentiators or most important features in the vendor content; then lead with those so the reader immediately sees what makes this product stand out. Add supporting details (product type, materials, use cases) after.
 - Clearly explain what the product is for, how to use it, and why the customer would care to buy the product.
-- Highlight tangible health/wellness benefits if supported by source material.
-- Incorporate 1-2 specific differentiators naturally within the narrative.
-- Write in a confident, benefit-driven tone. Do NOT list features mechanically. Include features that are most relevant to the product's appeal.
-- No pricing. Do NOT fabricate or infer unsupported claims.
-- Do not use repetitive language. Vary sentence structure and word choice.
-- DO NOT USE MARKETING FLUFF OR FILLER WORDS.`;
+- Highlight tangible health/wellness benefits if supported by source material. Include only features that are most relevant to the product's appeal.
+${commonRules}`;
 
   const response = await openai.responses.parse({
-    model: 'gpt-4o',
-    temperature: 0,
+    model: 'gpt-5.2',
+    // temperature: 0,
     input: [{ role: 'user', content: prompt }],
     text: { format: zodTextFormat(OverviewParagraphOutput, 'overview_paragraph_output') },
   });
