@@ -9,39 +9,37 @@
    ```bash
    npm run dev
    ```
-   Open [http://localhost:3000](http://localhost:3000). You should see the form (Excel upload, vendor website, and two placeholders).
+   Open [http://localhost:3000](http://localhost:3000).
 
 ## Scripts to run
 
-**Run the pipeline separately (unchanged)**
-   ```bash
-   npm run pipeline
-   ```
-   This still runs from the command line and writes to `data/listings/`. The app does not run the pipeline yet.
+See **Vendor pipelines** below for the main Elina and Golden Designs flows.
 
-**Sync listings to Vercel Blob** (optional, for the web listings viewer)
-   ```bash
-   npm run sync-listings-to-blob                                                              # upload all (overwrites existing)
-   npm run sync-listings-to-blob -- --full                                                    # full sync: wipe listings/ in Blob, then upload
-   npm run sync-listings-to-blob -- --single tab_09_gdina_traditional/GDI-8005-01.json       # upload one file only
-   ```
-   Uploads files under `data/listings/` to your Vercel Blob store (skips files whose name starts with `_`, e.g. `_all_listings.json`). Default run overwrites existing blobs with the same path. **`--full`** wipes all blobs under `listings/` then uploads (use after renames/deletes). **`--single <path>`** uploads only one file; path is relative to `data/listings/`. Requires `CATALOGGER_LISTINGS_READ_WRITE_TOKEN` in `.env` or `.env.local` (from the private listings Blob store in Vercel).
+**Other**
+- **`sync-listings-to-blob`** — Upload `data/listings/` to Vercel Blob (for the web viewer). `--full` wipes and re-uploads; `--single <path>` uploads one file. Requires `CATALOGGER_LISTINGS_READ_WRITE_TOKEN`.
+- **`parse-sheet`** — Parse Golden Designs XLSX to JSON only (no vendor search). Config in `scripts/listings/parse-sheet.ts`.
+- **`process-images-for-sku`** — Prepare 1500×1500 images for a SKU folder: `--input-dir`, `--output-dir`.
+- **`edit-image`** — Run edit (resize/crop) on a single image: `--image-path`, `--out-dir`.
 
-### Image processing
-
-Make sure Docker desktop is installed and pull the image that enables image segmentation
+**Image processing** — For subject segmentation (e.g. crop-with-segmentation, or edit-image on non-square images), you need Docker and the rembg image:
    ```bash
    docker pull danielgatis/rembg
    ```
+   Keep Docker Desktop running when using those scripts.
 
-**Test subject segmentation (rembg)** – for outline/crop pipeline
-   ```
-   npm run test-segmentation -- --image-path "path/to/image.png"
-   ```
+All scripts: see `package.json` (e.g. `eval-specs`, `rename-sku-images`, `test-segmentation`, `crop-with-segmentation`).
 
-**Process images for SKU**
-   ```
-   npm run process-images-for-sku -- \
-    --input-dir "path/to/sku_image_folder" \
-    --output-dir "path/to/output_folder"
-   ```
+---
+
+## Vendor pipelines
+
+**Elina Pilates** (run in order; each step writes a file the next step reads):
+1. `parse-pdf-pricing-sheet` → `data/elina/elina_pilates_pricing_sheet.json`
+2. `resolve-elina-urls` → `data/elina/elina_pilates_products_urls.json`
+3. `scrape-elina-site` → `data/elina/elina_pilates_products_site.json`
+4. (Optional) `download-elina-product-images` (images from site URLs) or `map-elina-sku-to-images` (map SKUs to local folders) → images / `elina_sku_to_images.json`
+5. `generate-listings-elina` → `data/listings/elina_pilates/*.json`
+
+**Golden Designs** (single script; config in `scripts/listings/pipeline.ts`):
+- `pipeline` = parse XLSX sheet → search vendor (Shopify) → generate listing. Writes to `data/listings/tab_03_dynamic_low_emf/` (or whatever `outputDir` + `sheetIndex` in CONFIG). Use `--single SKU` for one product.
+- Optional: `process-images-for-sku` to prepare 1500×1500 images from a SKU folder.
