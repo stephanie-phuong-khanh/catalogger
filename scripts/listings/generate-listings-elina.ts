@@ -28,7 +28,7 @@ import type {
   ElinaSpecifications,
   ElinaVariant,
   ElinaListingSource,
-} from '../../types/listings/elina-listing';
+} from '../../types/listings/elina-pilates-listing';
 
 dotenv.config();
 

@@ -11,7 +11,7 @@ export type {
   ElinaSpecRow,
   ElinaVariant,
   ElinaListingSource,
-} from './elina-listing';
+} from './elina-pilates-listing';
 
 export type {
   GoldenDesignsListing,
