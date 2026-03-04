@@ -1,6 +1,13 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
+import type {
+  GoldenDesignsListingFull,
+  GoldenDesignsListingIncomplete,
+  GoldenDesignsSpecifications,
+} from '../../types/listings';
+
+export type { GeneratedListing, IncompleteListing } from '../../types/listings';
 import { getFeaturesRelevantFromSheet, getSpecsRelevantFromSheet, RawProduct } from './parse-sheet';
 import { separateVendorBodyWithLLM, VendorSiteProduct } from './search-vendor-shopify';
 
@@ -31,32 +38,13 @@ const SpecsTable = z.object({
   ).describe('One row per physical element'),
 });
 
-export interface GeneratedListing {
-  sku: string;
-  title: string;
-  features: string[];
-  overviewParagraph: string;
-  specifications: typeof SpecsTable;
-  vendorPageUrl: string | null;
-  _raw: RawProduct;
-  _vendorData: VendorSiteProduct | null;
-}
-
-/** Minimal listing when pricing data is incomplete; no LLM-generated fields. */
-export interface IncompleteListing {
-  sku: string;
-  incompletePricingData: true;
-  _raw: RawProduct;
-  _vendorData: VendorSiteProduct | null;
-  vendorPageUrl: string | null;
-}
-
 export function createIncompleteListing(
   sku: string,
   product: RawProduct,
   vendorSiteData: VendorSiteProduct | null,
-): IncompleteListing {
+): GoldenDesignsListingIncomplete {
   return {
+    _listingFormat: 'golden_designs',
     sku,
     incompletePricingData: true,
     _raw: product,
@@ -161,7 +149,7 @@ function generateSpecifications(
   productTitle: string,
   productInfo: string,
   vendorSiteInfo: string,
-): Promise<typeof SpecsTable> {
+): Promise<GoldenDesignsSpecifications> {
   const prompt = `You are writing a list of specifications for a product listing for an eCommerce store.
   You have information about the product from a raw pricing sheet and from the vendor site product page.
 
@@ -198,7 +186,7 @@ function generateSpecifications(
       input: [{ role: 'user', content: prompt }],
       text: { format: zodTextFormat(SpecsTable, 'specs_table_output') },
     })
-    .then((response) => response.output_parsed) as Promise<typeof SpecsTable>;
+    .then((response) => response.output_parsed) as Promise<GoldenDesignsSpecifications>;
 }
 
 
@@ -248,7 +236,7 @@ export async function generateListing(
   skuColumn: string,
   vendorSiteData: VendorSiteProduct | null,
   _supplierName?: string,
-): Promise<GeneratedListing> {
+): Promise<GoldenDesignsListingFull> {
   const sku = product[skuColumn];
   if (!sku) {
     throw new Error(`No SKU found in column "${skuColumn}"`);
@@ -289,6 +277,7 @@ export async function generateListing(
   const overviewParagraph = await generateOverviewParagraph(_openai, title, features);
 
   return {
+    _listingFormat: 'golden_designs',
     sku,
     title,
     features,

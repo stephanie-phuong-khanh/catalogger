@@ -14,7 +14,8 @@ import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import { parseSheet } from '../../lib/listings/parse-sheet';
 import { searchVendorSite } from '../../lib/listings/search-vendor-shopify';
-import { generateListing, createIncompleteListing, GeneratedListing, IncompleteListing } from '../../lib/listings/generate-listing';
+import { generateListing, createIncompleteListing } from '../../lib/listings/generate-listing';
+import type { GoldenDesignsListing } from '../../types/listings';
 import { isPricingDataIncomplete } from '../../lib/listings/pricing-sheet-groups';
 
 dotenv.config();
@@ -39,7 +40,7 @@ const openai = new OpenAI({
 async function main() {
   const printOnly = process.argv.includes('--print-only');
   console.log('=== CATALOGGER PIPELINE ===\n');
-  const listings: (GeneratedListing | IncompleteListing)[] = [];
+  const listings: GoldenDesignsListing[] = [];
 
   // Step 1: Parse sheet
   console.log('STEP 1: Parsing spreadsheet...');
