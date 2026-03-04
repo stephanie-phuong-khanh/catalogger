@@ -134,25 +134,54 @@ function ElinaListingView({ listing, path: pathSegments }: { listing: ElinaListi
         </section>
       ) : null}
 
-      <section style={{ marginTop: '1.5rem' }}>
-        <h2 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111' }}>Variants</h2>
+      <section style={{ marginTop: '2rem' }}>
+        <hr style={{ border: 'none', borderTop: '2px solid #111', margin: '0 0 1rem 0' }} />
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 0.75rem 0', color: '#111' }}>Variants</h2>
         {!hasVendorLinks && (
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#666' }}>Product not found in vendor website.</p>
+          <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.875rem', color: '#666' }}>Product not found in vendor website.</p>
         )}
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.875rem' }}>
-          {listing.variants.map((v) => (
-            <li key={v.sku} style={{ marginBottom: '0.75rem', padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>
-              <strong>SKU {v.sku}</strong>
+          {listing.variants.map((v, index) => (
+            <li
+              key={v.sku}
+              style={{
+                padding: '0.75rem 0',
+                borderBottom: index < listing.variants.length - 1 ? '1px solid #ddd' : 'none',
+              }}
+            >
+              <div style={{ marginBottom: '0.5rem' }}>
+                <div style={{ fontWeight: 700, marginBottom: '0.15rem' }}>SKU:</div>
+                <div>{v.sku}</div>
+              </div>
               {v.vendorPageUrl && (
-                <span style={{ marginLeft: '0.5rem' }}>
-                  <a href={v.vendorPageUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0566e8', textDecoration: 'underline' }}>Vendor</a>
-                </span>
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <div style={{ fontWeight: 700, marginBottom: '0.15rem' }}>Vendor site URL:</div>
+                  <div>
+                    <a href={v.vendorPageUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0566e8', textDecoration: 'underline' }}>{v.vendorPageUrl}</a>
+                  </div>
+                </div>
               )}
               {v._source && (
-                <div style={{ marginTop: '0.25rem', color: '#555' }}>
-                  {v._source.description && <span>{v._source.description}</span>}
-                  {v._source.priceUsd != null && <span style={{ marginLeft: '0.5rem' }}>${v._source.priceUsd}</span>}
-                </div>
+                <>
+                  {v._source.description != null && (
+                    <div style={{ marginBottom: '0.5rem' }}>
+                      <div style={{ fontWeight: 700, marginBottom: '0.15rem' }}>Description (Pricing Sheet):</div>
+                      <div>{v._source.description}</div>
+                    </div>
+                  )}
+                  {v._source.priceUsd != null && (
+                    <div style={{ marginBottom: '0.5rem' }}>
+                      <div style={{ fontWeight: 700, marginBottom: '0.15rem' }}>Price USD:</div>
+                      <div>${v._source.priceUsd}</div>
+                    </div>
+                  )}
+                  {v._source.barcode != null && (
+                    <div style={{ marginBottom: '0.5rem' }}>
+                      <div style={{ fontWeight: 700, marginBottom: '0.15rem' }}>Barcode:</div>
+                      <div>{v._source.barcode}</div>
+                    </div>
+                  )}
+                </>
               )}
             </li>
           ))}
