@@ -5,8 +5,8 @@
  * READ-ONLY on --image-root: only reads directory structure. All writes go to --out-file.
  *
  * Usage:
- *   npm run map-sku-to-images -- --sku "100006" --image-root /path/to/elina_images
- *   npm run map-sku-to-images -- --sku "100006" --image-root ./data/elina_images --out-file data/elina/elina_sku_to_images.json
+ *   npm run map-elina-sku-to-images -- --sku "100006" --image-root /path/to/elina_images
+ *   npm run map-elina-sku-to-images -- --sku "100006" --image-root ./data/elina_images --out-file data/elina/elina_sku_to_images.json
  *   Output is written to --output-dir (default: data/elina/processed). Use that to create the per-SKU folder and run the (placeholder) edit+write step after confirm.
  *   Add --yes to skip the "Does this look correct? (y/n)" prompt and proceed as if yes.
  *
@@ -135,9 +135,9 @@ async function runEditAndWrite(
 ): Promise<void> {
   const allPaths = listImageFilesInFolderOnly(imageRoot, folderPath);
   const { paths: imagePaths, message: filterMessage } = filterImagesByColor(allPaths, productColor);
-  if (filterMessage) console.log('[map-sku] ' + filterMessage);
+  if (filterMessage) console.log('[map-elina-sku] ' + filterMessage);
   if (imagePaths.length === 0) {
-    console.log('[map-sku] No images in folder; nothing to write.');
+    console.log('[map-elina-sku] No images in folder; nothing to write.');
     return;
   }
 
@@ -155,7 +155,7 @@ async function runEditAndWrite(
     const outName = `${skuKey} (${n})${outExt}`;
     const outPath = path.join(skuOutputDirFull, outName);
 
-    console.log(`[map-sku] [${n}/${imagePaths.length}] ${path.basename(rel)} → ${outName}`);
+    console.log(`[map-elina-sku] [${n}/${imagePaths.length}] ${path.basename(rel)} → ${outName}`);
 
     const buffer = fs.readFileSync(srcFull);
     try {
@@ -168,11 +168,11 @@ async function runEditAndWrite(
       saveProcessedImage(buffer, origPath);
       savedOriginal += 1;
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`[map-sku]   Error: ${msg}; saved original as ${origName}`);
+      console.warn(`[map-elina-sku]   Error: ${msg}; saved original as ${origName}`);
     }
   }
 
-  console.log(`[map-sku] Wrote ${processed} processed, ${savedOriginal} originals (on error) to ${skuOutputDirFull}`);
+  console.log(`[map-elina-sku] Wrote ${processed} processed, ${savedOriginal} originals (on error) to ${skuOutputDirFull}`);
 }
 
 const VENDOR_STRIP_WIDTH = 400;
@@ -183,7 +183,7 @@ const VENDOR_STRIP_GAP_PX = 16;
  */
 async function buildVendorStrip(vendorImageUrls: string[], skuOutputDirFull: string): Promise<void> {
   if (vendorImageUrls.length === 0) {
-    console.log('[map-sku] No vendor site images; skipping vendor_site_photos.jpg');
+    console.log('[map-elina-sku] No vendor site images; skipping vendor_site_photos.jpg');
     return;
   }
 
@@ -215,7 +215,7 @@ async function buildVendorStrip(vendorImageUrls: string[], skuOutputDirFull: str
   }
 
   if (resized.length === 0) {
-    console.log('[map-sku] Could not fetch any vendor images; skipping vendor_site_photos.jpg');
+    console.log('[map-elina-sku] Could not fetch any vendor images; skipping vendor_site_photos.jpg');
     return;
   }
 
@@ -250,7 +250,7 @@ async function buildVendorStrip(vendorImageUrls: string[], skuOutputDirFull: str
     .jpeg({ quality: 90 })
     .toFile(outPath);
 
-  console.log(`[map-sku] Wrote vendor_site_photos.jpg (${resized.length} images) to ${skuOutputDirFull}`);
+  console.log(`[map-elina-sku] Wrote vendor_site_photos.jpg (${resized.length} images) to ${skuOutputDirFull}`);
 }
 
 function resolveSku(input: SiteInput, skuArg: string): {
@@ -275,7 +275,7 @@ function resolveSku(input: SiteInput, skuArg: string): {
             ? group.site.image_urls
             : [];
         if (imageUrls.length > 0 && !Array.isArray(itemImages) && (group.items?.length ?? 0) > 1) {
-          console.warn(`[map-sku] SKU ${item.article_ref}: using group-level images (no per-item image_urls). Re-run scraper for variant-specific images.`);
+          console.warn(`[map-elina-sku] SKU ${item.article_ref}: using group-level images (no per-item image_urls). Re-run scraper for variant-specific images.`);
         }
         return {
           skuKey: item.article_ref,
@@ -507,20 +507,20 @@ async function treeWalkToFolder(
     const currentHasImages = folderHasImages(imageRoot, currentPath);
     const pathLabel = currentPath || '(root)';
     const childrenLabel = childNames.length > 0 ? childNames.join(', ') : '(none — leaf or empty)';
-    console.log(`[map-sku] Step ${step}: At ${pathLabel}`);
-    console.log(`[map-sku]   Children: ${childrenLabel}`);
-    console.log(`[map-sku]   Has images here: ${currentHasImages ? 'yes' : 'no'}`);
+    console.log(`[map-elina-sku] Step ${step}: At ${pathLabel}`);
+    console.log(`[map-elina-sku]   Children: ${childrenLabel}`);
+    console.log(`[map-elina-sku]   Has images here: ${currentHasImages ? 'yes' : 'no'}`);
 
     const choice = await pick(productName, skuKey, productColor, currentPath, childNames, currentHasImages);
-    console.log(`[map-sku]   → Chose: ${choice}`);
+    console.log(`[map-elina-sku]   → Chose: ${choice}`);
 
     if (choice === 'CURRENT') {
-      console.log(`[map-sku] Stop: model said CURRENT (this folder is the product's image folder).`);
+      console.log(`[map-elina-sku] Stop: model said CURRENT (this folder is the product's image folder).`);
       return currentPath || '.';
     }
     const next = currentChildren.find((c) => c.name === choice || c.name.toLowerCase() === choice.toLowerCase());
     if (!next) {
-      console.log(`[map-sku] Stop: choice did not match any child; using current folder.`);
+      console.log(`[map-elina-sku] Stop: choice did not match any child; using current folder.`);
       return currentPath || '.';
     }
     currentPath = next.relativePath;
@@ -541,11 +541,11 @@ async function processOneSku(
   visionClient?: ImageVisionClient,
 ): Promise<'rejected' | 'done'> {
   const { skuKey, productName, productColor, vendorUrl, vendorSiteImages } = resolveSku(input, skuArg);
-  console.log(`[map-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}`);
+  console.log(`[map-elina-sku] SKU: ${skuKey}, product: ${productName}, color: ${productColor ?? '(none)'}`);
 
-  console.log('[map-sku] Tree-walk to select folder...');
+  console.log('[map-elina-sku] Tree-walk to select folder...');
   let folderPath = await treeWalkToFolder(imageRoot, productName, skuKey, productColor, picker);
-  console.log('[map-sku] Selected folder:', folderPath);
+  console.log('[map-elina-sku] Selected folder:', folderPath);
 
   let outputDirPathRelative: string | null = null;
   let skuOutputDirFull = '';
@@ -568,7 +568,7 @@ async function processOneSku(
     });
     if (step1.action === 'reject') {
       writeSkuMapping(outPath, skuKey, { input_folder_path: null, output_folder_path: null });
-      console.log('[map-sku] Rejected. Wrote null mapping for this SKU to', outPath);
+      console.log('[map-elina-sku] Rejected. Wrote null mapping for this SKU to', outPath);
       return 'rejected';
     }
     folderPath = step1.value;
@@ -582,7 +582,7 @@ async function processOneSku(
       });
       if (step2.action === 'reject') {
         writeSkuMapping(outPath, skuKey, { input_folder_path: null, output_folder_path: null });
-        console.log('[map-sku] Rejected. Wrote null mapping for this SKU to', outPath);
+        console.log('[map-elina-sku] Rejected. Wrote null mapping for this SKU to', outPath);
         return 'rejected';
       }
       outputDirPathRelative = step2.value.replace(/\\/g, '/');
@@ -603,13 +603,13 @@ async function processOneSku(
     ...(outputDirPathRelative ? { output_folder_path: outputDirPathRelative } : {}),
   };
   writeSkuMapping(outPath, skuKey, mapping);
-  console.log('[map-sku] Wrote', outPath);
+  console.log('[map-elina-sku] Wrote', outPath);
 
   if (outputDirResolved && skuOutputDirFull) {
     await buildVendorStrip(vendorSiteImages, skuOutputDirFull);
     await runEditAndWrite(skuKey, folderPath, imageRoot, skuOutputDirFull, productColor, visionClient);
   } else {
-    console.log('[map-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
+    console.log('[map-elina-sku] (Omit --output-dir to skip edit+write step; use --output-dir <path> to create per-SKU output folder.)');
   }
   return 'done';
 }
@@ -659,11 +659,11 @@ async function main() {
   const allSkus = getAllSkusFromInput(input);
   const unmapped = getUnmappedSkus(allSkus, outPath);
   if (unmapped.length === 0) {
-    console.log('[map-sku] All SKUs already mapped. Nothing to do.');
+    console.log('[map-elina-sku] All SKUs already mapped. Nothing to do.');
     return;
   }
 
-  console.log(`[map-sku] Batch mode: ${unmapped.length} SKU(s) not yet mapped. Processing in order.\n`);
+  console.log(`[map-elina-sku] Batch mode: ${unmapped.length} SKU(s) not yet mapped. Processing in order.\n`);
   const visionClient = createVisionClient();
   let done = 0;
   let rejected = 0;
@@ -691,7 +691,7 @@ async function main() {
   }
 
   console.log('\n' + '═'.repeat(60));
-  console.log(`[map-sku] Done. Processed ${done} SKU(s), skipped (rejected) ${rejected}.`);
+  console.log(`[map-elina-sku] Done. Processed ${done} SKU(s), skipped (rejected) ${rejected}.`);
 }
 
 main().catch((e) => {

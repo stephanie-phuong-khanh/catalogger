@@ -14,7 +14,7 @@
     "search-vendor-puppeteer": "npx ts-node scripts/listings/search-vendor-puppeteer.ts",
     "resolve-elina-urls": "npx ts-node scripts/listings/resolve-elina-urls-from-pricing-sheet.ts",
     "scrape-elina-site": "npx ts-node scripts/listings/scrape-vendor.ts",
-    "map-sku-to-images": "npx ts-node scripts/listings/map-sku-to-images.ts",
+    "map-elina-sku-to-images": "npx ts-node scripts/images/map-elina-sku-to-images.ts",
     "eval-specs": "npx ts-node scripts/listings/eval-specs.ts",
     "sync-listings-to-blob": "npx ts-node scripts/listings/sync-listings-to-blob.ts",
     "edit-image": "npx ts-node scripts/images/edit-image.ts",
