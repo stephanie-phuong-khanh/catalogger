@@ -36,6 +36,7 @@ export interface ElinaVariant {
 
 /** Full listing when vendor site was available and content was generated. */
 export interface ElinaListingFull {
+  _listingFormat: 'elina_pilates';
   status: 'full';
   productName: string;
   title: string;
@@ -49,6 +50,7 @@ export interface ElinaListingFull {
 
 /** Stub listing when no vendor site; no generated content. */
 export interface ElinaListingStub {
+  _listingFormat: 'elina_pilates';
   status: 'vendor_site_unavailable';
   productName: string;
   variants: ElinaVariant[];

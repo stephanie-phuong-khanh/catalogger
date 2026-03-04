@@ -44,6 +44,7 @@ export function createIncompleteListing(
   vendorSiteData: VendorSiteProduct | null,
 ): GoldenDesignsListingIncomplete {
   return {
+    _listingFormat: 'golden_designs',
     sku,
     incompletePricingData: true,
     _raw: product,
@@ -276,6 +277,7 @@ export async function generateListing(
   const overviewParagraph = await generateOverviewParagraph(_openai, title, features);
 
   return {
+    _listingFormat: 'golden_designs',
     sku,
     title,
     features,

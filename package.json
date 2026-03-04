@@ -24,7 +24,8 @@
     "crop-with-segmentation": "npx ts-node scripts/images/crop-with-segmentation.ts",
     "download-elina-product-images": "npx ts-node scripts/images/download-elina-product-images.ts",
     "parse-pdf-pricing-sheet": "npx ts-node scripts/listings/parse-pdf-pricing-sheet.ts",
-    "generate-listings-elina": "npx ts-node scripts/listings/generate-listings-elina.ts"
+    "generate-listings-elina": "npx ts-node scripts/listings/generate-listings-elina.ts",
+    "migrate-add-listing-format": "npx ts-node scripts/listings/migrate-add-listing-format.ts"
   },
   "keywords": [],
   "author": "",

@@ -477,6 +477,7 @@ function buildVariantsFromItems(items: ItemInput[]): ElinaVariant[] {
 /** Stub when no vendor site; no generated content. */
 function buildStubListing(productName: string, items: ItemInput[]): ElinaListingStub {
   return {
+    _listingFormat: 'elina_pilates',
     status: 'vendor_site_unavailable',
     productName,
     variants: buildVariantsFromItems(items),
@@ -491,6 +492,7 @@ function buildFullListingPlaceholder(
 ): ElinaListingFull {
   const variants = buildVariantsFromItems(items);
   return {
+    _listingFormat: 'elina_pilates',
     status: 'full',
     productName,
     title: '',

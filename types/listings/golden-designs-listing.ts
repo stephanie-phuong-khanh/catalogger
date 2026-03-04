@@ -31,6 +31,7 @@ export interface GoldenDesignsVendorData {
 
 /** Full listing when pricing data was complete and LLM generation succeeded. */
 export interface GoldenDesignsListingFull {
+  _listingFormat: 'golden_designs';
   sku: string;
   title: string;
   features: string[];
@@ -43,6 +44,7 @@ export interface GoldenDesignsListingFull {
 
 /** Stub listing when pricing data is incomplete; no LLM-generated fields. */
 export interface GoldenDesignsListingIncomplete {
+  _listingFormat: 'golden_designs';
   sku: string;
   incompletePricingData: true;
   _raw: Record<string, unknown>;
