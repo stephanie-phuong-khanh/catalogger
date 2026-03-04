@@ -17,8 +17,13 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import dotenv from 'dotenv';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import type { Page } from 'puppeteer';
 import { processImage, saveProcessedImage } from '../../lib/images/edit-image';
 import { createVisionClient } from '../../lib/images/vision-client';
+
+puppeteer.use(StealthPlugin());
 
 dotenv.config();
 if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
@@ -29,6 +34,7 @@ const CONFIG = {
   inputPath: path.join(process.cwd(), 'data/elina/elina_pilates_products_site.json'),
   // Use an absolute path so output is not under process.cwd(); override with --out-dir.
   outputPath: '/Users/sdoan/Google Drive/My Drive/Scraped from vendor: Elina Pilates <> Dansons',
+  reportPath: path.join(process.cwd(), 'data/elina/download-elina-product-images-report.json'),
 };
 
 type Item = { article_ref: string; product_name?: string; image_urls?: string[]; [k: string]: unknown };
@@ -66,12 +72,20 @@ function getExtFromUrl(url: string): string {
   return '.jpg';
 }
 
-async function downloadImage(url: string): Promise<Buffer> {
-  const res = await fetch(url, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; catalogger/1.0)' },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
-  return Buffer.from(await res.arrayBuffer());
+const ELINA_ORIGIN = 'https://www.elinapilates.com';
+const IMAGE_FETCH_DELAY_MS = 400;
+
+/** Fetch image via Puppeteer so the request runs in a real browser (avoids 403 from bot blocking). */
+async function downloadImage(page: Page, url: string): Promise<Buffer> {
+  const response = await page.goto(url, { waitUntil: 'load', timeout: 20000 });
+  if (!response) throw new Error(`No response: ${url}`);
+  if (!response.ok()) throw new Error(`HTTP ${response.status()}: ${url}`);
+  const buffer = await response.buffer();
+  return Buffer.from(buffer);
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 async function main() {
@@ -98,48 +112,121 @@ async function main() {
     }
   }
 
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 800 });
+  await page.setUserAgent(
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  );
+
+  try {
+    console.log('Loading site to establish session...');
+    await page.goto(ELINA_ORIGIN + '/eu/en/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await delay(2000);
+    console.log('Session ready. Downloading images...\n');
+  } catch (e) {
+    console.error('Failed to load site:', e);
+    await browser.close();
+    process.exit(1);
+  }
+
   let totalWritten = 0;
   let totalSkipped = 0;
+  const successes: { productName: string; articleRef: string; imageIndex: number; path: string }[] = [];
+  const skipped: { productName: string; articleRef: string; reason: string }[] = [];
+  const failures: { productName: string; articleRef: string; imageIndex: number; url: string; error: string }[] = [];
 
-  for (const group of groups) {
-    const productName = group.product_name ?? 'Unknown';
-    const productDirName = sanitizeFolderName(productName);
+  try {
+    for (const group of groups) {
+      const productName = group.product_name ?? 'Unknown';
+      const productDirName = sanitizeFolderName(productName);
 
-    for (const item of group.items ?? []) {
-      const articleRef = item.article_ref ?? 'unknown';
-      const imageUrls = item.image_urls ?? [];
-      if (imageUrls.length === 0) {
-        console.log(`[skip] ${productName} / ${articleRef}: no image_urls`);
-        totalSkipped++;
-        continue;
-      }
-
-      const skuDir = path.join(outputBase, productDirName, articleRef);
-
-      for (let i = 0; i < imageUrls.length; i++) {
-        const url = imageUrls[i];
-        const oneBased = i + 1;
-        const indexStr = String(oneBased).padStart(3, '0');
-        const ext = getExtFromUrl(url);
-        const fileName = `${articleRef} (${indexStr})${ext}`;
-        const outPath = path.join(skuDir, fileName);
-
-        try {
-          const buffer = await downloadImage(url);
-          const processed = await processImage(buffer, 1500, 1500, visionClient);
-          saveProcessedImage(processed, outPath);
-          console.log(`[ok] ${path.resolve(outPath)}`);
-          totalWritten++;
-        } catch (err) {
-          console.error(`[fail] ${productDirName}/${articleRef} image ${oneBased} (${url}):`, err);
+      for (const item of group.items ?? []) {
+        const articleRef = item.article_ref ?? 'unknown';
+        const imageUrls = item.image_urls ?? [];
+        if (imageUrls.length === 0) {
+          const reason = 'no image_urls';
+          skipped.push({ productName, articleRef, reason });
+          console.log(`[skip] ${productName} / ${articleRef}: ${reason}`);
           totalSkipped++;
+          continue;
+        }
+
+        const skuDir = path.join(outputBase, productDirName, articleRef);
+
+        for (let i = 0; i < imageUrls.length; i++) {
+          const url = imageUrls[i];
+          const oneBased = i + 1;
+          const indexStr = String(oneBased).padStart(3, '0');
+          const ext = getExtFromUrl(url);
+          const fileName = `${articleRef} (${indexStr})${ext}`;
+          const outPath = path.join(skuDir, fileName);
+          const fullPath = path.resolve(outPath);
+
+          try {
+            const buffer = await downloadImage(page, url);
+            const processed = await processImage(buffer, 1500, 1500, visionClient);
+            saveProcessedImage(processed, outPath);
+            successes.push({ productName, articleRef, imageIndex: oneBased, path: fullPath });
+            console.log(`[ok] ${fullPath}`);
+            totalWritten++;
+          } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : String(err);
+            failures.push({ productName, articleRef, imageIndex: oneBased, url, error: errorMsg });
+            console.error(`[fail] ${productDirName}/${articleRef} image ${oneBased} (${url}):`, err);
+            totalSkipped++;
+          }
+          await delay(IMAGE_FETCH_DELAY_MS);
         }
       }
     }
+  } finally {
+    await browser.close();
   }
 
   console.log(`\nDone. Written: ${totalWritten}, skipped/failed: ${totalSkipped}`);
   if (totalWritten > 0) console.log('Images saved under:', outputBase);
+
+  const reportPath = path.resolve(CONFIG.reportPath);
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(
+    reportPath,
+    JSON.stringify(
+      {
+        summary: { totalWritten, totalSkipped, successCount: successes.length, skippedCount: skipped.length, failureCount: failures.length },
+        successes,
+        skipped,
+        failures,
+      },
+      null,
+      2,
+    ),
+    'utf-8',
+  );
+  console.log(`\nReport written to: ${reportPath}`);
+
+  if (successes.length > 0) {
+    console.log('\n--- Successful downloads ---');
+    for (const s of successes) {
+      console.log(`  ${s.productName} / ${s.articleRef} image ${s.imageIndex}: ${s.path}`);
+    }
+  }
+  if (skipped.length > 0) {
+    console.log('\n--- Skipped ---');
+    for (const s of skipped) {
+      console.log(`  ${s.productName} / ${s.articleRef}: ${s.reason}`);
+    }
+  }
+  if (failures.length > 0) {
+    console.log('\n--- Failed ---');
+    for (const f of failures) {
+      console.log(`  ${f.productName} / ${f.articleRef} image ${f.imageIndex}: ${f.url}`);
+      console.log(`    → ${f.error}`);
+    }
+  }
 }
 
 main().catch((err) => {

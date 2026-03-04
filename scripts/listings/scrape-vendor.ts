@@ -17,6 +17,7 @@
  *   npm run scrape-elina-site -- --input-file=... --out-file=...
  *   npm run scrape-elina-site -- --headed
  *   npm run scrape-elina-site -- --fresh   # wipe output and start from input only
+ *   npm run scrape-elina-site -- --single "Wooden Reformer Lignum With Tower"   # re-scrape only this product (clears its site so it's re-fetched)
  */
 
 import * as fs from 'fs';
@@ -156,7 +157,33 @@ async function main() {
   const baseUrl = CONFIG.vendorBaseUrl.replace(/\/$/, '');
   const homepageUrl = `${baseUrl}/eu/en/`;
 
-  const groupsToDo = output.groups.map((g, i) => ({ group: g, index: i })).filter(({ group }) => !('site' in group && group.site != null));
+  const singleName = (() => {
+    const i = process.argv.indexOf('--single');
+    if (i === -1 || !process.argv[i + 1]) return null;
+    return process.argv[i + 1].trim();
+  })();
+  let singleIndex: number | null = null;
+  if (singleName) {
+    const want = singleName.toLowerCase();
+    const idx = output.groups.findIndex((g) => (g.product_name ?? '').trim().toLowerCase() === want);
+    if (idx === -1) {
+      console.error(`No product group matching "${singleName}".`);
+      process.exit(1);
+    }
+    singleIndex = idx;
+    const g = output.groups[idx] as Group;
+    delete g.site;
+    g.items = g.items.map((item) => {
+      const { image_urls, ...rest } = item as Item & { image_urls?: string[] };
+      return rest;
+    });
+    console.log(`--single: cleared site (and item image_urls) for "${g.product_name ?? singleName}" so it will be re-scraped.\n`);
+  }
+
+  let groupsToDo = output.groups.map((g, i) => ({ group: g, index: i })).filter(({ group }) => !('site' in group && group.site != null));
+  if (singleIndex !== null) {
+    groupsToDo = groupsToDo.filter(({ index }) => index === singleIndex);
+  }
 
   if (groupsToDo.length === 0) {
     console.log('All groups already have site data. Nothing to do.');
