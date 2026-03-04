@@ -307,7 +307,7 @@ function getTextUnderImages(site: unknown): string {
 }
 
 /**
- * Generate concise features list for Dansons. Pass intro + FEATURES + text_under_images when FEATURES exists;
+ * Generate concise features list for Elina. Pass intro + FEATURES + text_under_images when FEATURES exists;
  * otherwise full description + text_under_images. LLM de-dupes overlapping points.
  */
 async function generateFeaturesElina(
@@ -318,22 +318,29 @@ async function generateFeaturesElina(
   const optionalContext = textUnderImages
     ? `\n\nSHORT TEXT (may have repeated info from vendor content):\n${textUnderImages}`
     : '';
-  const prompt = `You are writing a clear, concise list of features for a product listing.
+
+  const prompt = `You are writing a clear, concise list of features for a product listing. Features should be scannable: key benefits and differentiators only, very short phrases.
 
 PRODUCT CONTENT:
 ${featuresSourceText || '(none)'}${optionalContext}
 
 RULES:
-- Compose concise, articulate bullets.
-- The product content above may repeat content. DEDUPLICATE repeated content. Combine only when closely related. Do not combine unrelated points into one bullet.
-- DO NOT DROP ANY INFORMATION FROM THE PRODUCT CONTENT, ESPECIALLY MATERIAL AND NUMBERS. KEEP NUMBERS AS DIGITS, NOT WORDS.
-- Aim for fewer than 12 total bullets. There is no minimum. If the vendor content is short, use fewer than 5 bullets.
-- Use plain language. No filler, no marketing fluff, no SKU/disclaimers/quotes.
-- Output only the list of feature strings. No preamble or numbering.`;
+- Prioritize key benefits and differentiators. Curate to what matters for a scanning customer; omit minor or highly technical details that belong in a specs table. Do not list every spec from the source.
+- Fewer than 7 words per bullet (guideline). Lead with the feature name, then the key modifier (e.g. "Aluminum frame" not "Frame made of aluminium").
+- One idea per bullet = one feature/component/benefit. Combine when it's the same part and the phrase stays short (e.g. "Collapisble tower, 3 heights" in one bullet). Split only when a single bullet would get long or mix unrelated things.
+- If available, have product material info in the first bullet.
+- Keep numbers as digits. Preserve materials and key specs that customers care about (e.g. "Anodized aluminum & stainless steel frame", "7 color-coded metal springs").
+- Aim for a scannable list; soft cap ~18 bullets. No minimum; if the vendor content is short, use fewer bullets.
+- Deduplicate repeated content. Do not combine unrelated points into one bullet.
+- Use benefit-led, plain language: "Durable upholstery" not "High-quality upholstery for intense, continuous use". No filler, no full sentences, no marketing fluff, no SKU/disclaimers/quotes.
+- Output only the list of feature strings. No preamble or numbering. No periods after the bullets.
+- Do not structure bullets like "Feature: Modifier". Just list the modifier before the feature name.
+- Use & instead of "and" where it keeps the bullet short.
+`;
 
   const response = await openai.responses.parse({
-    model: 'gpt-4o',
-    temperature: 0,
+    model: 'gpt-5.2',
+    // temperature: 0,
     input: [{ role: 'user', content: prompt }],
     text: { format: zodTextFormat(FeaturesOutput, 'features_output') },
   });
@@ -412,7 +419,7 @@ async function generateWarrantyBullet(
   openai: OpenAI,
   warrantyBody: string,
 ): Promise<string> {
-  const prompt = `Turn this warranty text into a single concise bullet point for a product features list. Output only the bullet text, no preamble or numbering.
+  const prompt = `Turn this warranty text into a single concise bullet point for a product features list. Output only the bullet text, no preamble or numbering. Use fewer than 10 words.
 
 WARRANTY TEXT:
 ${warrantyBody}`;
