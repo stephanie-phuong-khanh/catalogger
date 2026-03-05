@@ -11,6 +11,7 @@ export type {
   ElinaSpecRow,
   ElinaVariant,
   ElinaListingSource,
+  GoogleDriveLink,
 } from './elina-pilates-listing';
 
 export type {

@@ -2,7 +2,7 @@
  * Schema and types for Elina Pilates generated listings.
  * One JSON file per product group: data/listings/elina_pilates/{productGroupSlug}.json
  * Product-level content (title, overview, features, inclusions, specs, youtube) is shared;
- * variant-level data (sku, vendor URL, Google Drive images, _source) lives in variants[].
+ * variant-level data (sku, vendor URL, Google Drive folder links, _source) lives in variants[].
  */
 
 /** One row in the specifications table. */
@@ -26,11 +26,18 @@ export interface ElinaListingSource {
   barcode: string;
 }
 
+/** Google Drive folder link: base URL is looked up by baseUrlConstantKey from constants. */
+export interface GoogleDriveLink {
+  label: string;
+  baseUrlConstantKey: string;
+  path: string;
+}
+
 /** One variant (SKU) within a product group. */
 export interface ElinaVariant {
   sku: string;
   vendorPageUrl: string | null;
-  googleDriveUrls: string[];
+  googleDriveLinks: GoogleDriveLink[];
   _source: ElinaListingSource;
 }
 

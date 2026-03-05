@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import type { ElinaListing, GoldenDesignsListing } from '../../types/listings';
+import { ELINA_DRIVE_BASE_URLS } from '../../constants/elina-drive';
 import {
   normalizeKey,
   TOP_SECTION_KEYS,
@@ -160,6 +161,47 @@ function ElinaListingView({ listing, path: pathSegments }: { listing: ElinaListi
                   </div>
                 </div>
               )}
+              {v.googleDriveLinks?.length ? (
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <div style={{ fontWeight: 700, marginBottom: '0.15rem' }}>Google Drive image folders:</div>
+                  <ul style={{ listStyle: 'disc', paddingLeft: '1.25rem', margin: 0 }}>
+                    {v.googleDriveLinks.map((link) => {
+                      const baseUrl = ELINA_DRIVE_BASE_URLS[link.baseUrlConstantKey];
+                      const pathParts = link.path.split('/');
+                      return (
+                        <li key={link.baseUrlConstantKey} style={{ marginBottom: '0.25rem' }}>
+                          <span style={{ fontSize: '0.8125rem', paddingRight: '0.5rem' }}>
+                            {link.label?.endsWith(':') ? link.label : `${link.label ?? ''}:`}
+                          </span>
+                          {baseUrl ? (
+                            <span>
+                              <a href={baseUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0566e8', textDecoration: 'underline' }}>Folder</a>
+                              <span style={{ color: '#111' }}>
+                                {' '}→{' '}
+                                {pathParts.map((part, i) => (
+                                  <span key={i}>
+                                    {part}
+                                    {i < pathParts.length - 1 ? <strong> / </strong> : null}
+                                  </span>
+                                ))}
+                              </span>
+                            </span>
+                          ) : (
+                            <span style={{ color: '#111', marginLeft: '0.25rem' }}>
+                              {pathParts.map((part, i) => (
+                                <span key={i}>
+                                  {part}
+                                  {i < pathParts.length - 1 ? <strong> / </strong> : null}
+                                </span>
+                              ))}
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ) : null}
               {v._source && (
                 <>
                   {v._source.description != null && (

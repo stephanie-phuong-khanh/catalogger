@@ -28,6 +28,7 @@ import type {
   ElinaSpecifications,
   ElinaVariant,
   ElinaListingSource,
+  GoogleDriveLink,
 } from '../../types/listings/elina-pilates-listing';
 
 dotenv.config();
@@ -54,8 +55,12 @@ const SpecsTableOutput = z.object({
 });
 const CONFIG = {
   inputFile: 'data/elina/elina_pilates_products_site.json',
+  skuToImagesFile: 'data/elina/elina_sku_to_images.json',
   outputDir: 'data/listings/elina_pilates',
 };
+
+type SkuToImagesEntry = { input_folder_path: string | null; output_folder_path: string | null };
+type SkuToImages = { skus: Record<string, SkuToImagesEntry> };
 
 /** Normalize product group name for use as a filename slug: trim, replace / with -, collapse spaces to single dash. */
 function productGroupToSlug(productName: string): string {
@@ -496,10 +501,46 @@ function buildVariantsFromItems(items: ItemInput[]): ElinaVariant[] {
     return {
       sku: String(item.article_ref),
       vendorPageUrl: item.url != null ? String(item.url).trim() || null : null,
-      googleDriveUrls: [],
+      googleDriveLinks: [],
       _source: source,
     };
   });
+}
+
+function buildGoogleDriveLinks(
+  productName: string,
+  sku: string,
+  skuToImages: SkuToImages,
+): GoogleDriveLink[] {
+  const links: GoogleDriveLink[] = [];
+  const vendorPath = `${productName.trim()}/${sku}`;
+  links.push({
+    label: 'Scraped from vendor site:',
+    baseUrlConstantKey: 'vendorSiteScraped',
+    path: vendorPath,
+  });
+  const entry = skuToImages.skus?.[sku];
+  const elinaPath = entry?.output_folder_path ?? null;
+  if (elinaPath != null && elinaPath.trim() !== '') {
+    links.push({
+      label: 'Images provided by vendor:',
+      baseUrlConstantKey: 'elinaProvided',
+      path: elinaPath,
+    });
+  }
+  return links;
+}
+
+function enrichListingWithGoogleDriveLinks(
+  listing: ElinaListing,
+  skuToImages: SkuToImages,
+): ElinaListing {
+  const productName = listing.productName ?? 'Unknown';
+  const variants: ElinaVariant[] = listing.variants.map((v) => ({
+    ...v,
+    googleDriveLinks: buildGoogleDriveLinks(productName, v.sku, skuToImages),
+  }));
+  return { ...listing, variants };
 }
 
 /** Stub when no vendor site; no generated content. */
@@ -550,6 +591,15 @@ async function main() {
 
   const data = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
   const groups = data.groups ?? [];
+
+  const skuToImagesPath = path.isAbsolute(CONFIG.skuToImagesFile)
+    ? CONFIG.skuToImagesFile
+    : path.join(process.cwd(), CONFIG.skuToImagesFile);
+  let skuToImages: SkuToImages = { skus: {} };
+  if (fs.existsSync(skuToImagesPath)) {
+    skuToImages = JSON.parse(fs.readFileSync(skuToImagesPath, 'utf-8')) as SkuToImages;
+    if (!skuToImages.skus || typeof skuToImages.skus !== 'object') skuToImages.skus = {};
+  }
 
   const outputDir = path.join(process.cwd(), CONFIG.outputDir);
   if (!printOnly && !fs.existsSync(outputDir)) {
@@ -629,6 +679,8 @@ async function main() {
         }
       }
     }
+
+    listing = enrichListingWithGoogleDriveLinks(listing, skuToImages);
 
     if (printOnly) {
       console.log(JSON.stringify(listing, null, 2));

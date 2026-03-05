@@ -15,7 +15,7 @@
  * Usage:
  *   npm run sync-listings-to-blob                              # upload all (overwrite existing)
  *   npm run sync-listings-to-blob -- --full                    # full sync: wipe then upload
- *   npm run sync-listings-to-blob -- --single tab_09_gdina_traditional/GDI-8005-01.json  # one file
+ *   npm run sync-listings-to-blob -- --single elina_pilates/Reformer-Elite.json  # one file
  */
 
 import fs from 'fs';
