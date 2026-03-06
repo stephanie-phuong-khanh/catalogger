@@ -4,6 +4,7 @@
  */
 
 export type {
+  ElinaInclusionSection,
   ElinaListing,
   ElinaListingFull,
   ElinaListingStub,

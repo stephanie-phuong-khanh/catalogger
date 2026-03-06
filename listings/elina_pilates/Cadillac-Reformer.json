@@ -25,27 +25,37 @@
     "Jump board & box included"
   ],
   "inclusions": [
-    "Double mat to completely cover the surface",
-    "2 horizontal and vertical sliding bars with quick adjustment system",
-    "Foot support mat",
-    "Adjustable fastening strap",
-    "Wooden trapeze bar with padded protection, with covered springs for greater safety and stabilizer belt",
-    "Springs: 2 short light (yellow), 2 short medium (green), 2 light long (yellow) and 2 medium long (green)",
-    "Roll - down bar in solid beech wood",
-    "1 pair of Fuzzies grips, very soft",
-    "Stainless steel towers with hooks. Easier exercises from outside of the unit. Easily removable",
-    "Pulley bars with height change and removable quick-release system ",
-    "Adjustable headrest in 3 positions",
-    "Removable shoulder pads ",
-    "Removable quick-release pulley bars with height change",
-    "1 set of pulley ropes",
-    "Adjustable foot bar in 4 positions",
-    "Push bar adjustable in 4 heights",
-    "1 push bar safety strap",
-    "Bed Springs: 2 light (yellow), 2 medium (green), 2 strong (red)",
-    "A cotton handles: 1 set of double handles for hands and feet, 1 set of single handles for feet and 1 set of padded handles",
-    "Adjustable foot strap",
-    "Includes the jump table and the box"
+    {
+      "section": "Cadillac",
+      "items": [
+        "Double mat to completely cover the surface",
+        "2 horizontal and vertical sliding bars with quick adjustment system",
+        "Foot support mat",
+        "Adjustable fastening strap",
+        "Wooden trapeze bar with padded protection, with covered springs for greater safety and stabilizer belt",
+        "Springs: 2 short light (yellow), 2 short medium (green), 2 light long (yellow) and 2 medium long (green)",
+        "Roll - down bar in solid beech wood",
+        "1 pair of Fuzzies grips, very soft"
+      ]
+    },
+    {
+      "section": "Reformer",
+      "items": [
+        "Stainless steel towers with hooks. Easier exercises from outside of the unit. Easily removable",
+        "Pulley bars with height change and removable quick-release system ",
+        "Adjustable headrest in 3 positions",
+        "Removable shoulder pads ",
+        "Removable quick-release pulley bars with height change",
+        "1 set of pulley ropes",
+        "Adjustable foot bar in 4 positions",
+        "Push bar adjustable in 4 heights",
+        "1 push bar safety strap",
+        "Bed Springs: 2 light (yellow), 2 medium (green), 2 strong (red)",
+        "A cotton handles: 1 set of double handles for hands and feet, 1 set of single handles for feet and 1 set of padded handles",
+        "Adjustable foot strap",
+        "Includes the jump table and the box"
+      ]
+    }
   ],
   "specifications": {
     "tableTitle": "Key dimensions of Cadillac Reformer",

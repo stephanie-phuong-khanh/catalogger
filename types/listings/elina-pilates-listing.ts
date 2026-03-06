@@ -5,6 +5,12 @@
  * variant-level data (sku, vendor URL, Google Drive folder links, _source) lives in variants[].
  */
 
+/** One section in inclusions (e.g. "Cadillac", "Reformer") with a list of items. */
+export interface ElinaInclusionSection {
+  section: string;
+  items: string[];
+}
+
 /** One row in the specifications table. */
 export interface ElinaSpecRow {
   label: string;
@@ -49,7 +55,8 @@ export interface ElinaListingFull {
   title: string;
   overviewParagraph: string;
   features: string[];
-  inclusions: string[];
+  /** Flat list (legacy) or sectioned list: { section, items }[] */
+  inclusions: string[] | ElinaInclusionSection[];
   specifications: ElinaSpecifications;
   youtubeUrls: string[];
   variants: ElinaVariant[];

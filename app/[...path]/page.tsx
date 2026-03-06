@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import type { ElinaListing, GoldenDesignsListing } from '../../types/listings';
+import type { ElinaInclusionSection, ElinaListing, GoldenDesignsListing } from '../../types/listings';
 import { ELINA_DRIVE_BASE_URLS } from '../../constants/elina-drive';
 import {
   normalizeKey,
@@ -88,11 +88,29 @@ function ElinaListingView({ listing, path: pathSegments }: { listing: ElinaListi
       {full && full.inclusions?.length ? (
         <section style={{ marginBottom: '1rem' }}>
           <h2 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.25rem', color: '#333' }}>Inclusions</h2>
-          <ul style={{ paddingLeft: '1.25rem', margin: 0, lineHeight: 1.5, fontSize: '0.875rem' }}>
-            {full.inclusions.map((item, i) => (
-              <li key={i} style={{ marginBottom: '0.25rem' }}>{item}</li>
-            ))}
-          </ul>
+          {(() => {
+            const first = full.inclusions[0];
+            const isSectioned = typeof first === 'object' && first !== null && 'section' in first && Array.isArray((first as ElinaInclusionSection).items);
+            if (isSectioned) {
+              return (full.inclusions as ElinaInclusionSection[]).map((block, i) => (
+                <div key={i} style={{ marginBottom: '0.75rem' }}>
+                  <h3 style={{ fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem', color: '#555' }}>{block.section}</h3>
+                  <ul style={{ paddingLeft: '1.25rem', margin: 0, lineHeight: 1.5, fontSize: '0.875rem' }}>
+                    {block.items.map((item: string, j: number) => (
+                      <li key={j} style={{ marginBottom: '0.25rem' }}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ));
+            }
+            return (
+              <ul style={{ paddingLeft: '1.25rem', margin: 0, lineHeight: 1.5, fontSize: '0.875rem' }}>
+                {(full.inclusions as string[]).map((item, i) => (
+                  <li key={i} style={{ marginBottom: '0.25rem' }}>{item}</li>
+                ))}
+              </ul>
+            );
+          })()}
         </section>
       ) : null}
 
