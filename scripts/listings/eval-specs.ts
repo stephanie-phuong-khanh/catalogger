@@ -1,5 +1,5 @@
 /**
- * Eval: compare "specifications" section of generated listings (data/listings)
+ * Eval: compare "specifications" section of generated listings (listings/)
  * to golden reference (data/reference_golden). Row labels differ between the two
  * (e.g. "Sauna (Exterior)" vs "Infrared Sauna (Exterior)"), so we interleave
  * programmatic checks with LLM-based semantic comparison (row alignment + value equivalence).
@@ -15,7 +15,7 @@ import { z } from 'zod';
 dotenv.config();
 
 const CONFIG = {
-  listingsDir: path.join(process.cwd(), 'data', 'listings'),
+  listingsDir: path.join(process.cwd(), 'listings'),
   referenceDir: path.join(process.cwd(), 'data', 'reference_golden'),
 };
 
@@ -123,7 +123,7 @@ async function main() {
   const commonSkus = [...listingSkus].filter(sku => referenceSkus.has(sku)).sort();
 
   if (commonSkus.length === 0) {
-    console.log('No SKUs in common between data/listings and data/reference_golden.');
+    console.log('No SKUs in common between listings/ and data/reference_golden.');
     process.exit(0);
   }
 

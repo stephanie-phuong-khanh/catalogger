@@ -1,0 +1,158 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Wooden Reformer Lignum",
+  "title": "Elina Pilates Lignum Reformer",
+  "overviewParagraph": "The Lignum Reformer is a professional-grade Pilates reformer designed for both home and studio use, delivering full-machine functionality at a reduced price. Built with a light beech wood frame plus stainless steel and aluminum components, it’s made for stable, smooth training over time. Two quick adjustment systems for the footbar and springs, along with height-adjustable rope pulleys, let you change resistance and setup fast so you can move through workouts without interruption. It includes a wooden Pilates pole, box, jump board, and handles—featuring an innovative loop handle system that glides smoothly and silently for more comfortable sessions.",
+  "features": [
+    "Waterproof beech wood frame",
+    "Stainless steel & aluminum components",
+    "Home & studio ready",
+    "6-position quick-release footbar",
+    "Non-slip padded footbar & platform",
+    "Ultra-silent 8-wheel carriage",
+    "Durable studio-grade upholstery",
+    "5-spring resistance set",
+    "3-position adjustable spring bar",
+    "3-position adjustable headrest",
+    "Height-adjustable rope pulleys",
+    "Locking rope adjustment system",
+    "3-position carriage stopper",
+    "Padded adjustable shoulder rests",
+    "Stable padded box included",
+    "Extra-wide removable jump board",
+    "Silent loop handles",
+    "Front transport wheels",
+    "5-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Lignum Reformer",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded footbar",
+    "1 set of hard padded foam handles",
+    "1 set of cotton handles for hands and feet, double loop",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Spring bar",
+    "Foot strap",
+    "1 pair of wheels",
+    "1 set of pulley ropes",
+    "Pulley posts",
+    "Wooden pike"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Lignum Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "96.1\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "26.18\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "9.84\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.16\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "12.6\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "138.9 lb / 63.5 kg"
+        ]
+      },
+      {
+        "label": "Max Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.56\" x 15.75\" x 11.42\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=4ViForKV2pE"
+  ],
+  "variants": [
+    {
+      "sku": "100500",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1122-1942-lignum-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wooden Reformer Lignum/100500"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Lignum/Lignum/100500"
+        }
+      ],
+      "_source": {
+        "articleRef": "100500",
+        "description": "WOODEN REFORMER LIGNUM_BLACK",
+        "priceUsd": 3190,
+        "barcode": "8421941016066"
+      }
+    },
+    {
+      "sku": "100501",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1122-1943-lignum-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wooden Reformer Lignum/100501"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Lignum/Lignum/100501"
+        }
+      ],
+      "_source": {
+        "articleRef": "100501",
+        "description": "WOODEN REFORMER LIGNUM_GREY",
+        "priceUsd": 3190,
+        "barcode": "8421941016073"
+      }
+    }
+  ]
+}

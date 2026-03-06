@@ -1,0 +1,130 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Aluminium Reformer HL 4",
+  "title": "Elina Pilates Aluminum Reformer Hl4",
+  "overviewParagraph": "The Aluminum Reformer Hl4 is a modern, aluminum Pilates Reformer built for studios and clubs that need versatile, space-smart training. Its stackable design and vertical storage option let you maximize floor space without sacrificing a full Reformer setup. Choose from four leg heights to match your room and clientele, and adjust quickly with the footbar’s fast-release system for smoother class flow. The included box, jump board, and handles—paired with an innovative loop handle system for smooth, silent movement—deliver a more comfortable, premium workout experience.",
+  "features": [
+    "Anodized aluminum frame",
+    "Stackable horizontal storage",
+    "Vertical storage option",
+    "4 leg height options",
+    "6-position quick-release footbar",
+    "Non-slip padded footbar",
+    "Non-slip footplate",
+    "Ultra-silent smooth carriage",
+    "Noise-free loop handle system",
+    "Durable studio-grade upholstery",
+    "Cleat-adjust cable system",
+    "3-position carriage stoppers",
+    "5 springs, 4-position bar",
+    "3-position adjustable headrest",
+    "Removable padded shoulder rests",
+    "Stability box included",
+    "Removable jump board included",
+    "Inside/outside foot strap placement",
+    "Integrated transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Aluminum HL Reformer",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Non-slip foot platform",
+    "Padded footbar",
+    "1 set of foam padded hard handles",
+    "1 set of cotton double loop handles for hands and feet",
+    "Padded shoulder rests",
+    "Springs: 2 red strong, 2 green medium, and 1 yellow light",
+    "Foot strap",
+    "Pulley posts",
+    "2 pairs of wheels",
+    "One set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Aluminum Reformer Hl4",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.49\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.95\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "21.06\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "31.69\""
+        ]
+      },
+      {
+        "label": "Carriage Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Carriage Height",
+        "values": [
+          "23.82\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "154.32 lb / 70 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=kERnuH7xnYY",
+    "https://www.youtube.com/watch?v=kKWu70qX4J0"
+  ],
+  "variants": [
+    {
+      "sku": "200004",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/779-aluminio-hl4-reformer-8421941005404.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer HL 4/200004"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer de aluminio/200004"
+        }
+      ],
+      "_source": {
+        "articleRef": "200004",
+        "description": "ALUMINIUM REFORMER HL 4",
+        "priceUsd": 4045,
+        "barcode": "8421941005404"
+      }
+    }
+  ]
+}

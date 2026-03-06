@@ -1,0 +1,44 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Breath-A-Cizer",
+  "title": "Elina Pilates Breath A Cizer",
+  "overviewParagraph": "The Breath A Cizer is a Pilates breathing exerciser with a windmill-like wheel that spins when you blow through the straw, guiding you into diaphragmatic breathing. This simple visual feedback helps you practice breathing that can increase oxygen intake, support easier breathing, and promote relaxation or energy as needed. It’s also well-suited for asthma breathing exercises and neuromuscular system education. Made from durable, water-resistant materials, it’s compact, easy to clean, and simple to store anywhere.",
+  "features": [
+    "Water-resistant materials, easy-clean design",
+    "Windmill wheel breathing feedback",
+    "Straw-blow operation",
+    "Promotes diaphragmatic breathing",
+    "Supports asthma breathing exercises",
+    "Improves oxygen intake",
+    "Relaxation & energy breathing aid",
+    "Durable, minimal-parts construction",
+    "Compact, lightweight storage"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "",
+    "columns": [],
+    "rows": []
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "500104",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/accessories/1088-breat-a-cizer-8421941015243.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Breath-A-Cizer/500104"
+        }
+      ],
+      "_source": {
+        "articleRef": "500104",
+        "description": "BREATH-A-CIZER",
+        "priceUsd": 75,
+        "barcode": "8421941015243"
+      }
+    }
+  ]
+}

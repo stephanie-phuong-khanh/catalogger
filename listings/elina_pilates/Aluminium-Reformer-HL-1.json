@@ -1,0 +1,135 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Aluminium Reformer HL 1",
+  "title": "Elina Pilates Aluminum Hl1 Reformer",
+  "overviewParagraph": "The Aluminum Hl1 Reformer is Elina Pilates’ most versatile, modern reformer, built for studios and clubs that need practical performance in a premium package. Its stackable design stands vertically for easy storage, while four leg-height options let you match your space and client needs. A quick-release foot bar speeds setup changes, and the included box, jump board, and handles expand exercise variety for full-body Pilates sessions. The innovative loop handle system glides smoothly and silently, eliminating ring noise for a more comfortable, focused workout experience.",
+  "features": [
+    "Anodized aluminum frame",
+    "Stackable horizontal or vertical storage",
+    "4 leg height options",
+    "6-position quick-release footbar",
+    "Non-slip padded footbar",
+    "Non-slip standing platform",
+    "Ultra-quiet smooth carriage",
+    "Silent loop handle system",
+    "Durable studio-grade upholstery",
+    "5-spring resistance set",
+    "4-position adjustable spring bar",
+    "3-position adjustable headrest",
+    "Removable padded shoulder rests",
+    "3-position adjustable bed stoppers",
+    "Cleat-adjustable cord system",
+    "Includes padded box",
+    "Includes removable jump board",
+    "Integrated transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Aluminum HL Reformer structure + carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Non-slip foot platform",
+    "Padded footbar",
+    "1 set of padded foam handles",
+    "1 set of cotton double-loop handles for hands and feet",
+    "Padded shoulder rests",
+    "Springs: 2 red strong, 2 green medium, and 1 yellow light",
+    "Foot strap",
+    "Pulley posts",
+    "1 pair of wheels",
+    "One set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Aluminum Hl1 Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.49\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.95\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "6.31\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "16.92\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "9.05\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "136.69 lb / 62 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=tfREXDQ1rPs",
+    "https://www.youtube.com/watch?v=dCous_cRxD4"
+  ],
+  "variants": [
+    {
+      "sku": "200001",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/776-aluminum-hl1-reformer-8421941005350.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer HL 1/200001"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer de aluminio/200001"
+        }
+      ],
+      "_source": {
+        "articleRef": "200001",
+        "description": "ALUMINIUM REFORMER HL 1",
+        "priceUsd": 3745,
+        "barcode": "8421941005374"
+      }
+    }
+  ]
+}

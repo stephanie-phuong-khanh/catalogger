@@ -1,0 +1,208 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer Domo",
+  "title": "Elina Pilates Domo Reformer",
+  "overviewParagraph": "The Domo Reformer is a lightweight, durable Pilates reformer built specifically for home use, so you can train comfortably and consistently without a studio setup. Its aluminum construction plus wheels make it easy to move room to room, while the telescopic folding design lets you store it under a bed or upright in a closet to save space. A new loop handle system delivers smooth, silent movement for a more comfortable workout without ring noise. Add an optional box and jump board to expand your exercise variety as your practice grows.",
+  "features": [
+    "High-resistance aluminum frame",
+    "Lightweight, compact for home use",
+    "Telescopic folding design",
+    "Stores flat or vertically",
+    "Front wheels for easy transport",
+    "4-position folding non-slip footbar",
+    "Ultra-silent smooth carriage",
+    "Durable, wear-resistant upholstery",
+    "Click-adjust cord system",
+    "5 springs with 2-height bar",
+    "2-position adjustable headrest",
+    "Removable shoulder pads & pulley bar",
+    "Foot strap included",
+    "Optional jump board",
+    "Optional Pilates box",
+    "Quiet loop handles, no ring noise",
+    "2-year warranty included"
+  ],
+  "inclusions": [
+    "Structure + car of the Domo reformer",
+    "Padded footbar",
+    "1 set of padded hand straps",
+    "1 set of cotton hand and foot straps with double loop",
+    "Padded shoulder pads",
+    "Springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Two wheels",
+    "Optional jump board and box",
+    "Foot securing strap",
+    "Pulley posts",
+    "1 pair of wheels",
+    "1 set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Domo Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "99.02\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "28.35\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "5.12\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "13.39\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "6.30\""
+        ]
+      },
+      {
+        "label": "Folded Dimensions",
+        "values": [
+          "63.98\" x 28.35\" x 13.39\""
+        ]
+      },
+      {
+        "label": "Vertical Dimensions",
+        "values": [
+          "21.26\" x 28.35\" x 63.98\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "97 lb / 44 kg"
+        ]
+      },
+      {
+        "label": "Maximum Supported Weight",
+        "values": [
+          "264.5 lb / 120 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.56\" x 15.75\" x 11.42\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=SZcAiwePAfc"
+  ],
+  "variants": [
+    {
+      "sku": "300600",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1220-2536-domo-reformer.html#/177-options-domo",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Domo/300600"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Domo/300600"
+        }
+      ],
+      "_source": {
+        "articleRef": "300600",
+        "description": "REFORMER DOMO_BLACK",
+        "priceUsd": 1490,
+        "barcode": "8421941015342"
+      }
+    },
+    {
+      "sku": "30060001",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1220-2537-domo-reformer.html#/options-domo_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Domo/30060001"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Domo/30060001"
+        }
+      ],
+      "_source": {
+        "articleRef": "30060001",
+        "description": "REFORMER DOMO_BLACK + BOX",
+        "priceUsd": 1521,
+        "barcode": "8421941017568"
+      }
+    },
+    {
+      "sku": "30060003",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1220-2539-domo-reformer.html#/180-options-domo_box_jumping_board",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Domo/30060003"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Domo/30060003"
+        }
+      ],
+      "_source": {
+        "articleRef": "30060003",
+        "description": "REFORMER DOMO_BLACK + BOX + JUMPBOARD",
+        "priceUsd": 1890,
+        "barcode": "8421941017575"
+      }
+    },
+    {
+      "sku": "30060002",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1220-2538-domo-reformer.html#/179-options-domo_jumping_board",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Domo/30060002"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Domo/30060002"
+        }
+      ],
+      "_source": {
+        "articleRef": "30060002",
+        "description": "REFORMER DOMO BLACK + JUMPBOARD",
+        "priceUsd": 1720,
+        "barcode": "8421941017582"
+      }
+    }
+  ]
+}

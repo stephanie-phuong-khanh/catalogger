@@ -1,0 +1,135 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Aluminium Reformer HL 3",
+  "title": "Elina Pilates Aluminum Hl3 Reformer",
+  "overviewParagraph": "The Aluminum Hl3 Reformer is Elina Pilates’ most versatile, modern reformer, built for studios and clubs that need practical performance and easy storage. Its stackable design stores vertically to save floor space, while four leg-height options let you tailor setup for different room layouts and client needs. A quick-release foot bar speeds transitions between exercises, and the included box, jump board, and handles expand training variety right out of the box. The innovative loop handle system delivers smooth, silent movement without ring noise for a more comfortable, premium workout experience.",
+  "features": [
+    "Anodized aluminum frame",
+    "4 leg height options",
+    "Horizontal stackable design",
+    "Vertical storage for small spaces",
+    "6-position quick-release footbar",
+    "Non-slip padded footbar",
+    "Ultra-silent smooth carriage",
+    "Durable studio-grade upholstery",
+    "Cleat-adjustable cords",
+    "3-position carriage stopper",
+    "5 springs & 4-position bar",
+    "3-position adjustable headrest",
+    "Removable padded shoulder rests",
+    "Stable padded medium box included",
+    "Removable jump board included",
+    "Quiet loop handle system",
+    "Inside/outside foot strap placement",
+    "Integrated transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Aluminum HL Reformer",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Non-slip foot platform",
+    "Padded footbar",
+    "1 set of padded hard foam handles",
+    "1 set of cotton double loop handles for hands and feet",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Foot strap",
+    "Pulley posts",
+    "2 pairs of wheels",
+    "One set of pulley cords"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Aluminum Hl3 Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.49\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.95\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "13.19\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "23.81\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "15.94\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "147.71 lb / 67 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.56\" x 15.75\" x 11.42\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=kERnuH7xnYY",
+    "https://www.youtube.com/watch?v=p_fmp20pXPY"
+  ],
+  "variants": [
+    {
+      "sku": "200003",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/778-aluminio-hl3-reformer-8421941005398.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer HL 3/200003"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer de aluminio/200003"
+        }
+      ],
+      "_source": {
+        "articleRef": "200003",
+        "description": "ALUMINIUM REFORMER HL 3",
+        "priceUsd": 3945,
+        "barcode": "8421941005398"
+      }
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Nubium Black Edition With Tower",
+  "title": "Elina Pilates Reformer Nubium Black Edition With Tower",
+  "overviewParagraph": "The Reformer Nubium Black Edition With Tower is a limited-edition Elina Pilates reformer in an all-black finish with tower components for a broader, more versatile Pilates repertoire at home or in a studio. Its ultra-silent carriage with high-precision bearings and innovative loop handle system deliver smooth, quiet transitions so you can stay focused on form without distracting noise. A retractable rope collection system keeps adjustments fast and the setup tidy, while vertical storage helps save space between sessions. It comes ready to train with a box, jump board, and handles for expanded exercise options.",
+  "features": [
+    "Aluminum frame construction",
+    "Space-saving vertical storage",
+    "Ultra-quiet 8-wheel carriage",
+    "6-position padded footbar",
+    "3-position bed cushioning",
+    "Fixed spring bar, 5 springs",
+    "Tower with 8 springs included",
+    "Stainless steel tower uprights",
+    "Retractable rope storage system",
+    "Noise-free loop handle system",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Extra-wide box, stable support",
+    "Removable extra-wide jump board",
+    "Interior foot strap",
+    "Non-slip push-bar, 3 heights",
+    "Rock maple roll-down bar",
+    "Front transport wheels",
+    "5-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Reformer Nubium structure + carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Extra-wide box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of padded hard foam handles",
+    "1 set of double-loop cotton handles for hands and feet",
+    "1 set of simple cotton handles for feet",
+    "Padded shoulder rests",
+    "Reformer springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Foot strap",
+    "Pulley posts",
+    "1 pair of wheels",
+    "1 set of pulley ropes",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Reformer Nubium Black Edition With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "96.85\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "30.7\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.81\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "23.23\""
+        ]
+      },
+      {
+        "label": "Maximum Height with tower",
+        "values": [
+          "79.92\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "14.2\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "139 lb / 63 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=qv1FLV-p8ME"
+  ],
+  "variants": [
+    {
+      "sku": "300310",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1343-2923-nubium-reformer-black-edition-with-tower.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Nubium Black Edition With Tower/300310"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Nubium/Nubium Black Edition/300310"
+        }
+      ],
+      "_source": {
+        "articleRef": "300310",
+        "description": "NUBIUM_BLACK EDITION WITH TOWER _BLACK",
+        "priceUsd": 3990,
+        "barcode": "8421941014963"
+      }
+    },
+    {
+      "sku": "300311",
+      "vendorPageUrl": null,
+      "googleDriveLinks": [],
+      "_source": {
+        "articleRef": "300311",
+        "description": "NUBIUM_BLACK EDITION WITH TOWER _GREY",
+        "priceUsd": 3990,
+        "barcode": "8421941014970"
+      }
+    }
+  ]
+}

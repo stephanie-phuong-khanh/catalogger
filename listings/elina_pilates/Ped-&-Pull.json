@@ -1,0 +1,76 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Ped & Pull",
+  "title": "Elina Pilates Ped And Pull",
+  "overviewParagraph": "The Ped And Pull is a compact Ped-o-pull exercise tool designed to support people recovering from shoulder or back injuries while improving postural awareness. It helps build core strength and balance, making training more effective and functional. Ideal for small work areas, it fits easily into limited spaces so you can keep up with targeted movement and stability work.",
+  "features": [
+    "Non-slip wooden base",
+    "Stainless steel wall-mount post",
+    "Compact footprint for small spaces",
+    "Improves posture awareness",
+    "Supports shoulder & back rehab",
+    "Builds core strength & balance",
+    "2-year warranty"
+  ],
+  "inclusions": [
+    "2 medium intensity (green) springs adjustable horizontally in 3 positions to adapt to the height of each user",
+    "1 pair of hand handles",
+    "1 wooden base with a heart shape",
+    "1 stainless steel post"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Ped And Pull",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Base",
+        "values": [
+          "48 x 60 cm"
+        ]
+      },
+      {
+        "label": "Width",
+        "values": [
+          "57 cm"
+        ]
+      },
+      {
+        "label": "Adjustable height",
+        "values": [
+          "2.30 cm max"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=oW2ERZP_duU"
+  ],
+  "variants": [
+    {
+      "sku": "500021",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/991-ped-pull-8421941009655.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Ped & Pull/500021"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Wall Unit/Ped & Pull/500021"
+        }
+      ],
+      "_source": {
+        "articleRef": "500021",
+        "description": "PED & PULL",
+        "priceUsd": 675,
+        "barcode": "8421941009655"
+      }
+    }
+  ]
+}

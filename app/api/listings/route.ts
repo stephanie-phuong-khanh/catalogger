@@ -52,7 +52,7 @@ export async function GET() {
   const useLocal = process.env.LISTINGS_SOURCE === 'local';
 
   if (useLocal) {
-    const listingsDir = path.join(process.cwd(), 'data', 'listings');
+    const listingsDir = path.join(process.cwd(), 'listings');
     const pathnames = [...walkListingFiles(listingsDir)];
     const folders = buildFoldersTree(pathnames);
     return NextResponse.json({ folders }, {

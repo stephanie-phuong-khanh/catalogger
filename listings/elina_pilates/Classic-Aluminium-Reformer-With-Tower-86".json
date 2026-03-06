@@ -1,0 +1,161 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Classic Aluminium Reformer With Tower 86\"",
+  "title": "Elina Pilates Classic Reformer With Tower",
+  "overviewParagraph": "The Classic Reformer With Tower is Elina Pilates’ classic reformer designed for precise, versatile Pilates training with added tower-based exercise options. Natural leather straps and classic handles provide a secure, comfortable grip so you can control alignment and form through each movement. An ultra-silent carriage with high-precision bearings delivers smooth, consistent resistance for focused sessions without distraction. Built to be stable and highly resistant, it includes a box and jump board to expand exercise variety for full-body strength, mobility, and control.",
+  "features": [
+    "Anodized aluminum frame, 86 in",
+    "Stainless steel tower frame",
+    "Classic Pilates footbar, rubber ends",
+    "Non-slip padded carriage",
+    "Ultra-quiet 8-wheel glide",
+    "Durable studio-grade upholstery",
+    "Natural leather straps",
+    "Classic wooden handles",
+    "3-position adjustable headrest",
+    "Multi-position carriage stoppers",
+    "4 classic reformer springs",
+    "8 classic tower springs set",
+    "3-position adjustable spring bar",
+    "Wood push-through bar",
+    "Steel safety chains",
+    "Padded classic box included",
+    "Removable padded jump board",
+    "Roll-down bar included",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Aluminum reformer frame + carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of classic handles",
+    "1 set of single handles",
+    "Padded shoulder rests",
+    "Reformer springs: 4 classic",
+    "Tower springs: 8 classic",
+    "Foot straps",
+    "Set of leather pulley straps",
+    "Aluminum footbar",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety chains"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Classic Reformer With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "88.58\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "25.98\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "13.78\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Maximum Height with Tower",
+        "values": [
+          "72.24\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "35.43\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "14.96\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "110 lb / 50 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "29.92\" x 16.54\" x 9.84\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=6nAT4i1AX2w"
+  ],
+  "variants": [
+    {
+      "sku": "300100",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1083-1882-classic-aluminium-reformer-86-with-tower.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Aluminium Reformer With Tower 86\"/300100"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Classic/Classic with Tower/300100"
+        }
+      ],
+      "_source": {
+        "articleRef": "300100",
+        "description": "CLASSIC ALUMINIUM REFORMER WITH TOWER 86\"_BLACK",
+        "priceUsd": 5490,
+        "barcode": "8421941014901"
+      }
+    },
+    {
+      "sku": "300101",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1083-1883-classic-aluminium-reformer-86-with-tower.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Aluminium Reformer With Tower 86\"/300101"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Classic/Classic with Tower/300101"
+        }
+      ],
+      "_source": {
+        "articleRef": "300101",
+        "description": "CLASSIC ALUMINIUM REFORMER WITH TOWER 86\"_GREY",
+        "priceUsd": 5490,
+        "barcode": "8421941014918"
+      }
+    }
+  ]
+}

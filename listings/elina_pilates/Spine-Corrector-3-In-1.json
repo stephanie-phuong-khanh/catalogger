@@ -1,0 +1,99 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Spine Corrector 3 In 1",
+  "title": "Elina Pilates Spine Corrector 3 In 1",
+  "overviewParagraph": "The Spine Corrector 3 In 1 is a Pilates barrel designed to support spine-focused training with three interchangeable support contours, so you can vary positioning and expand your exercise options. Its non-slip, resistant synthetic leather cover helps keep you stable and comfortable during controlled movement. Switch contours to tailor support and challenge for different stretches, mobility work, and strengthening exercises.",
+  "features": [
+    "Non-slip synthetic leather upholstery",
+    "3 interchangeable support bases",
+    "Adjustable barrel height: 24/28/32 cm",
+    "Aluminum handles",
+    "High-density EVA padding",
+    "Customizable flexibility support",
+    "Eco-compliant materials"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "Key dimensions of Spine Corrector 3 In 1",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Barrel length",
+        "values": [
+          "29.13\""
+        ]
+      },
+      {
+        "label": "Barrel width",
+        "values": [
+          "18.90\""
+        ]
+      },
+      {
+        "label": "Barrel height",
+        "values": [
+          "9.45\", 11.02\", or 12.60\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "52.91 lb / 24 kg"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=ytg0wv3JC7A"
+  ],
+  "variants": [
+    {
+      "sku": "450030",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/1325-2847-spine-corrector-3-in-1.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Spine Corrector 3 In 1/450030"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Spine/Spine Corrector 3in1/450030"
+        }
+      ],
+      "_source": {
+        "articleRef": "450030",
+        "description": "SPINE CORRECTOR 3 IN 1_BLACK",
+        "priceUsd": 650,
+        "barcode": "8421941924033"
+      }
+    },
+    {
+      "sku": "700100",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/1325-2843-spine-corrector-3-in-1.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Spine Corrector 3 In 1/700100"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Spine/Spine Corrector 3in1/700100"
+        }
+      ],
+      "_source": {
+        "articleRef": "700100",
+        "description": "SPINE CORRECTOR 3 IN 1_GREY",
+        "priceUsd": 650,
+        "barcode": "8421941006647"
+      }
+    }
+  ]
+}

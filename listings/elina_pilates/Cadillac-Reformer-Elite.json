@@ -1,0 +1,166 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Cadillac-Reformer Elite",
+  "title": "Elina Pilates Cadillac Elite Reformer",
+  "overviewParagraph": "The Cadillac Elite Reformer is a high-end Pilates Cadillac reformer built for professionals who want modern design and top performance in one machine. Innovative upgrades like the push bar, an integrated chair structure with spring-loaded chair push bar, and a quick-release foot bar let you transition between exercises and setups faster to keep sessions flowing. An ultra-silent carriage with high-precision bearings plus a new loop handle system delivers smooth, quiet movement for a more comfortable, premium training experience. It also includes a box, jump board, and handles to expand workout variety for full-body strength, control, and mobility work.",
+  "features": [
+    "Rock maple wood frame",
+    "Stackable design for small spaces",
+    "Cadillac + reformer + chair in 1",
+    "Quick-release foot bar, 7 positions",
+    "2-height padded non-slip foot bar",
+    "Adjustable height pulleys",
+    "Ultra-quiet carriage, 8 wheels",
+    "Durable premium upholstery",
+    "Cleat system rope adjustment",
+    "3-position bed stopper system",
+    "6 reformer springs, 4-position bar",
+    "8 tower springs, short & long",
+    "3-position adjustable headrest",
+    "Quick-attach padded shoulder rests",
+    "Padded stability box included",
+    "Wide removable jump board",
+    "Adjustable foot strap, in/out mount",
+    "Stainless steel tower, front & rear hooks",
+    "3-height non-slip push bar + safety strap",
+    "Quiet sliding loop handles, no ring noise",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + Elite reformer carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam padded handles",
+    "1 set of double loop cotton handles for hands and feet",
+    "1 set of simple cotton handles for feet",
+    "Padded shoulder rests",
+    "Reformer springs: 2 strong red, 2 medium green, and 2 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Foot strap",
+    "Pulleys posts",
+    "1 pair of wheels",
+    "Set of pulley cords",
+    "Wooden pick",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Cadillac Elite Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.88\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "30.32\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.81\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "28.94\""
+        ]
+      },
+      {
+        "label": "Maximum Height with Tower",
+        "values": [
+          "79.53\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "15.55\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "187.40 lb / 85 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=hp_oIGsM8uc"
+  ],
+  "variants": [
+    {
+      "sku": "300003",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/cadillacs-trapeze-for-pilates/990-1110-cadillac-reformer-elite.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Cadillac-Reformer Elite/300003"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Cadillac/Cadillac Reformer Elite/300003"
+        }
+      ],
+      "_source": {
+        "articleRef": "300003",
+        "description": "CADILLAC-REFORMER ELITE_GREY",
+        "priceUsd": 5995,
+        "barcode": "8421941009648"
+      }
+    },
+    {
+      "sku": "700155",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/cadillacs-trapeze-for-pilates/990-1108-cadillac-reformer-elite.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Cadillac-Reformer Elite/700155"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Cadillac/Cadillac Reformer Elite/700155"
+        }
+      ],
+      "_source": {
+        "articleRef": "700155",
+        "description": "CADILLAC-REFORMER ELITE_BLACK",
+        "priceUsd": 5995,
+        "barcode": "8421941010514"
+      }
+    }
+  ]
+}

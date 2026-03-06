@@ -7,7 +7,7 @@
  * 5. Finally, here we generate the listings from data saved from the previous steps.
  *
  * Input: data/elina/elina_pilates_products_site.json.
- * Output: data/listings/elina_pilates/{ProductGroupSlug}.json (one file per product group; each file has variants[] for each SKU).
+ * Output: listings/elina_pilates/{ProductGroupSlug}.json (one file per product group; each file has variants[] for each SKU).
  *
  * Usage:
  *   npm run generate-listings-elina
@@ -56,7 +56,7 @@ const SpecsTableOutput = z.object({
 const CONFIG = {
   inputFile: 'data/elina/elina_pilates_products_site.json',
   skuToImagesFile: 'data/elina/elina_sku_to_images.json',
-  outputDir: 'data/listings/elina_pilates',
+  outputDir: 'listings/elina_pilates',
 };
 
 type SkuToImagesEntry = { input_folder_path: string | null; output_folder_path: string | null };

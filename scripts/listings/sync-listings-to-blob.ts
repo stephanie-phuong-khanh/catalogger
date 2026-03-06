@@ -1,15 +1,15 @@
 /**
- * Sync data/listings to Vercel Blob store.
- * - Walks data/listings recursively.
+ * Sync listings/ to Vercel Blob store.
+ * - Walks repo-root listings/ recursively.
  * - Skips any file or directory whose name starts with _ (e.g. _all_listings.json).
- * - Uploads each file with pathname: listings/<relative-path> (e.g. listings/tab_11_dct_chillers/SKU.json).
+ * - Uploads each file with pathname: listings/<relative-path> (e.g. listings/elina_pilates/SKU.json).
  *
  * Modes:
  * - Default: uploads local files and overwrites existing blobs with the same pathname.
  * - --full: wipes all blobs under listings/ in the store, then uploads current local files.
  *   Use this to make Blob exactly match local (handles renames, deletes, and updates).
- * - --single <path>: upload only one file. Path is relative to data/listings (e.g. tab_09_gdina_traditional/GDI-8005-01.json).
- * - --only <path>: upload only files under this subpath (e.g. elina_pilates). Path is relative to data/listings.
+ * - --single <path>: upload only one file. Path is relative to listings/ (e.g. elina_pilates/Reformer-Elite.json).
+ * - --only <path>: upload only files under this subpath (e.g. elina_pilates). Path is relative to listings/.
  *
  * Requires CATALOGGER_LISTINGS_READ_WRITE_TOKEN in .env or .env.local (from the private listings Blob store).
  *
@@ -17,7 +17,7 @@
  *   npm run sync-listings-to-blob                              # upload all (overwrite existing)
  *   npm run sync-listings-to-blob -- --full                    # full sync: wipe then upload
  *   npm run sync-listings-to-blob -- --single elina_pilates/Reformer-Elite.json  # one file
- *   npm run sync-listings-to-blob -- --only elina_pilates      # only files under data/listings/elina_pilates/
+ *   npm run sync-listings-to-blob -- --only elina_pilates      # only files under listings/elina_pilates/
  */
 
 import fs from 'fs';
@@ -32,7 +32,7 @@ if (fs.existsSync(path.join(process.cwd(), '.env.local'))) {
 }
 
 const CONFIG = {
-  listingsDir: path.join(process.cwd(), 'data', 'listings'),
+  listingsDir: path.join(process.cwd(), 'listings'),
   blobPrefix: 'listings',
 };
 
@@ -115,7 +115,7 @@ async function main() {
   const initialRelativeDir = onlyPath ? onlyPath.replace(/^\.\//, '').replace(/\\/g, '/').replace(/\/$/, '') : '';
 
   if (onlyPath && (!fs.existsSync(startDir) || !fs.statSync(startDir).isDirectory())) {
-    console.error(`Path not found or not a directory: data/listings/${onlyPath}`);
+    console.error(`Path not found or not a directory: listings/${onlyPath}`);
     process.exit(1);
   }
 
@@ -128,7 +128,7 @@ async function main() {
     const blobPathname = `${CONFIG.blobPrefix}/${normalized}`;
     const absolutePath = path.join(CONFIG.listingsDir, normalized);
     if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) {
-      console.error(`File not found: data/listings/${normalized}`);
+      console.error(`File not found: listings/${normalized}`);
       process.exit(1);
     }
     if (shouldSkip(path.basename(normalized))) {
@@ -140,7 +140,7 @@ async function main() {
   }
 
   if (files.length === 0) {
-    console.log('No listing files to sync (nothing under data/listings besides _*).');
+    console.log('No listing files to sync (nothing under listings/ besides _*).');
     return;
   }
 

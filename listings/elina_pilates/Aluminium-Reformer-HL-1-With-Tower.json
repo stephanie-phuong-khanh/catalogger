@@ -1,0 +1,148 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Aluminium Reformer HL 1 With Tower",
+  "title": "Elina Pilates Aluminum Hl 1 Reformer With Tower",
+  "overviewParagraph": "The Aluminum Hl 1 Reformer With Tower is Elina Pilates’ most versatile studio reformer, uniquely designed to stack horizontally without removing the tower for fast, space-saving storage. Built for clubs and studios that need practicality, it also stores vertically and comes in four leg heights to fit your room and client setup. A quick-release foot bar speeds transitions between exercises, while the included box, jump board, and handles expand training variety in one station. The innovative loop handle system glides smoothly and quietly, improving comfort and creating a more premium workout experience.",
+  "features": [
+    "Anodized aluminum frame",
+    "Stainless steel tower",
+    "Horizontal stackable without tower removal",
+    "Stores vertically for small spaces",
+    "4 leg height options",
+    "Quick-release foot bar, 6 positions",
+    "Non-slip padded foot bar",
+    "Ultra-silent smooth carriage",
+    "Noise-free loop handle system",
+    "Cleat-adjustable cords",
+    "Adjustable spring bar, 4 positions",
+    "5 resistance springs included",
+    "8 tower springs included",
+    "Adjustable headrest, 3 positions",
+    "Removable shoulder pads",
+    "Stability box included",
+    "Removable jump board",
+    "Integrated transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Aluminum HL Reformer",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Anti-slip foot platform",
+    "Padded foot bar",
+    "1 set of padded foam handles",
+    "1 set of double-loop cotton handles for hands and feet",
+    "1 set of simple cotton handles for feet",
+    "Padded shoulder pads",
+    "Reformer springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Foot strap",
+    "Pulley posts",
+    "1 pair of wheels",
+    "Set of pulley ropes",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Aluminum Hl 1 Reformer With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.49\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.95\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "6.31\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "70.08\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "9.05\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "136.69 lb / 62 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Tower Weight",
+        "values": [
+          "187.40 lb / 20 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=2Xa6q-WxOxg",
+    "https://www.youtube.com/watch?v=MWpcceQlws4"
+  ],
+  "variants": [
+    {
+      "sku": "400001",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/782-aluminium-reformer-hl-1-with-tower-8421941005503.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer HL 1 With Tower/400001"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer de aluminio/400001"
+        }
+      ],
+      "_source": {
+        "articleRef": "400001",
+        "description": "ALUMINIUM REFORMER HL 1 WITH TOWER",
+        "priceUsd": 4435,
+        "barcode": "8421941005503"
+      }
+    }
+  ]
+}

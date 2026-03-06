@@ -1,6 +1,6 @@
 /**
  * Schema and types for Elina Pilates generated listings.
- * One JSON file per product group: data/listings/elina_pilates/{productGroupSlug}.json
+ * One JSON file per product group: listings/elina_pilates/{productGroupSlug}.json
  * Product-level content (title, overview, features, inclusions, specs, youtube) is shared;
  * variant-level data (sku, vendor URL, Google Drive folder links, _source) lives in variants[].
  */

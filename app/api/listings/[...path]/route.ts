@@ -27,7 +27,7 @@ export async function GET(
   const useLocal = process.env.LISTINGS_SOURCE === 'local';
 
   if (useLocal) {
-    const listingsDir = path.resolve(process.cwd(), 'data', 'listings');
+    const listingsDir = path.resolve(process.cwd(), 'listings');
     const fullPath = path.resolve(listingsDir, relativePath);
     const rel = path.relative(listingsDir, fullPath);
     if (rel.startsWith('..') || path.isAbsolute(rel)) {

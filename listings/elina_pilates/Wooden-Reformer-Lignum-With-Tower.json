@@ -1,0 +1,165 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Wooden Reformer Lignum With Tower",
+  "title": "Elina Pilates Lignum Reformer With Tower",
+  "overviewParagraph": "The Lignum Reformer With Tower delivers professional-grade Pilates training for home or studio use, combining a beech wood frame with stainless steel and aluminum components for reliable performance. It features quick-adjust systems for the footbar and springs plus height-adjustable rope pulleys, so you can change setups fast and keep workouts smooth and uninterrupted. The included box, wooden jump board, and handles expand exercise variety for full-body strength, mobility, and controlled cardio work. An innovative loop handle system eliminates ring noise for quieter, more comfortable sessions.",
+  "features": [
+    "Waterproofed beech wood frame",
+    "Stainless steel & aluminum components",
+    "Quick-release footbar, 6 positions",
+    "Quick-adjust spring bar, 3 positions",
+    "Smooth ultra-silent carriage",
+    "8 PU wheels, precision bearings",
+    "Non-slip padded carriage & footbar",
+    "Durable studio-grade upholstery",
+    "5 reformer springs included",
+    "Stainless steel tower with hooks",
+    "8 tower springs included",
+    "Height-adjustable rope pulleys",
+    "Cleat rope adjustment system",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Extra-wide removable jump board",
+    "Medium padded box included",
+    "Front wheels for easy transport",
+    "5-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Lignum reformer structure + carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of padded foam hard handles",
+    "1 set of double-loop cotton handles for hands and feet",
+    "1 set of simple cotton handles for feet",
+    "Padded shoulder rests",
+    "Reformer springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Spring bar",
+    "Foot strap",
+    "1 pair of wheels",
+    "1 set of pulley cords",
+    "Pulley posts",
+    "Wood pick",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Lignum Reformer With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "96.1\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.95\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "9.84\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Maximum Height with Tower",
+        "values": [
+          "76.38\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.16\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "12.6\""
+        ]
+      },
+      {
+        "label": "Reformer Weight",
+        "values": [
+          "138.9 lb / 63.5 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.56\" x 15.75\" x 11.42\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=argHj4IRZV0"
+  ],
+  "variants": [
+    {
+      "sku": "300500",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1128-1948-wooden-lignum-reformer-with-tower.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wooden Reformer Lignum With Tower/300500"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Lignum/Lignum with Tower/300500"
+        }
+      ],
+      "_source": {
+        "articleRef": "300500",
+        "description": "WOODEN REFORMER LIGNUM WITH TOWER_BLACK",
+        "priceUsd": 3990,
+        "barcode": "8421941016141"
+      }
+    },
+    {
+      "sku": "300501",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1128-1949-wooden-lignum-reformer-with-tower.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wooden Reformer Lignum With Tower/300501"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Lignum/Lignum with Tower/300501"
+        }
+      ],
+      "_source": {
+        "articleRef": "300501",
+        "description": "WOODEN REFORMER LIGNUM WITH TOWER_GREY",
+        "priceUsd": 3990,
+        "barcode": "8421941016158"
+      }
+    }
+  ]
+}

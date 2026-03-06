@@ -1,0 +1,106 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Wall Board Onne",
+  "title": "Elina Pilates Wall Board Onne",
+  "overviewParagraph": "The Wall Board Onne is a space-smart, versatile training machine that combines 5 Pilates and functional stations in one wall-mounted system. It integrates a Cadillac, Ped-Pull, leaning platform, ballet bar, and suspension training so you can move seamlessly between strength, mobility, and full-body control work without changing equipment. Designed to help you maximize limited studio or home space, it delivers a broad range of workouts from a single, streamlined setup.",
+  "features": [
+    "Wood & aluminum construction",
+    "5-in-1 wall board system",
+    "Cadillac training functions",
+    "Adjustable Ped-Pull unit",
+    "Incline leaning platform",
+    "Height-adjustable ballet bar",
+    "Suspension training belt",
+    "Wall-anchored, space-saving design",
+    "Fully adjustable for user fit",
+    "Spring & accessory hanger"
+  ],
+  "inclusions": [
+    "Wall Board",
+    "Wooden mat table with anti-slip mat and adjustable support",
+    "Ballet bar adjustable in height",
+    "Roll-down bar",
+    "Adjustable Push bar",
+    "Adjustable Ped-Pull",
+    "Hanger for springs and accessories",
+    "Adjustable height spring grip",
+    "Complete Set of springs (2 light lengths + 2 medium shorts + 2 small ones)",
+    "Complete Set of grips (handles and padded handles)",
+    "Adjustable clamping strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wall Board Onne",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Machine width",
+        "values": [
+          "68.5 cm"
+        ]
+      },
+      {
+        "label": "Width with ballet bar",
+        "values": [
+          "100 cm"
+        ]
+      },
+      {
+        "label": "Height",
+        "values": [
+          "209 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300021",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/969-787-wall-board-onne-by-eva-espuelas.html#/77-model-basic",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wall Board Onne Basic/300021"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Wall Unit/Onne/300021"
+        }
+      ],
+      "_source": {
+        "articleRef": "300021",
+        "description": "WALL BOARD ONNE BASIC",
+        "priceUsd": 1795,
+        "barcode": "8421941009174"
+      }
+    },
+    {
+      "sku": "300022",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/969-786-wall-board-onne-by-eva-espuelas.html#/78-model-full_equip",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wall Board Onne Full Equip/300022"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Wall Unit/Onne/300022"
+        }
+      ],
+      "_source": {
+        "articleRef": "300022",
+        "description": "WALL BOARD ONNE FULL EQUIP",
+        "priceUsd": 2725,
+        "barcode": "8421941009181"
+      }
+    }
+  ]
+}

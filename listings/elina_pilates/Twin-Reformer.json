@@ -1,0 +1,157 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Twin Reformer",
+  "title": "Elina Pilates Twin Reformer",
+  "overviewParagraph": "The Twin Reformer from Elina Pilates is a latest-generation professional reformer built for studios and rehabilitation, featuring a unique double carriage you can use together or separately to expand programming and keep sessions varied. With resistances on both sides, it helps you focus on precise body alignment while developing strength, flexibility, and balance. The integrated tower with adjustable pulleys supports a wider range of exercises for recovery and performance training. Premium details like the smooth, silent loop handle system plus included box, jump board, mat, and handles deliver a more comfortable, seamless workout experience.",
+  "features": [
+    "Waterproof-varnished American maple frame",
+    "Dual carriage design",
+    "Resistances on both sides",
+    "7-position quick-release foot bar",
+    "28-position sliding foot bar",
+    "Ultra-quiet carriage glide",
+    "Silent loop handle system",
+    "12 premium bed springs",
+    "8 tower springs set",
+    "Tower with adjustable pulleys",
+    "Adjustable tower push-bar",
+    "Adjustable padded shoulder rests",
+    "Removable & fixed headrest",
+    "Extra-wide stable Pilates box",
+    "Extra-wide removable jump board",
+    "Mat cover with handles",
+    "Front foot strap",
+    "Front transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Twin Reformer frame + carriage (double carriage)",
+    "Essentials Kit with box, jump board, and handles",
+    "Extra wide box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam padded handles",
+    "1 set of cotton double loop handles for hands and feet",
+    "1 set of simple cotton handles for feet",
+    "Padded shoulder pads",
+    "Reformer springs: 4 strong red, 4 medium green and 4 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow) and 2 long medium (green)",
+    "Foot strap",
+    "1 pair of wheels",
+    "A set of pulley ropes",
+    "Wooden pole",
+    "Aluminum tower with hexagonal profiles",
+    "Mats to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Twin Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "96.46\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "35.43\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "13.78\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.57\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "15.75\""
+        ]
+      },
+      {
+        "label": "Bed Width",
+        "values": [
+          "27.17\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "179.68 lb / 81.5 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=YPePMx7hA5g"
+  ],
+  "variants": [
+    {
+      "sku": "300611",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1340-2895-twin-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Twin Reformer/300611"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Twin Reformer/300611"
+        }
+      ],
+      "_source": {
+        "articleRef": "300611",
+        "description": "TWIN REFORMER_GREY",
+        "priceUsd": 5995,
+        "barcode": "8421941017841"
+      }
+    },
+    {
+      "sku": "300610",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1340-2894-twin-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Twin Reformer/300610"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Twin Reformer/300610"
+        }
+      ],
+      "_source": {
+        "articleRef": "300610",
+        "description": "TWIN REFORMER_BLACK",
+        "priceUsd": 5995,
+        "barcode": "8421941017834"
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Folding Mat With Handles",
+  "title": "Elina Pilates Pilates Mat With Handles",
+  "overviewParagraph": "The Pilates Mat With Handles combines the feel of a traditional mat with the supportive shape of a barrel to enhance alignment and control during Pilates work. Its gentle curve is adapted to your neck to increase comfort and reduce muscle pressure, helping you stay focused through longer sessions. Two slightly elevated wooden bars relieve shoulder joint tension while providing stable hand support, so you can perform exercises with greater confidence and precision.",
+  "features": [
+    "Soft padded upholstery",
+    "Foldable 2-piece mat design",
+    "2 wooden dowel handles",
+    "Slight neck-support curve",
+    "Raised bars for shoulder relief",
+    "Stable support for exercises",
+    "Lightweight for easy transport",
+    "Side carry handles when folded",
+    "Body-contouring comfort",
+    "For toning, flexibility & rehab",
+    "Beginner to advanced friendly"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "Key dimensions of Pilates Mat With Handles",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Unfolded Length",
+        "values": [
+          "200 cm"
+        ]
+      },
+      {
+        "label": "Unfolded Width",
+        "values": [
+          "60 cm"
+        ]
+      },
+      {
+        "label": "Unfolded Height",
+        "values": [
+          "5.5 cm"
+        ]
+      },
+      {
+        "label": "Folded Length",
+        "values": [
+          "100 cm"
+        ]
+      },
+      {
+        "label": "Folded Width",
+        "values": [
+          "60 cm"
+        ]
+      },
+      {
+        "label": "Folded Height",
+        "values": [
+          "11 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300050",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/1080-1858-mat-plegable-con-asas.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Folding Mat With Handles/300050"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Mat/300050"
+        }
+      ],
+      "_source": {
+        "articleRef": "300050",
+        "description": "FOLDING MAT WITH HANDLES_BLACK",
+        "priceUsd": 675,
+        "barcode": "8421941014840"
+      }
+    },
+    {
+      "sku": "300051",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/1080-1859-mat-plegable-con-asas.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Folding Mat With Handles/300051"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Mat/300051"
+        }
+      ],
+      "_source": {
+        "articleRef": "300051",
+        "description": "FOLDING MAT WITH HANDLES_GREY",
+        "priceUsd": 675,
+        "barcode": "8421941014857"
+      }
+    }
+  ]
+}

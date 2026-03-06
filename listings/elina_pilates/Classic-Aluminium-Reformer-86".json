@@ -1,0 +1,151 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Classic Aluminium Reformer 86\"",
+  "title": "Elina Pilates Classic Reformer",
+  "overviewParagraph": "The Classic Reformer is Elina Pilates’ classic reformer kit designed for precise, controlled Pilates training. Natural leather straps provide a secure, comfortable feel as you work through exercises with confidence and consistency. An ultra-silent carriage with high-precision bearings delivers smooth, quiet motion for better focus and cleaner movement. Built to be stable and highly resistant, it includes a box, jump board, and classic handles to expand your workout options and progress your sessions.",
+  "features": [
+    "86\" anodized aluminum frame",
+    "Classic padded non-slip footboard",
+    "Rubber-ended aluminum foot bar",
+    "Ultra-silent 8-wheel carriage",
+    "Durable studio-grade upholstery",
+    "Natural leather straps",
+    "Classic wooden handles",
+    "4 classic springs, 3-position bar",
+    "3-position adjustable headrest",
+    "Adjustable carriage stoppers",
+    "Removable padded shoulder rests",
+    "Included padded stability box",
+    "Included removable padded jumpboard",
+    "Front & under-bar foot straps",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + aluminum reformer carriage",
+    "Essentials Kit with box, jumpboard, and handles",
+    "Padded box",
+    "Jumpboard",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of classic wooden handles",
+    "Padded shoulder rests",
+    "Springs: 4 classic",
+    "Foot straps",
+    "One set of leather pulley straps",
+    "Aluminum foot bar"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Classic Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "88.58\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "25.98\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "13.78\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "35.43\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "14.96\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "110 lb / 50 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Maximum Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "29.92\" x 16.54\" x 9.84\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=6nAT4i1AX2w",
+    "https://www.youtube.com/watch?v=rQWllt_EXqo"
+  ],
+  "variants": [
+    {
+      "sku": "100100",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1079-1852-classic-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Aluminium Reformer 86\"/100100"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Classic/Classic/100100"
+        }
+      ],
+      "_source": {
+        "articleRef": "100100",
+        "description": "CLASSIC ALUMINIUM REFORMER 86\"_BLACK",
+        "priceUsd": 3990,
+        "barcode": "8421941014727"
+      }
+    },
+    {
+      "sku": "100101",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1079-1853-classic-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Aluminium Reformer 86\"/100101"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Classic/Classic/100101"
+        }
+      ],
+      "_source": {
+        "articleRef": "100101",
+        "description": "CLASSIC ALUMINIUM REFORMER 86\"_GREY",
+        "priceUsd": 3990,
+        "barcode": "8421941014734"
+      }
+    }
+  ]
+}

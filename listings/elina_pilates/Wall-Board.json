@@ -1,0 +1,71 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Wall Board",
+  "title": "Elina Pilates Wall Board",
+  "overviewParagraph": "The Wall Board is a wall-anchored, space-saving training unit that lets you perform countless exercises on a single machine. Its adjustable design adapts to different movements and user needs, helping you build a versatile workout setup without taking over your room. Made from high-end wood and aluminum, it combines an elegant look with durable construction for consistent use. Easy to use and ready to mount, it delivers a clean, efficient way to train at home or in a studio.",
+  "features": [
+    "Wood & aluminum wall unit",
+    "Space-saving wall-mounted design",
+    "Flush-to-wall installation",
+    "Multiple spring anchor points",
+    "Adjustable push bar",
+    "2-year warranty"
+  ],
+  "inclusions": [
+    "2 long springs - Yellow (light resistance)",
+    "2 long springs - Green (medium resistance)",
+    "2 short springs - Yellow (light resistance)",
+    "2 short springs - Green (medium resistance)",
+    "A pair of hand grips",
+    "A pair of soft foot loops",
+    "Solid wood Roll down bar",
+    "Solid wood Dowel (bottom bar)",
+    "Push bar with 5 height positions",
+    "Security strap for the trapeze",
+    "Side and central anchor points for spring attachment",
+    "Designed to be mounted flush to the wall",
+    "Dimensions: 55.5 cm X 180 cm X 7.5 cm. 80 cm (maximum width)"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wall Board",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Dimensions",
+        "values": [
+          "55.5 cm x 180 cm x 7.5 cm"
+        ]
+      },
+      {
+        "label": "Maximum Width",
+        "values": [
+          "80 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300020",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/1378-wall-unit.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wall Board/300020"
+        }
+      ],
+      "_source": {
+        "articleRef": "300020",
+        "description": "WALL BOARD",
+        "priceUsd": 890,
+        "barcode": "8421941005497"
+      }
+    }
+  ]
+}

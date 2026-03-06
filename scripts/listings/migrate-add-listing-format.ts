@@ -1,5 +1,5 @@
 /**
- * Migration: add _listingFormat to existing listing JSONs under data/listings/.
+ * Migration: add _listingFormat to existing listing JSONs under listings/.
  * Infers format from path (elina_pilates vs golden_designs). Idempotent.
  *
  * Usage: npm run migrate-add-listing-format
@@ -9,7 +9,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const LISTINGS_DIR = path.join(process.cwd(), 'data', 'listings');
+const LISTINGS_DIR = path.join(process.cwd(), 'listings');
 const FORMAT_ELINA_PILATES = 'elina_pilates';
 const FORMAT_GOLDEN_DESIGNS = 'golden_designs';
 

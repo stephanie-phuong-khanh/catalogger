@@ -1,0 +1,45 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Push-Up Device",
+  "title": "Elina Pilates Push Up Device",
+  "overviewParagraph": "The Push Up Device is a Pilates push-up structure designed to develop the nervous system through push-up training and a wide range of movements. It supports balanced, uniform muscle work and body-defining exercises without focusing on hypertrophy, allowing you to perform Pilates-style push-up variations to build control. Durable, comfortable handles and compact size make it easy to carry and store conveniently.",
+  "features": [
+    "Pilates push-up training structure",
+    "Nervous system-focused movement training",
+    "Wide range of push-up variations",
+    "Balanced full-body muscle engagement",
+    "Body definition without hypertrophy",
+    "Improves body control & coordination",
+    "Stable, safe support platform",
+    "Easy-carry integrated handles",
+    "Lightweight for transport",
+    "Compact for easy storage"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "",
+    "columns": [],
+    "rows": []
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "500103",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/accessories/1087-push-up-device-8421941015236.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Push-Up Device/500103"
+        }
+      ],
+      "_source": {
+        "articleRef": "500103",
+        "description": "PUSH-UP DEVICE",
+        "priceUsd": 375,
+        "barcode": "8421941015236"
+      }
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Classic Combo Chair",
+  "title": "Elina Pilates Wunda Classic Chair",
+  "overviewParagraph": "The Wunda Classic Chair is Elina Pilates’ most classic Wunda Chair, built from solid, high-quality maple wood for a stable, traditional Pilates experience. Two springs with three hook positions each let you quickly adjust resistance so you can tailor exercises to your level and training goals. The padded pedal adds comfort and control, helping you move with confidence through chair-based Pilates work. Ideal for classical Pilates enthusiasts seeking a durable, responsive chair for consistent practice.",
+  "features": [
+    "Solid maple wood frame",
+    "Stainless steel hardware",
+    "2 tension springs",
+    "3-position spring hooks",
+    "Non-slip padded pedal",
+    "Durable non-slip upholstery",
+    "2-year warranty included"
+  ],
+  "inclusions": [
+    "Chair structure",
+    "Padded pedal",
+    "Chair springs: 2 classic"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wunda Classic Chair",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Chair Length",
+        "values": [
+          "29.13\""
+        ]
+      },
+      {
+        "label": "Chair Width",
+        "values": [
+          "20.87\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "22.44\""
+        ]
+      },
+      {
+        "label": "Seat Length",
+        "values": [
+          "16.54\""
+        ]
+      },
+      {
+        "label": "Seat Width",
+        "values": [
+          "14.2\""
+        ]
+      },
+      {
+        "label": "Seat Height",
+        "values": [
+          "22.44\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "lb / kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Maximum Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "400100",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1113-1904-wunda-chair.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Combo Chair/400100"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Wunda Chair/400100"
+        }
+      ],
+      "_source": {
+        "articleRef": "400100",
+        "description": "CLASSIC COMBO CHAIR_BLACK",
+        "priceUsd": 1390,
+        "barcode": "8421941015021"
+      }
+    },
+    {
+      "sku": "400101",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1113-1905-wunda-chair.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Combo Chair/400101"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Wunda Chair/400101"
+        }
+      ],
+      "_source": {
+        "articleRef": "400101",
+        "description": "CLASSIC COMBO CHAIR_GREY",
+        "priceUsd": 1390,
+        "barcode": "8421941015038"
+      }
+    }
+  ]
+}

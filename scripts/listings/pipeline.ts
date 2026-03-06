@@ -30,7 +30,7 @@ const CONFIG = {
   // Vendor website
   vendorBaseUrl: 'https://goldendesigninc.com',
   // Output
-  outputDir: 'data/listings/tab_03_dynamic_low_emf',
+  outputDir: 'listings/tab_03_dynamic_low_emf',
 };
 
 const openai = new OpenAI({

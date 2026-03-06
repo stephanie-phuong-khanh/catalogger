@@ -1,0 +1,74 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Arc",
+  "title": "Elina Pilates Arc",
+  "overviewParagraph": "N/A - compose manually",
+  "features": [
+    "Wood frame with leather cover",
+    "Built-in carry handle"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "Key dimensions of Arc",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Dimensions",
+        "values": [
+          "48 x 16 x 43 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "450025",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/inicio/798-1180-pilates-arc.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Arc/450025"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Arc/Arc/450025"
+        }
+      ],
+      "_source": {
+        "articleRef": "450025",
+        "description": "ARC_BLACK",
+        "priceUsd": 375,
+        "barcode": "8421941005626"
+      }
+    },
+    {
+      "sku": "700110",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/inicio/798-1182-pilates-arc.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Arc/700110"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Arc/Arc/700110"
+        }
+      ],
+      "_source": {
+        "articleRef": "700110",
+        "description": "ARC_GREY",
+        "priceUsd": 375,
+        "barcode": "8421941006722"
+      }
+    }
+  ]
+}

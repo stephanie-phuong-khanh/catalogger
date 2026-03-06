@@ -1,0 +1,984 @@
+[
+  {
+    "sku": "DCT-SV-08DO3",
+    "title": "Golden Designs DCT Premier Edition 0.8 HP Cold/Heat System with WIFI App",
+    "features": [
+      "Designed for cooling and heating plunges up to 135 gallons",
+      "Requires 120/15 AMP Outlet and Non-CAFCI/GFCI Breaker (Recommended to be on a dedicated outlet)",
+      "0.8 HP Compressor",
+      "Temperature Range of 37°F-85°F",
+      "Cools 1-3°F every 30 minutes (pending on ambient temperature and water volume)",
+      "Built-in Self-priming Water Circulation Pump",
+      "Two-Stage Water Filtration System",
+      "20 Micron Replaceable Filters",
+      "Automated Natural Ozone Sanitation System",
+      "Splash-proof Digital Touch Screen",
+      "Wi-Fi enabled for mobile device control and automation",
+      "Standard 120v Power Outlet (GFCI built in)",
+      "Quick Connect Hoses (Pair - 2 Hoses)",
+      "Pre-installed Water Filter + Two Replacement Filters",
+      "Filter Housing Wrench",
+      "Indoor/Outdoor use",
+      "White color",
+      "This item will be delivered by FedEx/UPS Ground"
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Premier Edition 0.8 HP Cold/Heat System",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "62 lbs",
+            "20\"",
+            "13\"",
+            "18\""
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "85 lbs",
+            "29\"",
+            "16\"",
+            "21\""
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT Premier Edition 0.8 HP Cold/Heat System with WIFI App is a versatile solution for maintaining optimal water temperatures in plunges up to 135 gallons. Ideal for both indoor and outdoor use, this system offers a temperature range of 37°F-85°F, making it perfect for muscle relaxation and stress relief through therapeutic cold and heat therapy. With its Wi-Fi-enabled control, you can easily adjust settings from your mobile device, ensuring convenience and precision. The built-in self-priming water circulation pump and two-stage water filtration system enhance water quality, while the automated ozone sanitation system ensures a clean and refreshing experience. Suitable for installation in fitness rooms or home spas, this system is designed for easy setup with quick connect hoses and a splash-proof digital touch screen.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-SV-08DO3",
+      "Dealer Cost": 2200,
+      "MAP": 3499,
+      "MSRP": 4399,
+      "Shipping Cost": 200,
+      "Description": "DCT Premier Edition - 0.8 HP Cold/Heat System with WIFI APP",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851314",
+      "Color": "White",
+      "Product Ad-Copy": "With your DCT chiller you can easily and efficiently cool your water down to a low of 37°F without the daily hassle of obtaining and adding ice! With the mobile app, the chiller can be powered on and controlled anywhere there’s a Wi-Fi connection. Additionally, the built-in ozone, filter, and strainer, will complement and simplify your standard recommended maintenance routine to keep your cold plunge water crystal clear and clean. Upgrade your cold plunge with a DCT chiller today!",
+      "General Features for Website": [
+        "Seamless Integration with Dynamic Cold Tubs: Designed to work effortlessly with Dynamic Cold Therapy tubs, this system ensures a perfect fit and optimal performance, enhancing the aesthetic and functional appeal of your wellness space.",
+        "Advanced Cold and Heat Functions: Experience the best of both worlds with the ability to cool down to a crisp 37 degrees Fahrenheit (3 degrees Celsius) and the added capability of heat function. This versatility allows for a wide range of therapeutic applications, from soothing warmth to invigorating cold.",
+        "Intuitive WiFi Connectivity: Harness the power of technology with a WiFi-enabled app on your phone, offering seamless control over your system. Adjust temperatures, set schedules, and monitor your system's performance from the comfort of your smartphone.",
+        "Robust Warranty for Peace of Mind: Enjoy the confidence that comes with a 1-year warranty, ensuring your investment is protected and your satisfaction is guaranteed."
+      ],
+      "Product Weight": 62,
+      "Dimensions\nLength x Width x Height": "20\"L x 13\"W x 18\"H",
+      "Length": 20,
+      "Width": 13,
+      "Height": 18,
+      "Ship Weight": 85,
+      "Ship Dimensions": "29\" L X 16\" W X 21\" H",
+      "Ship Length": 29,
+      "Ship Width": 16,
+      "Ship Height": 21,
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "1 Year Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential",
+      "Features": [
+        "Delivery: This item will be delivered by FedEx/UPS Ground",
+        "HP: 0.8 HP Compressor",
+        "Temperature: 37°F-85°F, Cools 1-3°F every 30min (pending on ambient temperature and water volume)",
+        "Max Water Amount: Designed for cooling and heating plunges up to 135 gallons",
+        "Water: Built-in Self-priming Water Circulation Pump",
+        "Filtration System: Two-Stage Water Filtration System",
+        "Micron Filters: 20 Micron Replaceable Filters",
+        "Sanitation System: Automated Natural Ozone Sanitation System",
+        "Touch Screen: Splash-poroof Digital Touch Screen",
+        "Wi-Fi: Wi-fi enabled for mobile device control and automation",
+        "Power Outlet: Standard 120v Power Outlet (GFCI built in)",
+        "Hoses: Quick Connect Hoses (Pair - 2 Hoses)",
+        "Filters: Pre-installed Water Filter + Two Replacement Filter",
+        "Wrench: Filter Housing Wrench",
+        "Location: Indoor/Outdoor"
+      ]
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-SV-10DO3",
+    "title": "Golden Designs DCT Premier Edition 1.0 HP Cold/Heat System with WIFI App",
+    "features": [
+      "Designed for cooling and heating plunges up to 135 gallons",
+      "Requires 120/15 AMP Outlet and Non-CAFCI/GFCI Breaker (Recommended to be on a dedicated outlet)",
+      "1.0 HP Compressor",
+      "Temperature Range of 37°F-85°F",
+      "Cools 1-3°F every 20 minutes (pending on ambient temperature and water volume)",
+      "Built-in Self-priming Water Circulation Pump",
+      "Two-Stage Water Filtration System",
+      "20 Micron Replaceable Filters",
+      "Automated Natural Ozone Sanitation System",
+      "Splash-proof Digital Touch Screen",
+      "Wi-Fi enabled for mobile device control and automation",
+      "Standard 120v Power Outlet (GFCI built in)",
+      "Quick Connect Hoses (Pair - 2 Hoses)",
+      "Pre-installed Water Filter + Two Replacement Filters",
+      "Filter Housing Wrench",
+      "Suitable for Indoor/Outdoor use",
+      "Color: White",
+      "This item will be delivered by FedEx/UPS Ground"
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Premier Edition 1.0 HP Cold/Heat System",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "78 lbs",
+            "21\"",
+            "14\"",
+            "21\""
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "105 lbs",
+            "26\"",
+            "18\"",
+            "25\""
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT Premier Edition 1.0 HP Cold/Heat System with WIFI App is a versatile solution for both cooling and heating water plunges up to 135 gallons, ideal for enhancing your wellness routine. With a temperature range of 37°F-85°F, this system is perfect for muscle relaxation and stress relief, whether installed indoors or outdoors. Its Wi-Fi connectivity allows for seamless control and automation via your mobile device, while the built-in self-priming water circulation pump and two-stage filtration system ensure clean, efficient operation. Designed for easy installation with quick connect hoses and a splash-proof digital touch screen, this system is a must-have for any fitness room or spa area.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-SV-10DO3",
+      "Dealer Cost": 2400,
+      "MAP": 3699,
+      "MSRP": 4899,
+      "Shipping Cost": 200,
+      "Description": "DCT Premier Edition - 1.0 HP Cold/Heat System with WIFI APP",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851321",
+      "Color": "White",
+      "Product Ad-Copy": "With your DCT chiller you can easily and efficiently cool your water down to a low of 37°F without the daily hassle of obtaining and adding ice! With the mobile app, the chiller can be powered on and controlled anywhere there’s a Wi-Fi connection. Additionally, the built-in ozone, filter, and strainer, will complement and simplify your standard recommended maintenance routine to keep your cold plunge water crystal clear and clean. Upgrade your cold plunge with a DCT chiller today!",
+      "General Features for Website": [
+        "Seamless Integration with Dynamic Cold Tubs: Designed to work effortlessly with Dynamic Cold Therapy tubs, this system ensures a perfect fit and optimal performance, enhancing the aesthetic and functional appeal of your wellness space.",
+        "Advanced Cold and Heat Functions: Experience the best of both worlds with the ability to cool down to a crisp 37 degrees Fahrenheit (3 degrees Celsius) and the added capability of heat function. This versatility allows for a wide range of therapeutic applications, from soothing warmth to invigorating cold.",
+        "Intuitive WiFi Connectivity: Harness the power of technology with a WiFi-enabled app on your phone, offering seamless control over your system. Adjust temperatures, set schedules, and monitor your system's performance from the comfort of your smartphone.",
+        "Robust Warranty for Peace of Mind: Enjoy the confidence that comes with a 1-year warranty, ensuring your investment is protected and your satisfaction is guaranteed."
+      ],
+      "Features": [
+        "Delivery: This item will be delivered by FedEx/UPS Ground",
+        "HP: 1.0 HP Compressor",
+        "Temperature: 37°F-85°F, Cools 1-3°F every 20min (pending on ambient temperature and water volume)",
+        "Max Water Amount: Designed for cooling and heating plunges up to 135 gallons",
+        "Water: Built-in Self-priming Water Circulation Pump",
+        "Filtration System: Two-Stage Water Filtration System",
+        "Micron Filters: 20 Micron Replaceable Filters",
+        "Sanitation System: Automated Natural Ozone Sanitation System",
+        "Touch Screen: Splash-poroof Digital Touch Screen",
+        "Wi-Fi: Wi-fi enabled for mobile device control and automation",
+        "Power Outlet: Standard 120v Power Outlet (GFCI built in)",
+        "Hoses: Quick Connect Hoses (Pair - 2 Hoses)",
+        "Filters: Pre-installed Water Filter + Two Replacement Filter",
+        "Wrench: Filter Housing Wrench",
+        "Location: Indoor/Outdoor"
+      ],
+      "Product Weight": 78,
+      "Dimensions\nLength x Width x Height": "21\"L x 14\"W x21\"H",
+      "Length": 21,
+      "Width": 14,
+      "Height": 21,
+      "Ship Weight": 105,
+      "Ship Dimensions": "26\" L X 18\" W X 25\" H",
+      "Ship Length": 26,
+      "Ship Width": 18,
+      "Ship Height": 25,
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "1 Year Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential",
+      "__EMPTY": "Dynamic Cold Therapy Basic Cooling/Heating System"
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-SY-08-PRO",
+    "title": "Golden Designs Dynamic Cold Therapy 0.8 HP Chiller with WIFI App",
+    "features": [
+      "0.8 HP Chiller with Cold/Heat Functionality",
+      "Temperature Range: Can cool water down to 37°F",
+      "WIFI APP for remote control and operation",
+      "Built-in ozone, filter, and strainer for maintenance",
+      "Color: Black",
+      "Requires 120/15 AMP Outlet and Non-CAFCI/GFCI Breaker (Recommended to be on a dedicated outlet)",
+      "This item will be delivered by FedEx/UPS Ground"
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Dynamic Cold Therapy 0.8 HP Chiller with WIFI App",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "85 lbs",
+            "14\"",
+            "19\"",
+            "22\""
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "90 lbs",
+            "23\"",
+            "17\"",
+            "24\""
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs Dynamic Cold Therapy 0.8 HP Chiller with WIFI App is a versatile solution for effective temperature management, ideal for enhancing your wellness routine. Designed to cool water down to a refreshing 37°F, this chiller offers both cold and heat functionality, making it perfect for muscle relaxation and stress relief. With its convenient WIFI app, you can easily control and operate the unit remotely, ensuring optimal performance at your fingertips. The built-in ozone, filter, and strainer simplify maintenance, while its sleek black design fits seamlessly into home gyms or wellness spaces. For best results, install on a dedicated 120/15 AMP outlet.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-SY-08-PRO",
+      "Dealer Cost": 2000,
+      "MAP": 3299,
+      "MSRP": 3899,
+      "Shipping Cost": 200,
+      "Description": "Dynamic Cold Therapy 0.8 HP Chiller (Cold/Heat) with WIFI APP",
+      "UPC (12 digits)\nEAN (13 digits)": "850041998879",
+      "Color": "Black",
+      "Product Ad-Copy": "With your DCT chiller you can easily and efficiently cool your water down to a low of 37°F without the daily hassle of obtaining and adding ice! With the mobile app, the chiller can be powered on and controlled anywhere there’s a Wi-Fi connection. Additionally, the built-in ozone, filter, and strainer, will complement and simplify your standard recommended maintenance routine to keep your cold plunge water crystal clear and clean. Upgrade your cold plunge with a DCT chiller today!",
+      "General Features for Website": "Seamless Integration with Dynamic Cold Tubs: Designed to work effortlessly with Dynamic Cold Therapy tubs, this system ensures a perfect fit and optimal performance, enhancing the aesthetic and functional appeal of your wellness space.",
+      "Features": "Delivery: This item will be delivered by FedEx/UPS Ground",
+      "Product Weight": 85,
+      "Dimensions\nLength x Width x Height": "14\"L x 19\"W x 22\"H",
+      "Length": 14,
+      "Width": 19,
+      "Height": 22,
+      "Ship Weight": 90,
+      "Ship Dimensions": "23\" L x 17\" W x 24\" H",
+      "Ship Length": 23,
+      "Ship Width": 17,
+      "Ship Height": 24,
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "1 Year Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": [
+      "Replaces",
+      "DCT-SY-08-HC"
+    ],
+    "incompletePricingData": true,
+    "_raw": {
+      "GDINA Item #": [
+        "Replaces",
+        "DCT-SY-08-HC"
+      ],
+      "General Features for Website": [
+        "Advanced Cold and Heat Functions: Experience the best of both worlds with the ability to cool down to a crisp 37 degrees Fahrenheit (3 degrees Celsius) and the added capability of heat function. This versatility allows for a wide range of therapeutic applications, from soothing warmth to invigorating cold.",
+        "Intuitive WiFi Connectivity: Harness the power of technology with a WiFi-enabled app on your phone, offering seamless control over your system. Adjust temperatures, set schedules, and monitor your system's performance from the comfort of your smartphone.",
+        "Robust Warranty for Peace of Mind: Enjoy the confidence that comes with a 1-year warranty, ensuring your investment is protected and your satisfaction is guaranteed."
+      ],
+      "Features": [
+        "HP: 0.8 HP Compressor",
+        "Temperature: 37°F-85°F, Cools 1-3°F every 30min (pending on ambient temperature and water volume)",
+        "Max Water Amount: Designed for cooling and heating plunges up to 135 gallons",
+        "Water: Built-in Self-priming Water Circulation Pump",
+        "Filtration System: Two-Stage Water Filtration System",
+        "Micron Filters: 20 Micron Replaceable Filters",
+        "Sanitation System: Automated Natural Ozone Sanitation System",
+        "Touch Screen: Splash-poroof Digital Touch Screen",
+        "Wi-Fi: Wi-fi enabled for mobile device control and automation",
+        "Power Outlet: Standard 120v Power Outlet (GFCI built in)",
+        "Hoses: Quick Connect Hoses (Pair - 2 Hoses)",
+        "Filters: Pre-installed Water Filter + Two Replacement Filter",
+        "Wrench: Filter Housing Wrench",
+        "Location: Indoor/Outdoor"
+      ]
+    },
+    "_vendorData": null,
+    "vendorPageUrl": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-SY-10-PRO",
+    "title": "Golden Designs Dynamic Cold Therapy 1.0 HP Chiller with WIFI App",
+    "features": [
+      "Dynamic Cold Therapy 1.0 HP Chiller with Cold/Heat Functionality",
+      "Temperature Range: Can cool water down to 37°F",
+      "WIFI APP for remote control and operation",
+      "Built-in ozone, filter, and strainer for maintenance",
+      "Color: Black",
+      "Requires 120/15 AMP Outlet and Non-CAFCI/GFCI Breaker (Recommended to be on a dedicated outlet)",
+      "This item will be delivered by FedEx/UPS Ground"
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Dynamic Cold Therapy 1.0 HP Chiller with WIFI App",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Chiller (Product)",
+          "values": [
+            "89 lbs",
+            "15\"",
+            "21\"",
+            "22\""
+          ]
+        },
+        {
+          "label": "Carton (Shipping)",
+          "values": [
+            "94 lbs",
+            "25\"",
+            "18\"",
+            "24\""
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs Dynamic Cold Therapy 1.0 HP Chiller with WIFI App is a versatile solution for effective cold and heat therapy, ideal for enhancing recovery and wellness routines. With the ability to cool water down to 37°F, this chiller is perfect for muscle relaxation and stress relief, making it a valuable addition to home gyms or wellness spaces. Its WIFI app allows for convenient remote control, ensuring you can easily adjust settings to suit your needs. Designed with a built-in ozone, filter, and strainer, it offers low-maintenance operation, while its sleek black design complements any modern setup.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-SY-10-PRO",
+      "Dealer Cost": 2200,
+      "MAP": 3499,
+      "MSRP": 4399,
+      "Shipping Cost": 200,
+      "Description": "Dynamic Cold Therapy 1.0 HP Chiller (Cold/Heat) with WIFI APP",
+      "UPC (12 digits)\nEAN (13 digits)": "850041998886",
+      "Color": "Black",
+      "Product Ad-Copy": "With your DCT chiller you can easily and efficiently cool your water down to a low of 37°F without the daily hassle of obtaining and adding ice! With the mobile app, the chiller can be powered on and controlled anywhere there’s a Wi-Fi connection. Additionally, the built-in ozone, filter, and strainer, will complement and simplify your standard recommended maintenance routine to keep your cold plunge water crystal clear and clean. Upgrade your cold plunge with a DCT chiller today!",
+      "General Features for Website": "Seamless Integration with Dynamic Cold Tubs: Designed to work effortlessly with Dynamic Cold Therapy tubs, this system ensures a perfect fit and optimal performance, enhancing the aesthetic and functional appeal of your wellness space.",
+      "Features": "Delivery: This item will be delivered by FedEx/UPS Ground",
+      "Product Weight": 89,
+      "Dimensions\nLength x Width x Height": "15\"L x 21\"W x 22\"H",
+      "Length": 15,
+      "Width": 21,
+      "Height": 22,
+      "Ship Weight": 94,
+      "Ship Dimensions": "25\" L x 18\" W x 24\" H",
+      "Ship Length": 25,
+      "Ship Width": 18,
+      "Ship Height": 24,
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "1 Year Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": [
+      "Replaces",
+      "DCT-SY-10-HC"
+    ],
+    "incompletePricingData": true,
+    "_raw": {
+      "GDINA Item #": [
+        "Replaces",
+        "DCT-SY-10-HC"
+      ],
+      "General Features for Website": [
+        "Advanced Cold and Heat Functions: Experience the best of both worlds with the ability to cool down to a crisp 37 degrees Fahrenheit (3 degrees Celsius) and the added capability of heat function. This versatility allows for a wide range of therapeutic applications, from soothing warmth to invigorating cold.",
+        "Intuitive WiFi Connectivity: Harness the power of technology with a WiFi-enabled app on your phone, offering seamless control over your system. Adjust temperatures, set schedules, and monitor your system's performance from the comfort of your smartphone.",
+        "Robust Warranty for Peace of Mind: Enjoy the confidence that comes with a 1-year warranty, ensuring your investment is protected and your satisfaction is guaranteed. "
+      ],
+      "Features": [
+        "HP: 1.0 HP Compressor",
+        "Temperature: 37°F-85°F, Cools 1-3°F every 30min (pending on ambient temperature and water volume)",
+        "Max Water Amount: Designed for cooling and heating plunges up to 135 gallons",
+        "Water: Built-in Self-priming Water Circulation Pump",
+        "Filtration System: Two-Stage Water Filtration System",
+        "Micron Filters: 20 Micron Replaceable Filters",
+        "Sanitation System: Automated Natural Ozone Sanitation System",
+        "Touch Screen: Splash-poroof Digital Touch Screen",
+        "Wi-Fi: Wi-fi enabled for mobile device control and automation",
+        "Power Outlet: Standard 120v Power Outlet (GFCI built in)",
+        "Hoses: Quick Connect Hoses (Pair - 2 Hoses)",
+        "Filters: Pre-installed Water Filter + Two Replacement Filter",
+        "Wrench: Filter Housing Wrench",
+        "Location: Indoor/Outdoor"
+      ],
+      "__EMPTY": "Dynamic Cold Therapy - Accessories "
+    },
+    "_vendorData": null,
+    "vendorPageUrl": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-Filter-5x2.5",
+    "title": "Golden Designs DCT 5x2.5 20 Micron Filters 4 Pack With Shipping Included",
+    "features": [
+      "Compatible with Dynamic Cold Therapy Chillers",
+      "Small 20-micron filters for Dynamic Cold Therapy Cold Plunges (5x2.5)",
+      "No Warranty",
+      "Shipping included in the purchase price and shipped via UPS or FedEx Ground Service (No PO Box, must be physical address for delivery)",
+      "Additional shipping fees for Canada"
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the DCT 5x2.5 20 Micron Filters",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Shipping",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT 5x2.5 20 Micron Filters 4 Pack is designed to enhance the performance of your Dynamic Cold Therapy Chillers, ensuring optimal filtration for your cold plunges. These small, 20-micron filters are essential for maintaining clean and efficient operation, contributing to muscle relaxation and improved circulation during your therapy sessions. With shipping included in the purchase price, these filters are conveniently delivered to your physical address via UPS or FedEx Ground Service. Please note, additional shipping fees apply for Canadian addresses.",
+    "vendorPageUrl": "https://goldendesigninc.com/products/dct-5x2-5-20-micron-filters-4-pack?_pos=1&_psq=DCT-Filter-5x2.5&_ss=e&_v=1.0",
+    "_raw": {
+      "__EMPTY": "Dynamic Cold Therapy - Accessories ",
+      "GDINA Item #": "DCT-Filter-5x2.5",
+      "Dealer Cost": 40,
+      "MAP": 54.95,
+      "MSRP": 59.95,
+      "Shipping Cost": "Included in Cost",
+      "Description": "DCT 5x2.5 20 Micron Filters (4 Pack) (Shipping Included in Price)",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851352",
+      "Dimensions\nLength x Width x Height": "5\"x2.5\"",
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "No Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": {
+      "id": 8059785806016,
+      "title": "DCT 5x2.5 20 Micron Filters (4 Pack)",
+      "url": "https://goldendesigninc.com/products/dct-5x2-5-20-micron-filters-4-pack?_pos=1&_psq=DCT-Filter-5x2.5&_ss=e&_v=1.0",
+      "price": "54.95",
+      "body": [
+        "These filters are compatible with Dynamic Cold Therapy Chillers.",
+        "Model - DCT-Filter-5x2.5",
+        "Small 20-micron filters for Dynamic Cold Therapy Cold Plunges (5x2.5)",
+        "No Warranty",
+        "Shipping included in the purchase price and shipped via UPS or FedEx Ground Service (No PO Box, must be physical address for delivery) (Additional shipping fees for Canada)"
+      ],
+      "image": "https://cdn.shopify.com/s/files/1/0065/5202/7225/files/SMALLFILTER-4PACK.jpg?v=1724089507",
+      "handle": "dct-5x2-5-20-micron-filters-4-pack"
+    },
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-Filter-10x2.5",
+    "title": "Golden Designs DCT 10x2.5 20 Micron Filters 4 Pack With Shipping Included",
+    "features": [
+      "Compatible with Dynamic Cold Therapy Chillers",
+      "Large 20-micron filters for Dynamic Cold Therapy Cold Plunges (10x2.5in)",
+      "No Warranty",
+      "Shipping included in the purchase price and shipped via UPS or FedEx Ground Service",
+      "Must be delivered to a physical address (No PO Box)",
+      "Additional shipping fees for Canada"
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the DCT 10x2.5 20 Micron Filters",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Shipping",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT 10x2.5 20 Micron Filters 4 Pack is designed to enhance your Dynamic Cold Therapy experience by ensuring optimal water purity. These large 20-micron filters are specifically crafted for use with Dynamic Cold Therapy Chillers, making them essential for maintaining clean and effective cold plunges. Ideal for promoting muscle relaxation and improved circulation, these filters help you achieve the full benefits of cold therapy. With shipping included via UPS or FedEx Ground Service, these filters are conveniently delivered to your doorstep, ensuring you can focus on your wellness journey without hassle.",
+    "vendorPageUrl": "https://goldendesigninc.com/products/dct-10x2-5-20-micron-filters-4-pack?_pos=1&_psq=DCT-Filter-10x2.5&_ss=e&_v=1.0",
+    "_raw": {
+      "GDINA Item #": "DCT-Filter-10x2.5",
+      "Dealer Cost": 46,
+      "MAP": 59.95,
+      "MSRP": 64.95,
+      "Shipping Cost": "Included in Cost",
+      "Description": "DCT 10x2.5 20 Micron Filters (4 Pack) (Shipping Included in Price)",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851369",
+      "Dimensions\nLength x Width x Height": "10\"x2.5\"",
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "No Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": {
+      "id": 8059790491840,
+      "title": "DCT 10x2.5 20 Micron Filters (4 Pack)",
+      "url": "https://goldendesigninc.com/products/dct-10x2-5-20-micron-filters-4-pack?_pos=1&_psq=DCT-Filter-10x2.5&_ss=e&_v=1.0",
+      "price": "59.95",
+      "body": [
+        "These filters are compatible with Dynamic Cold Therapy Chillers.",
+        "Model - DCT-Filter-10x2.5",
+        "Large 20-micron filters for Dynamic Cold Therapy Cold Plunges (10x2.5in)",
+        "No Warranty",
+        "Shipping included in the purchase price and shipped via UPS or FedEx Ground Service (No PO Box, must be physical address for delivery) (Additional shipping fees for Canada)"
+      ],
+      "image": "https://cdn.shopify.com/s/files/1/0065/5202/7225/files/LARGEFILTER4-PACK_1.jpg?v=1725319927",
+      "handle": "dct-10x2-5-20-micron-filters-4-pack"
+    },
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-NP-H-CVR",
+    "title": "Golden Designs DCT Neoprene Hose Cover Pair 9 FT Length",
+    "features": [
+      "Sold as a pair",
+      "9 FT length per hose cover",
+      "Neoprene material for durability and flexibility",
+      "Designed to protect hoses from wear and tear",
+      "Easy to install and remove",
+      "Suitable for various applications",
+      "This item will be delivered curbside only on a pallet by a freight carrier."
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Neoprene Hose Cover Pair 9 FT Length",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "—",
+            "9 ft",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Shipping",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT Neoprene Hose Cover Pair, each measuring 9 feet in length, is expertly crafted to protect your hoses from wear and tear. Made from durable and flexible neoprene, these covers are easy to install and remove, ensuring your hoses remain in top condition for various applications. Ideal for both residential and commercial use, they offer a practical solution to extend the life of your equipment. Delivered curbside on a pallet by a freight carrier, these hose covers are a convenient and essential addition to your maintenance toolkit.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-NP-H-CVR",
+      "Dealer Cost": 55,
+      "MAP": 109.95,
+      "MSRP": 139.95,
+      "Shipping Cost": 20,
+      "Description": "DCT Neoprene Hose Cover (Sold as a Pair) (9 FT Length per Hose Cover)",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851420",
+      "Dimensions\nLength x Width x Height": "9 FT Length Each Cover",
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "90 Days Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-B-042-CVR-F",
+    "title": "Golden Designs DCT Barrel 4\" Insulated Cover Black",
+    "features": [
+      "4\" Insulated Cover for enhanced thermal efficiency",
+      "Black color for a sleek appearance",
+      "Durable construction for long-lasting use",
+      "This item will be delivered curbside only on a pallet by a freight carrier."
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Barrel 4\" Insulated Cover",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Shipping",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT Barrel 4\" Insulated Cover Black is designed to enhance the thermal efficiency of your sauna, ensuring optimal heat retention and energy savings. This sleek, black cover not only adds a modern touch to your setup but also boasts durable construction for long-lasting use. Ideal for maintaining consistent temperatures, it supports muscle relaxation and stress relief by keeping your sauna environment perfectly insulated. Delivered curbside on a pallet by a freight carrier, this cover is a practical addition for those seeking to maximize their sauna's performance and longevity.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-B-042-CVR-F",
+      "Dealer Cost": 100,
+      "MAP": 260,
+      "MSRP": 280,
+      "Shipping Cost": 110,
+      "Description": "DCT Barrel - 4\" Insulated Cover (Black)",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851376",
+      "Dimensions\nLength x Width x Height": "42\" Diameter / 4\" T",
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "90 Days Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-S-050-CVR-F",
+    "title": "Golden Designs DCT Cuboid 4\" Insulated Cover Black",
+    "features": [
+      "4\" Insulated Cover for optimal thermal retention",
+      "Black color for a sleek appearance",
+      "Durable construction for long-lasting use",
+      "This item will be delivered curbside only on a pallet by a freight carrier."
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Cuboid 4\" Insulated Cover",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Shipping",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT Cuboid 4\" Insulated Cover Black is expertly crafted to provide optimal thermal retention for your sauna, ensuring a consistent and efficient heat experience. Its sleek black design not only enhances the aesthetic appeal but also offers durable construction for long-lasting use. Ideal for maintaining the perfect sauna environment, this cover helps improve circulation and promote relaxation by keeping the heat contained. Delivered curbside on a pallet by a freight carrier, it’s a convenient addition to any home wellness setup.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-S-050-CVR-F",
+      "Dealer Cost": 100,
+      "MAP": 260,
+      "MSRP": 280,
+      "Shipping Cost": 110,
+      "Description": "DCT \"CUBOID\" 4\" Insulated Cover (Black)",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851383",
+      "Dimensions\nLength x Width x Height": "50\" Length / 4\" T",
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "90 Days Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  },
+  {
+    "sku": "DCT-S-055-CVR-F",
+    "title": "Golden Designs DCT Cuboid XL 4\" Insulated Cover Black",
+    "features": [
+      "Extra Large 4\" Insulated Cover",
+      "Black Color",
+      "This item will be delivered curbside only on a pallet by a freight carrier."
+    ],
+    "specifications": {
+      "tableTitle": "Key Measurements of the Cuboid XL 4\" Insulated Cover",
+      "columns": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+      ],
+      "rows": [
+        {
+          "label": "Product",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Carton",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "Shipping",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "LTL Pallet",
+          "values": [
+            "—",
+            "—",
+            "—",
+            "—"
+          ]
+        }
+      ]
+    },
+    "overviewParagraph": "The Golden Designs DCT Cuboid XL 4\" Insulated Cover in Black is an essential accessory designed to enhance the efficiency and longevity of your outdoor sauna. This extra-large, 4-inch insulated cover provides superior protection against the elements, ensuring optimal heat retention and energy efficiency. Ideal for outdoor installations, it helps maintain consistent temperatures, promoting muscle relaxation and stress relief during your sauna sessions. Delivered curbside on a pallet by a freight carrier, this cover is a practical addition for those seeking to maximize their sauna's performance and durability.",
+    "vendorPageUrl": null,
+    "_raw": {
+      "GDINA Item #": "DCT-S-055-CVR-F",
+      "Dealer Cost": 110,
+      "MAP": 260,
+      "MSRP": 280,
+      "Shipping Cost": 110,
+      "Description": "DCT \"CUBOID\" (XL) 4\" Insulated Cover (Black)",
+      "UPC (12 digits)\nEAN (13 digits)": "850061851390",
+      "Dimensions\nLength x Width x Height": "55\" Length / 4\" T",
+      "UPS/Fedex\nGround": "Ground/LTL",
+      "Country of Manufacturer": "China",
+      "Process Time": "1 Day",
+      "Shipping Cartons": 1,
+      "Warranty": "90 Days Warranty",
+      "Unit of Measure": 1,
+      "Residential\nCommercial \nUse": "Residential"
+    },
+    "_vendorData": null,
+    "_listingFormat": "golden_designs"
+  }
+]

@@ -1,0 +1,157 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Aluminium Reformer Mentor With Tower",
+  "title": "Elina Pilates Reformer Mentor With Tower",
+  "overviewParagraph": "The Reformer Mentor With Tower combines a compact, high-strength anodized aluminum frame with an adjustable pulley Tower to deliver versatile, professional Pilates training for all levels. A moveable foot bar that runs the length of the reformer lets you quickly tailor positioning for different exercises, while the silent sliding carriage and bed damping system keep sessions smooth and quiet. Padded shoulder rests and an adjustable headrest add supportive comfort for longer workouts. It includes an extra-wide box, jump board, and handles—plus an innovative loop handle system that glides quietly for a more comfortable, premium feel.",
+  "features": [
+    "Anodized aluminum frame & steel feet",
+    "Mini Tower with adjustable pulleys",
+    "7-position quick-release foot bar",
+    "Sliding foot bar, length-adjustable",
+    "Non-slip padded foot bar & bed",
+    "Ultra-silent smooth carriage glide",
+    "Durable heavy-use upholstery",
+    "Retractable cord storage under carriage",
+    "4-position bed damping system",
+    "6-spring resistance set",
+    "2-height spring bar",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Extra-wide padded box included",
+    "Wide removable jump board",
+    "Premium quiet loop handles",
+    "Adjustable ankle strap",
+    "Front transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + Mentor reformer carriage",
+    "Complete tower with pulleys",
+    "Essentials Kit with box, jump board, and handles",
+    "Extra wide box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of padded hard foam handles",
+    "1 set of double loop cotton handles for hands and feet",
+    "1 set of simple cotton handles",
+    "Padded shoulder rests",
+    "Reformer springs: 2 strong reds, 2 medium greens, and 2 light yellows",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Foot securing strap",
+    "Foot anchoring strap",
+    "1 pair of wheels",
+    "A set of pulley cords",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Reformer Mentor With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "98.43\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "29.53\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "12.80\""
+        ]
+      },
+      {
+        "label": "Maximum Height with Tower",
+        "values": [
+          "74.41\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "16.14\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "179.68 lb / 81.5 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=TOsCp2rl_GQ"
+  ],
+  "variants": [
+    {
+      "sku": "300400",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1127-1936-mentor-reformer-with-tower.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer Mentor With Tower/300400"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Mentor/Mentor with Tower/300400"
+        }
+      ],
+      "_source": {
+        "articleRef": "300400",
+        "description": "ALUMINIUM REFORMER MENTOR WITH TOWER_BLACK",
+        "priceUsd": 5490,
+        "barcode": "8421941015908"
+      }
+    },
+    {
+      "sku": "300401",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1127-1937-mentor-reformer-with-tower.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer Mentor With Tower/300401"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Mentor/Mentor with Tower/300401"
+        }
+      ],
+      "_source": {
+        "articleRef": "300401",
+        "description": "ALUMINIUM REFORMER MENTOR WITH TOWER_GREY",
+        "priceUsd": 5490,
+        "barcode": "8421941015915"
+      }
+    }
+  ]
+}

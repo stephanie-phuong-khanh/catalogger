@@ -1,0 +1,91 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Ladder Barrel Elite Steel Base",
+  "title": "Elina Pilates Ladder Barrel With Steel Elite Model",
+  "overviewParagraph": "The Ladder Barrel With Steel Elite Model delivers maximum comfort for Ladder Barrel exercises, helping you move through stretches and strength work with control. Its steel structure provides outstanding stability and durability, and steel shelves with cushioned rubber coating add secure, comfortable support.",
+  "features": [
+    "Wood barrel & steel frame",
+    "Ladder rungs + barrel design",
+    "Adjustable length 39.3–47.2 in",
+    "Reinforced wood bracing",
+    "Non-slip leather barrel cover",
+    "High-density EVA cushioning",
+    "Stable, durable base"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "Key dimensions of Ladder Barrel With Steel Elite Model",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Adjustable Length",
+        "values": [
+          "39.3 to 47.2 in"
+        ]
+      },
+      {
+        "label": "Total Measurement",
+        "values": [
+          "37.4 * 7.8 in"
+        ]
+      },
+      {
+        "label": "Barrel Measurement",
+        "values": [
+          "21.6 * 34.6 in"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "450012",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/1042-1431-elite-steel-base-ladder-barrel.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Ladder Barrel Elite Steel Base/450012"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Barrel/Elite Steel Base Ladder/450012"
+        }
+      ],
+      "_source": {
+        "articleRef": "450012",
+        "description": "LADDER BARREL ELITE_STEEL BASE_BLACK",
+        "priceUsd": 1730,
+        "barcode": "8421941009525"
+      }
+    },
+    {
+      "sku": "700145",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/1042-1430-elite-steel-base-ladder-barrel.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Ladder Barrel Elite Steel Base/700145"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Barrel/Elite Steel Base Ladder/700145"
+        }
+      ],
+      "_source": {
+        "articleRef": "700145",
+        "description": "LADDER BARREL ELITE_STEEL BASE_GREY",
+        "priceUsd": 1730,
+        "barcode": "8421941009549"
+      }
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Aluminium Reformer HL 2",
+  "title": "Elina Pilates Aluminum Hl2 Reformer",
+  "overviewParagraph": "The Aluminum Hl2 Reformer is Elina Pilates’ most versatile, modern studio reformer, built for clubs and professional spaces that need maximum functionality in minimal space. Its stackable design stores vertically and offers four leg heights, so you can tailor setup and storage to your room and clients. A quick-release foot bar speeds transitions between exercises, while the included box, jump board, and handles expand programming for full-body Pilates training. The innovative loop handle system glides smoothly and silently, eliminating ring noise for a more comfortable, premium workout experience.",
+  "features": [
+    "Anodized aluminum frame",
+    "Stackable horizontal or vertical storage",
+    "4 leg height options",
+    "Quick-release foot bar, 6 positions",
+    "Non-slip padded foot bar",
+    "Non-slip foot platform",
+    "Smooth, ultra-quiet carriage",
+    "Silent loop handle system",
+    "Durable studio-grade upholstery",
+    "5-spring set, 4-position spring bar",
+    "3-position adjustable headrest",
+    "Removable padded shoulder rests",
+    "3-position carriage stoppers",
+    "Cleat-adjustable ropes",
+    "Includes padded box",
+    "Includes removable jump board",
+    "Inside/outside adjustable foot strap",
+    "Integrated transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Aluminum HL Reformer",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Non-slip foot platform",
+    "Padded foot bar",
+    "1 set of padded hard foam handles",
+    "1 set of cotton handles for hands and double loop feet",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Foot strap",
+    "Pulley posts",
+    "2 pairs of wheels",
+    "One set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Aluminum Hl2 Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.49\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.95\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "7.28\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "17.91\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "10.04\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "143.3 lb / 65 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=kERnuH7xnYY",
+    "https://www.youtube.com/watch?v=c0QQ_4gaNHQ"
+  ],
+  "variants": [
+    {
+      "sku": "200002",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/777-aluminum-hl2-reformer-8421941005381.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer HL 2/200002"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer de aluminio/200002"
+        }
+      ],
+      "_source": {
+        "articleRef": "200002",
+        "description": "ALUMINIUM REFORMER HL 2",
+        "priceUsd": 3845,
+        "barcode": "8421941005381"
+      }
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Cadillac - Reformer",
+  "title": "Elina Pilates Cadillac Reformer",
+  "overviewParagraph": "The Cadillac Reformer is a premium Pilates machine built from American rock maple for a stable, long-lasting platform for full-body training. Stainless steel and anodized aluminum components boost durability and smooth operation, while the innovative loop handle system slides silently to keep sessions focused and comfortable. A leather-upholstered bed with high-density EVA foam cushions your body for better support during Pilates work. It also complies with environmental regulations, making it a responsible choice for home or studio use.",
+  "features": [
+    "American rock maple wood frame",
+    "Stainless steel & anodized aluminum hardware",
+    "Long-wear leather upholstered bed",
+    "High-density EVA foam padding",
+    "Smooth, silent loop handle system",
+    "Cadillac trapeze bar with padded protection",
+    "2 sliding bars with quick adjustment",
+    "8 color-coded Cadillac springs",
+    "Solid beech roll-down bar",
+    "Fuzzies grip handles, extra soft",
+    "Removable stainless steel towers with hooks",
+    "Quick-release height-adjust pulleys",
+    "3-position adjustable headrest",
+    "Removable shoulder pads",
+    "4-position adjustable foot bar",
+    "4-height adjustable push bar",
+    "5 spring resistance levels included",
+    "Jump board & box included"
+  ],
+  "inclusions": [
+    "Double mat to completely cover the surface",
+    "2 horizontal and vertical sliding bars with quick adjustment system",
+    "Foot support mat",
+    "Adjustable fastening strap",
+    "Wooden trapeze bar with padded protection, with covered springs for greater safety and stabilizer belt",
+    "Springs: 2 short light (yellow), 2 short medium (green), 2 light long (yellow) and 2 medium long (green)",
+    "Roll - down bar in solid beech wood",
+    "1 pair of Fuzzies grips, very soft",
+    "Stainless steel towers with hooks. Easier exercises from outside of the unit. Easily removable",
+    "Pulley bars with height change and removable quick-release system ",
+    "Adjustable headrest in 3 positions",
+    "Removable shoulder pads ",
+    "Removable quick-release pulley bars with height change",
+    "1 set of pulley ropes",
+    "Adjustable foot bar in 4 positions",
+    "Push bar adjustable in 4 heights",
+    "1 push bar safety strap",
+    "Bed Springs: 2 light (yellow), 2 medium (green), 2 strong (red)",
+    "A cotton handles: 1 set of double handles for hands and feet, 1 set of single handles for feet and 1 set of padded handles",
+    "Adjustable foot strap",
+    "Includes the jump table and the box"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Cadillac Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Length",
+        "values": [
+          "94.5\""
+        ]
+      },
+      {
+        "label": "Width",
+        "values": [
+          "30.7\""
+        ]
+      },
+      {
+        "label": "Tower height",
+        "values": [
+          "212 cm"
+        ]
+      },
+      {
+        "label": "Bed height",
+        "values": [
+          "56\""
+        ]
+      },
+      {
+        "label": "Bed size",
+        "values": [
+          "240 x 69 x 218 cm"
+        ]
+      },
+      {
+        "label": "Wood structure length",
+        "values": [
+          "234 + 6 cm"
+        ]
+      },
+      {
+        "label": "Wood structure width",
+        "values": [
+          "68 + 11 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300001",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/cadillacs-trapeze-for-pilates/786-1114-cadillac-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Cadillac - Reformer/300001"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Cadillac/Cadillac Reformer/300001"
+        }
+      ],
+      "_source": {
+        "articleRef": "300001",
+        "description": "CADILLAC - REFORMER_BLACK",
+        "priceUsd": 5250,
+        "barcode": "8421941005428"
+      }
+    },
+    {
+      "sku": "700020",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/cadillacs-trapeze-for-pilates/786-1115-cadillac-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Cadillac - Reformer/700020"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Cadillac/Cadillac Reformer/700020"
+        }
+      ],
+      "_source": {
+        "articleRef": "700020",
+        "description": "CADILLAC - REFORMER_GREY",
+        "priceUsd": 5250,
+        "barcode": "8421941006005"
+      }
+    }
+  ]
+}

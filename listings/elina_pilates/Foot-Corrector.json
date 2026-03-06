@@ -1,0 +1,58 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Foot Corrector",
+  "title": "Elina Pilates Pilates Foot Corrector",
+  "overviewParagraph": "The Pilates Foot Corrector helps correct and strengthen your feet to support more stable movement. Designed to improve balance and walking posture, it’s an effective tool for building better foot alignment and control. Made from soft, durable material, it helps prevent pinching or damage for more comfortable, consistent use.",
+  "features": [
+    "Soft-touch, durable material",
+    "Foot arch strengthening exercises",
+    "Improved balance & stability",
+    "Better walking posture support",
+    "Targets ankle & knee joints",
+    "Improves hip mobility",
+    "Fits all foot sizes"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "Key dimensions of Foot Corrector",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Dimensions",
+        "values": [
+          "46 x 19 x 12 cm"
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "1.5kg"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "500100",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/accessories/1084-foot-corrector-8421941015205.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Foot Corrector/500100"
+        }
+      ],
+      "_source": {
+        "articleRef": "500100",
+        "description": "FOOT CORRECTOR",
+        "priceUsd": 175,
+        "barcode": "8421941015205"
+      }
+    }
+  ]
+}

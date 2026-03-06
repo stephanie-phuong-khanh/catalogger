@@ -1,0 +1,203 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Vertical Reformer",
+  "title": "Elina Pilates Vertical Reformer For Home",
+  "overviewParagraph": "The Vertical Reformer For Home delivers a professional-style Pilates reformer experience in a compact format designed for domestic spaces. Built from durable American maple wood, it provides the stability and firmness needed for controlled, precise workouts while remaining easy to move and store. A secure vertical storage system with two removable support legs keeps it safely upright when not in use, helping you reclaim floor space. Adjustable legs offer two bed heights (28 cm or 35.5 cm) to fit different users and training preferences, and it includes a Foot Strap and Jump Board (Box optional).",
+  "features": [
+    "American maple wood frame",
+    "Waterproof protective varnish",
+    "Compact home-friendly footprint",
+    "Secure vertical storage legs",
+    "2 adjustable bed heights: 28/35.5 cm",
+    "6-position quick-release footbar",
+    "Non-slip padded footbar",
+    "Ultra-quiet 8-wheel carriage",
+    "Smooth cushioned carriage glide",
+    "Auto retractable cord storage",
+    "Adjustable padded shoulder rests",
+    "3-position adjustable headrest",
+    "Durable alloy resistance springs",
+    "Removable foot support",
+    "Includes foot strap & jump board",
+    "Optional box accessory",
+    "2-year warranty"
+  ],
+  "inclusions": [
+    "Vertical Reformer for home: Structure + carriage",
+    "Five high-precision springs with three levels of resistance that can be combined depending on the desired intensity",
+    "Two green springs with low resistance",
+    "One yellow spring with medium intensity",
+    "Two red springs with high intensity",
+    "Box (OPTIONAL) with extra-wide padding that makes it easier to place between the shoulder rests and supports, providing total stability. It can be positioned either parallel or perpendicular to the reformer",
+    "Padded shoulder rests that are very easy to insert and remove",
+    "Sturdy and wide jump board to facilitate foot placement, designed for easy positioning and removal",
+    "Padded foot platform",
+    "One set of hand straps and one set of double loop hand and foot straps",
+    "One set of ropes",
+    "Retractable automatic cord storage system",
+    "2 wheels for transporting the Vertical Reformer",
+    "4 adjustable legs with 2 height options",
+    "2 safety legs to keep the reformer in a vertical position"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Vertical Reformer For Home",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "92.52\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "24.02\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.02\" (With folded legs) 13.98\" (With extended legs. Maximum height)"
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.76\" (Total) 29.53\" (Under shoulder rest)"
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "14.17\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "136.687 lb / 62 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Weight Supported",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "26.77\" x 15.35\" x 11.02\""
+        ]
+      },
+      {
+        "label": "Jump Board",
+        "values": [
+          "22.44\" x 23.03\""
+        ]
+      },
+      {
+        "label": "Maximum Carriage Travel",
+        "values": [
+          "74.80\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300640",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1370-3394-reformer-vertical-para-casa.html#/upholstered_color-black/options-without_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Vertical Reformer/300640"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Vertical/300640"
+        }
+      ],
+      "_source": {
+        "articleRef": "300640",
+        "description": "VERTICAL REFORMER_BLACK",
+        "priceUsd": 1790,
+        "barcode": "8421941018862"
+      }
+    },
+    {
+      "sku": "300641",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1370-3393-reformer-vertical-para-casa.html#/105-upholstered_color-grey/201-options-without_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Vertical Reformer/300641"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Vertical/300641"
+        }
+      ],
+      "_source": {
+        "articleRef": "300641",
+        "description": "VERTICAL REFORMER_GREY",
+        "priceUsd": 1790,
+        "barcode": "8421941018879"
+      }
+    },
+    {
+      "sku": "300651",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1370-3383-reformer-vertical-para-casa.html#/104-upholstered_color-black/200-options-with_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Vertical Reformer/300651"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Vertical/300651"
+        }
+      ],
+      "_source": {
+        "articleRef": "300651",
+        "description": "VERTICAL REFORMER + BOX_BLACK",
+        "priceUsd": 1990,
+        "barcode": "8421941018978"
+      }
+    },
+    {
+      "sku": "300652",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1370-3382-reformer-vertical-para-casa.html#/105-upholstered_color-grey/200-options-with_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Vertical Reformer/300652"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Vertical/300652"
+        }
+      ],
+      "_source": {
+        "articleRef": "300652",
+        "description": "VERTICAL REFORMER + BOX_GREY",
+        "priceUsd": 1990,
+        "barcode": "8421941018985"
+      }
+    }
+  ]
+}

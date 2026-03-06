@@ -1,6 +1,6 @@
 /**
  * Schema and types for Golden Designs generated listings.
- * One JSON file per SKU (e.g. data/listings/tab_03_dynamic_low_emf/{sku}.json).
+ * One JSON file per SKU (e.g. listings/tab_03_dynamic_low_emf/{sku}.json).
  * Content is LLM-generated from pricing sheet + optional vendor site; _raw and _vendorData
  * preserve source data for debugging and re-runs.
  */

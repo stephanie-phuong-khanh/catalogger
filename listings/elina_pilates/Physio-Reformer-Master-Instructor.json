@@ -1,0 +1,156 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Physio Reformer Master Instructor",
+  "title": "Elina Pilates Master Instructor Physio Reformer",
+  "overviewParagraph": "The Master Instructor Physio Reformer is an elevated, ergonomic Pilates reformer built specifically for physiotherapy, rehabilitation Pilates, and users with reduced mobility, making transfers and therapist access easier for targeted pain treatment. Its integrated mini‑tower with adjustable pulleys and a horizontal bar expands programming for therapeutic strengthening, ballet-style drills, and stretching across hundreds of exercises and all levels. An ultra‑silent, high‑precision bearing carriage plus a retractable cord collection system and innovative loop handles deliver smooth, quiet movement for more comfortable sessions. Supplied with a box, jump board, and handles, it’s equipped for complete clinical or studio workouts.",
+  "features": [
+    "Waterproof-varnished American maple frame",
+    "40 cm or 60 cm bed height",
+    "Elevated physio-friendly access",
+    "Mini-tower with adjustable pulleys",
+    "Ballet/stretch bar on mini-tower",
+    "7-position quick-release footbar",
+    "Horizontally sliding footbar",
+    "Non-slip padded footbar & footboard",
+    "Ultra-quiet, smooth carriage",
+    "Retractable rope storage under carriage",
+    "6-spring resistance set",
+    "3-height spring bar",
+    "4-position carriage damping",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Extra-wide padded box included",
+    "Removable extra-wide jump board",
+    "New silent loop handle system",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + Master Instructor reformer carriage",
+    "Complete mini tower with pulleys",
+    "Essentials Kit with box, jump board, and handles",
+    "Extra-wide box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of padded foam hard handles",
+    "1 set of double loop cotton handles for hands and feet",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 2 light yellow",
+    "Foot securing strap",
+    "Foot anchor strap",
+    "Set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Master Instructor Physio Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "92.13\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "32.68\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "22.05\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "49.21\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "23.62\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "194.01 lb / 88 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=BYJFX58dc4A"
+  ],
+  "variants": [
+    {
+      "sku": "100170",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1323-2823-master-instructor-physio-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Physio Reformer Master Instructor/100170"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Master Instructor Fisio/Master Instructor Fisio/100170"
+        }
+      ],
+      "_source": {
+        "articleRef": "100170",
+        "description": "PHYSIO REFORMER MASTER INSTRUCTOR_BLACK",
+        "priceUsd": 5990,
+        "barcode": "8421941015410"
+      }
+    },
+    {
+      "sku": "100171",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1323-2819-master-instructor-physio-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Physio Reformer Master Instructor/100171"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Master Instructor Fisio/Master Instructor Fisio/100171"
+        }
+      ],
+      "_source": {
+        "articleRef": "100171",
+        "description": "PHYSIO REFORMER MASTER INSTRUCTOR_GREY",
+        "priceUsd": 5990,
+        "barcode": "8421941015427"
+      }
+    }
+  ]
+}

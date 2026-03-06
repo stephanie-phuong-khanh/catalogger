@@ -1,0 +1,137 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Combo Chair",
+  "title": "Elina Pilates Pilates Chair With Wooden Base",
+  "overviewParagraph": "The Pilates Chair With Wooden Base is a sturdy, highly durable Combo Chair designed under the guidance of leading Pilates professionals worldwide. Its dual pedals support simultaneous or alternating movements, helping you progress through balanced, full-body chair workouts. Handles with elastic straps add control and stability for safer transitions and a wider range of exercises. A wooden footbar provides a solid base of support so you can maintain precise positioning as you train.",
+  "features": [
+    "Compact, high-resistance wood frame",
+    "Stainless steel hardware",
+    "Multi-position spring anchors",
+    "Adjustable handles, 3 heights",
+    "Rubber-grip, removable handles",
+    "Dual pedals, together or separate",
+    "Padded, non-slip pedals",
+    "Non-slip, durable upholstery",
+    "Wooden dowel insert for pedals",
+    "Elastic strap handles for resistance",
+    "Rear transport wheels",
+    "2-year warranty included"
+  ],
+  "inclusions": [
+    "Chair structure",
+    "Padded pedals",
+    "1 set of padded handles",
+    "1 set of padded handles with elastic straps",
+    "Chair springs: 2 medium green and 2 strong red",
+    "1 pair of spring anchoring posts",
+    "Wooden dowel",
+    "1 pair of wheels"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Pilates Chair With Wooden Base",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Chair Length",
+        "values": [
+          "33.07\""
+        ]
+      },
+      {
+        "label": "Chair Width",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "50\""
+        ]
+      },
+      {
+        "label": "Seat Length",
+        "values": [
+          "13.78\""
+        ]
+      },
+      {
+        "label": "Seat Width",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Seat Height",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Dowel Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "81.57 lb / 37 kg (without accessories)"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=gNCEeNX5QyQ"
+  ],
+  "variants": [
+    {
+      "sku": "400011",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/793-1132-wood-combo-chair.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Combo Chair/400011"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Wood Base/400011"
+        }
+      ],
+      "_source": {
+        "articleRef": "400011",
+        "description": "COMBO CHAIR_BLACK",
+        "priceUsd": 1565,
+        "barcode": "8421941005565"
+      }
+    },
+    {
+      "sku": "700065",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/793-1134-wood-combo-chair.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Combo Chair/700065"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Wood Base/700065"
+        }
+      ],
+      "_source": {
+        "articleRef": "700065",
+        "description": "COMBO CHAIR_GREY",
+        "priceUsd": 1565,
+        "barcode": "8421941006364"
+      }
+    }
+  ]
+}

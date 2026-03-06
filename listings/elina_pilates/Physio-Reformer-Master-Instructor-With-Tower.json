@@ -1,0 +1,156 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Physio Reformer Master Instructor With Tower",
+  "title": "Elina Pilates Reformer Fisio Master Instructor With Tower",
+  "overviewParagraph": "The Reformer Fisio Master Instructor With Tower is a professional tower reformer built for physiotherapy Pilates and users with reduced mobility, featuring a taller bed height that gives therapists easier access for safer, more effective rehab work. Crafted from American maple wood, its adjustable pulley tower supports hundreds of exercises and precise progressions from beginner to advanced. An ultra-silent, high‑precision bearing carriage plus a retractable rope collection system and smooth loop handles keep movement quiet and controlled for focused sessions. It includes the box, jump board, and handles to deliver complete, versatile training and rehabilitation in one machine.",
+  "features": [
+    "Waterproof-varnished American maple frame",
+    "40 cm or 60 cm bed height",
+    "Physio-friendly taller working height",
+    "Tower reformer for full-body training",
+    "7-position quick-release footbar",
+    "Horizontal-sliding footbar adjustment",
+    "Ultra-silent 8-wheel carriage",
+    "Retractable rope storage system",
+    "4-position damped bed adjustment",
+    "6 reformer springs, multi-resistance",
+    "8 tower springs, short & long",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Extra-wide padded box, stable",
+    "Removable wide jump board",
+    "Non-slip push-through bar, adjustable",
+    "Adjustable pulleys, tower-mounted",
+    "Rock maple roll-down bar",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Master Instructor reformer",
+    "Complete tower with pulleys",
+    "Essentials Kit with box, jumping board, and handles",
+    "Extra wide box",
+    "Jump table",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam padded handles",
+    "1 set of cotton hand and foot loops double loop",
+    "1 set of simple cotton handles",
+    "Padded shoulder pads",
+    "Reformer springs: 2 strong red, 2 medium green, and 2 light yellow",
+    "Tower springs: 2 light short (yellow), 2 medium short (green), 2 light long (yellow), and 2 medium long (green)",
+    "Foot strap",
+    "Foot harness strap",
+    "A set of pulley ropes",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety belt"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Reformer Fisio Master Instructor With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "92.13\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "32.68\""
+        ]
+      },
+      {
+        "label": "Reformer structure height",
+        "values": [
+          "22.05\""
+        ]
+      },
+      {
+        "label": "Maximum height with tower",
+        "values": [
+          "87.80\""
+        ]
+      },
+      {
+        "label": "Bed length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed height",
+        "values": [
+          "23.62\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "179.68 lb / 81.5 kg"
+        ]
+      },
+      {
+        "label": "Box dimensions",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=2ykLWWZVFwM"
+  ],
+  "variants": [
+    {
+      "sku": "300170",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1131-1972-reformer-master-instructor-fisio-with-tower.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Physio Reformer Master Instructor With Tower/300170"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Master Instructor Fisio/Master Instructor Fisio with Tower/300170"
+        }
+      ],
+      "_source": {
+        "articleRef": "300170",
+        "description": "PHYSIO REFORMER MASTER INSTRUCTOR WITH TOWER_BLACK",
+        "priceUsd": 6490,
+        "barcode": "8421941015571"
+      }
+    },
+    {
+      "sku": "300171",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/1131-1973-reformer-master-instructor-fisio-with-tower.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Physio Reformer Master Instructor With Tower/300171"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Master Instructor Fisio/Master Instructor Fisio with Tower/300171"
+        }
+      ],
+      "_source": {
+        "articleRef": "300171",
+        "description": "PHYSIO REFORMER MASTER INSTRUCTOR WITH TOWER_GREY",
+        "priceUsd": 6490,
+        "barcode": "8421941015588"
+      }
+    }
+  ]
+}

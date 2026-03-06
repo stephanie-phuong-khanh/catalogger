@@ -1,0 +1,213 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer Nubium",
+  "title": "Elina Pilates Nubium Reformer",
+  "overviewParagraph": "The Nubium Reformer is built for both home and professional Pilates, delivering a smooth, quiet workout experience with an ultra-silent cart and high-precision bearings. A new loop handle system eliminates ring noise for more comfortable, premium-feeling movement through every exercise. It stores vertically and includes a retractable cord collection system, making setup and storage easy in any space. Complete with a box, jump board, and handles, it’s ready for versatile full-body training right out of the box.",
+  "features": [
+    "Aluminum frame, lightweight & durable",
+    "Vertical storage, space-saving",
+    "6-position adjustable footbar",
+    "Non-slip padded footbar & footplate",
+    "Ultra-quiet carriage, precision bearings",
+    "Durable upholstery, studio-ready",
+    "Retractable cord storage under carriage",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "5-spring resistance set",
+    "3-position carriage cushioning",
+    "Extra-wide padded box included",
+    "Wide removable jump board included",
+    "Smooth silent loop handles",
+    "Front transport wheels",
+    "5-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Nubium Aluminum Reformer",
+    "Essentials Kit with box, jump board, and handles",
+    "Extra wide box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded footbar",
+    "1 set of cotton handles for hands and feet with double loop",
+    "Padded shoulder pads",
+    "Springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Foot fastening strap",
+    "Pulley posts",
+    "1 pair of wheels",
+    "1 set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Nubium Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "96.85\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "30.7\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.81\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "23.23\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "14.2\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "139 lb / 63 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Weight Supported",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=7nmir-sYyyg"
+  ],
+  "variants": [
+    {
+      "sku": "100300",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1329-2882-nubium-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Nubium/100300"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Nubium/Nubium/100300"
+        }
+      ],
+      "_source": {
+        "articleRef": "100300",
+        "description": "REFORMER NUBIUM_BLACK",
+        "priceUsd": 3990,
+        "barcode": "8421941014963"
+      }
+    },
+    {
+      "sku": "100301",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1329-2875-nubium-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Nubium/100301"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Nubium/Nubium/100301"
+        }
+      ],
+      "_source": {
+        "articleRef": "100301",
+        "description": "REFORMER NUBIUM_GREY",
+        "priceUsd": 3990,
+        "barcode": "8421941014970"
+      }
+    },
+    {
+      "sku": "100302",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1329-2879-nubium-reformer.html#/109-upholstered_color-ivory",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Nubium/100302"
+        }
+      ],
+      "_source": {
+        "articleRef": "100302",
+        "description": "REFORMER NUBIUM_IVORY",
+        "priceUsd": 3990,
+        "barcode": "8421941014987"
+      }
+    },
+    {
+      "sku": "100300",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1329-2882-nubium-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Nubium/100300"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Nubium/Nubium/100300"
+        }
+      ],
+      "_source": {
+        "articleRef": "100300",
+        "description": "REFORMER NUBIUM_BLACK",
+        "priceUsd": 3190,
+        "barcode": "8421941015748"
+      }
+    },
+    {
+      "sku": "100301",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1329-2875-nubium-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Nubium/100301"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Nubium/Nubium/100301"
+        }
+      ],
+      "_source": {
+        "articleRef": "100301",
+        "description": "REFORMER NUBIUM_GREY",
+        "priceUsd": 3190,
+        "barcode": "8421941015755"
+      }
+    }
+  ]
+}

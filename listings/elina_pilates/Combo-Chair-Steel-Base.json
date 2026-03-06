@@ -1,0 +1,140 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Combo Chair Steel Base",
+  "title": "Elina Pilates Pilates Chair With Steel Base",
+  "overviewParagraph": "The Pilates Chair With Steel Base is a lightweight yet highly resistant combo chair designed for versatile Pilates training while staying easy to move on its built-in wheels. Its black steel base provides stable support for controlled exercises, helping you focus on precise movement and form. Two pedals allow simultaneous or alternating work so you can vary routines and target different movement patterns with smooth transitions. A wooden handle offers a secure grip for better control during balance and strength-focused sequences.",
+  "features": [
+    "Lightweight wood chair & steel base",
+    "Black steel base",
+    "Stainless steel hardware",
+    "Rear multi-position spring anchors",
+    "4 resistance springs included",
+    "Reverse-resistance lower spring system",
+    "2 split pedals, linked or independent",
+    "Non-slip padded pedals",
+    "Removable handles, 3 height settings",
+    "Rubber-grip handles",
+    "Handles with elastic straps",
+    "Non-slip, durable upholstery",
+    "Integrated rear transport wheels",
+    "2-year warranty included"
+  ],
+  "inclusions": [
+    "Chair structure",
+    "Padded pedals",
+    "1 set of padded handles",
+    "1 set of padded handles with elastic straps",
+    "Chair springs: 2 medium green and 2 strong red",
+    "1 pair of spring anchoring bars",
+    "Wooden pick",
+    "1 pair of wheels"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Pilates Chair With Steel Base",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Chair Length",
+        "values": [
+          "33.07\""
+        ]
+      },
+      {
+        "label": "Chair Width",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "50\""
+        ]
+      },
+      {
+        "label": "Seat Length",
+        "values": [
+          "13.78\""
+        ]
+      },
+      {
+        "label": "Seat Width",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Seat Height",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Pick Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "79.37 lb / 36 kg (without accessories)"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=0q010sGHMhc",
+    "https://www.youtube.com/watch?v=gNCEeNX5QyQ"
+  ],
+  "variants": [
+    {
+      "sku": "400010",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/787-1138-pilates-combo-chair.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Combo Chair Steel Base/400010"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Steel Base/400010"
+        }
+      ],
+      "_source": {
+        "articleRef": "400010",
+        "description": "COMBO CHAIR_STEEL BASE_BLACK",
+        "priceUsd": 1565,
+        "barcode": "8421941005558"
+      }
+    },
+    {
+      "sku": "700060",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/787-1140-pilates-combo-chair.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Combo Chair Steel Base/700060"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Steel Base/700060"
+        }
+      ],
+      "_source": {
+        "articleRef": "700060",
+        "description": "COMBO CHAIR_STEEL BASE_GREY",
+        "priceUsd": 1565,
+        "barcode": "8421941006326"
+      }
+    }
+  ]
+}

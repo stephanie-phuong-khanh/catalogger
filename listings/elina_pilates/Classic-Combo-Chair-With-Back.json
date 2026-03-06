@@ -1,0 +1,120 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Classic Combo Chair With Back",
+  "title": "Elina Pilates Classic Electric Pilates Chair | Combined Wunda",
+  "overviewParagraph": "The  Combination Wunda / Electric Chair is Elina Pilates’ most classic chair, built to deliver complete Pilates chair training in a single piece. Its solid maple wood frame and backrest provide stable, supportive positioning so you can work with control and precision. Two classic springs with three hook positions per spring let you quickly adjust resistance to match your exercise and strength level. Aluminum-and-wood handles add confident grip and guidance for safer transitions and better alignment.",
+  "features": [
+    "Solid maple wood frame",
+    "Wunda/Electric combo chair design",
+    "Adjustable spring resistance",
+    "2 classic springs included",
+    "3 hook positions per spring",
+    "Removable handles, 3 height settings",
+    "Padded non-slip pedal",
+    "Non-slip, durable upholstery",
+    "Stainless steel hardware",
+    "Steel center bars, easy assembly",
+    "2-year warranty"
+  ],
+  "inclusions": [
+    "Chair structure",
+    "Central structure with backrest",
+    "Padded seat",
+    "1 set of wooden and aluminum handles",
+    "Padded pedal",
+    "Chair spring: 2 classic"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Combination Wunda / Electric Chair",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Chair Length",
+        "values": [
+          "29.13\""
+        ]
+      },
+      {
+        "label": "Chair Width",
+        "values": [
+          "24.8\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "64.76\""
+        ]
+      },
+      {
+        "label": "Seat Length",
+        "values": [
+          "12.6\""
+        ]
+      },
+      {
+        "label": "Seat Width",
+        "values": [
+          "16.73\""
+        ]
+      },
+      {
+        "label": "Seat Height",
+        "values": [
+          "27.95\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "400200",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1082-1870-combo-chair-clasica-con-respaldo.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Combo Chair With Back/400200"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Wunda Chair Electric/400200"
+        }
+      ],
+      "_source": {
+        "articleRef": "400200",
+        "description": "CLASSIC COMBO CHAIR WITH BACK_BLACK",
+        "priceUsd": 2290,
+        "barcode": "8421941015083"
+      }
+    },
+    {
+      "sku": "400201",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1082-1871-combo-chair-clasica-con-respaldo.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Classic Combo Chair With Back/400201"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Wunda Chair Electric/400201"
+        }
+      ],
+      "_source": {
+        "articleRef": "400201",
+        "description": "CLASSIC COMBO CHAIR WITH BACK_GREY",
+        "priceUsd": 2290,
+        "barcode": "8421941015090"
+      }
+    }
+  ]
+}

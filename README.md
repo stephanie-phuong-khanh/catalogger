@@ -16,7 +16,7 @@
 See **Vendor pipelines** below for the main Elina and Golden Designs flows.
 
 **Other**
-- **`sync-listings-to-blob`** — Upload `data/listings/` to Vercel Blob (for the web viewer). `--full` wipes and re-uploads; `--single <path>` uploads one file. Requires `CATALOGGER_LISTINGS_READ_WRITE_TOKEN`.
+- **`sync-listings-to-blob`** — Upload `listings/` to Vercel Blob (for the web viewer). `--full` wipes and re-uploads; `--single <path>` uploads one file. Requires `CATALOGGER_LISTINGS_READ_WRITE_TOKEN`.
 - **`parse-sheet`** — Parse Golden Designs XLSX to JSON only (no vendor search). Config in `scripts/listings/parse-sheet.ts`.
 - **`process-images-for-sku`** — Prepare 1500×1500 images for a SKU folder: `--input-dir`, `--output-dir`.
 - **`edit-image`** — Run edit (resize/crop) on a single image: `--image-path`, `--out-dir`.
@@ -38,8 +38,8 @@ All scripts: see `package.json` (e.g. `eval-specs`, `rename-sku-images`, `test-s
 2. `resolve-elina-urls` → `data/elina/elina_pilates_products_urls.json`
 3. `scrape-elina-site` → `data/elina/elina_pilates_products_site.json`
 4. (Optional) `download-elina-product-images` (images from site URLs) or `map-elina-sku-to-images` (map SKUs to local folders) → images / `elina_sku_to_images.json`
-5. `generate-listings-elina` → `data/listings/elina_pilates/*.json`
+5. `generate-listings-elina` → `listings/elina_pilates/*.json`
 
 **Golden Designs** (single script; config in `scripts/listings/pipeline.ts`):
-- `pipeline` = parse XLSX sheet → search vendor (Shopify) → generate listing. Writes to `data/listings/tab_03_dynamic_low_emf/` (or whatever `outputDir` + `sheetIndex` in CONFIG). Use `--single SKU` for one product.
+- `pipeline` = parse XLSX sheet → search vendor (Shopify) → generate listing. Writes to `listings/tab_03_dynamic_low_emf/` (or whatever `outputDir` + `sheetIndex` in CONFIG). Use `--single SKU` for one product.
 - Optional: `process-images-for-sku` to prepare 1500×1500 images from a SKU folder.

@@ -1,0 +1,88 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Ladder Barrel Elite",
+  "title": "Elina Pilates Ladder Barrel Elite Model",
+  "overviewParagraph": "The Ladder Barrel Elite Model is a Pilates ladder barrel designed to deliver maximum comfort while you move through stretching and strengthening exercises. Its robust steel structure provides exceptional stability and durability, helping you train with confidence session after session. Steel shelves with a cushioned rubber coating add secure, comfortable contact points, so you can focus on controlled form and deeper range of motion.",
+  "features": [
+    "Wood & steel frame",
+    "Stable, durable construction",
+    "Non-slip synthetic leather barrel",
+    "Eco-compliant upholstery",
+    "High-density EVA padding",
+    "Padded foot platforms included",
+    "Multiple exercise heights",
+    "Rubber-coated steel foot shelves"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "Key dimensions of Ladder Barrel Elite Model",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Total dimensions",
+        "values": [
+          "95 cm x 120 cm"
+        ]
+      },
+      {
+        "label": "Barrel dimensions",
+        "values": [
+          "55 cm x 88 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=KPNfz1pIUXg"
+  ],
+  "variants": [
+    {
+      "sku": "450013",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/997-1788-pilates-ladder-barrel-elite-with-wooden-base.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Ladder Barrel Elite/450013"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Barrel/Elite Wood Base/450013"
+        }
+      ],
+      "_source": {
+        "articleRef": "450013",
+        "description": "LADDER BARREL ELITE_BLACK",
+        "priceUsd": 1730,
+        "barcode": "8421941009532"
+      }
+    },
+    {
+      "sku": "700150",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/997-1271-pilates-ladder-barrel-elite-with-wooden-base.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Ladder Barrel Elite/700150"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Barrel/Elite Wood Base/700150"
+        }
+      ],
+      "_source": {
+        "articleRef": "700150",
+        "description": "LADDER BARREL ELITE_GREY",
+        "priceUsd": 1730,
+        "barcode": "8421941009556"
+      }
+    }
+  ]
+}

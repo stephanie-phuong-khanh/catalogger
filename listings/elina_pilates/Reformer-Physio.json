@@ -1,0 +1,148 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer Physio",
+  "title": "Elina Pilates Wooden Reformer Physio",
+  "overviewParagraph": "The Wooden Reformer Physio is a taller, physiotherapy-focused Pilates reformer designed for people with reduced mobility or back problems, making rehabilitative sessions safer and more comfortable. Its elevated frame gives therapists easier access to support and adjust clients, while height-adjustable rope pulleys help tailor setup to individual needs. An ultra-silent carriage with high-precision bearings and an innovative loop handle system deliver smooth, quiet movement for better focus and control during exercises. Built stable and highly resistant, it includes a box, jump board, and handles for versatile rehab programming.",
+  "features": [
+    "Rock maple & stainless steel frame",
+    "2 bed heights: 33 cm or 48 cm",
+    "Rehab-friendly elevated working height",
+    "4-position adjustable footbar",
+    "Non-slip padded footbar & footplate",
+    "Ultra-silent carriage, precision bearings",
+    "Durable upholstery for studio use",
+    "Cleat-adjustable ropes",
+    "3-position carriage stopper",
+    "5-spring set, 4-position spring bar",
+    "3-position adjustable headrest",
+    "Height-adjustable pulleys",
+    "Removable padded shoulder rests",
+    "Medium padded box included",
+    "Removable jump board included",
+    "Front foot strap included",
+    "Silent loop handles, no ring noise",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + wooden Reformer carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam padded handles",
+    "1 set of double loop cotton handles for hands and feet",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Foot strap",
+    "Pulley posts",
+    "Set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wooden Reformer Physio",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "93.31\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.17\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "27.56\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "12.99\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "176.37 lb / 80 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Maximum Supported Weight",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=CtHfqNpjdJU"
+  ],
+  "variants": [
+    {
+      "sku": "100003",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/775-1084-wooden-reformer-physio.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Physio/100003"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera Fisio/100003"
+        }
+      ],
+      "_source": {
+        "articleRef": "100003",
+        "description": "REFORMER PHYSIO_BLACK",
+        "priceUsd": 3790,
+        "barcode": "8421941005350"
+      }
+    },
+    {
+      "sku": "700005",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/775-1086-wooden-reformer-physio.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Physio/700005"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera Fisio/700005"
+        }
+      ],
+      "_source": {
+        "articleRef": "700005",
+        "description": "REFORMER PHYSIO_GREY",
+        "priceUsd": 3790,
+        "barcode": "8421941005886"
+      }
+    }
+  ]
+}

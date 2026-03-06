@@ -1,0 +1,150 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer",
+  "title": "Elina Pilates Wooden Reformer",
+  "overviewParagraph": "The Wooden Reformer is a classic Pilates reformer updated with precision innovations for smoother, quieter training. Height-adjustable rope pulleys and an ultra-silent carriage with high-precision bearings let you fine-tune setup and move fluidly without distracting noise. Built for stability and long-term durability, it includes a box, jump board, and handles so you can expand exercise variety in one system. The innovative loop handle system eliminates ring noise for a more comfortable, premium feel through every repetition.",
+  "features": [
+    "Rock maple wood & stainless steel frame",
+    "4-position adjustable foot bar",
+    "Padded non-slip foot bar",
+    "Ultra-silent carriage, precision bearings",
+    "8 polyurethane carriage wheels",
+    "Durable, studio-grade upholstery",
+    "Cleat system rope adjustment",
+    "3-position adjustable carriage stoppers",
+    "5-spring resistance set",
+    "4-position adjustable spring bar",
+    "3-position adjustable headrest",
+    "Removable padded shoulder rests",
+    "Height-adjustable rope pulleys",
+    "Medium padded stability box included",
+    "Wide removable jump board",
+    "Front foot strap",
+    "Silent loop handle system",
+    "Handles included",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Wooden structure + reformer carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of padded hard foam handles",
+    "1 set of cotton handles for hands and double loop feet",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Foot strap",
+    "Pulley posts",
+    "One set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wooden Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "93.31\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.17\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.42\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "27.56\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "12.99\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "154.33 lb / 70 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=MQMedI-fHtQ",
+    "https://www.youtube.com/watch?v=Ulo6CnTG-d0"
+  ],
+  "variants": [
+    {
+      "sku": "100002",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/774-1078-wooden-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer/100002"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera/100002"
+        }
+      ],
+      "_source": {
+        "articleRef": "100002",
+        "description": "REFORMER_BLACK",
+        "priceUsd": 3585,
+        "barcode": "8421941005343"
+      }
+    },
+    {
+      "sku": "700000",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/774-1080-wooden-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer/700000"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera/700000"
+        }
+      ],
+      "_source": {
+        "articleRef": "700000",
+        "description": "REFORMER_GREY",
+        "priceUsd": 3585,
+        "barcode": "8421941005848"
+      }
+    }
+  ]
+}

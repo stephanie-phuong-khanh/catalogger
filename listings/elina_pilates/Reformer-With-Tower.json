@@ -1,0 +1,157 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer With Tower",
+  "title": "Elina Pilates Pilates Wood Reformer With Tower",
+  "overviewParagraph": "The Pilates Wood Reformer With Tower delivers a stable, highly resistant platform for full-body Pilates training with smooth, quiet performance. Adjustable-height rope pulleys let you dial in precise positioning and resistance for more comfortable, controlled movement, while the ultra-silent carriage with high-precision bearings keeps every rep fluid and distraction-free. It includes a box, jump board, and handles, so you can expand your exercise options from strength and mobility work to dynamic cardio-style sessions. The innovative loop handle system slides silently and comfortably, eliminating ring noise for a more premium training experience.",
+  "features": [
+    "Rock maple & stainless steel frame",
+    "4-position adjustable footbar",
+    "Non-slip padded footbar & footboard",
+    "Ultra-quiet carriage, precision bearings",
+    "Durable studio-grade upholstery",
+    "Cleat-style rope adjustment",
+    "3-position adjustable carriage stops",
+    "5 resistance springs included",
+    "4-position adjustable spring bar",
+    "Height-adjustable rope pulleys",
+    "3-position adjustable headrest",
+    "Removable padded shoulder rests",
+    "Stainless steel tower, spring hooks",
+    "8 tower springs included",
+    "Medium padded box included",
+    "Wide removable jump board",
+    "Mat cover with handles",
+    "3-height push-bar with safety strap",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Wooden reformer structure + carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam-padded handles",
+    "1 set of double-loop cotton handles for hands and feet",
+    "1 set of simple cotton handles for feet",
+    "Padded shoulder rests",
+    "Reformer springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Foot strap",
+    "Pulley posts",
+    "Set of pulley ropes",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Rock maple roll-down bar",
+    "Non-slip push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Pilates Wood Reformer With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "93.31\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.17\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.42\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "27.56\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "12.99\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "154.33 lb / 70 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=_bDQl63VkLE",
+    "https://www.youtube.com/watch?v=QMkX2IZ4Afk"
+  ],
+  "variants": [
+    {
+      "sku": "300008",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/780-1090-wood-half-trapeze.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer With Tower/300008"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera/300008"
+        }
+      ],
+      "_source": {
+        "articleRef": "300008",
+        "description": "REFORMER WITH BLACK TOWER",
+        "priceUsd": 4290,
+        "barcode": "8421941009570"
+      }
+    },
+    {
+      "sku": "700030",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/780-1092-wood-half-trapeze.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer With Tower/700030"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera/700030"
+        }
+      ],
+      "_source": {
+        "articleRef": "700030",
+        "description": "REFORMER WITH TOWER_GREY",
+        "priceUsd": 4290,
+        "barcode": "8421941006081"
+      }
+    }
+  ]
+}

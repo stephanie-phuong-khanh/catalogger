@@ -1,0 +1,138 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Physio Reformer With Tower",
+  "title": "Elina Pilates Wooden Reformer Fisio With Tower",
+  "overviewParagraph": "The Wooden Reformer Fisio With Tower is a taller, physiotherapy-focused Pilates reformer designed for rehabilitation, reduced mobility, and back-problem support, making client access and exercise setup more comfortable for both practitioner and user. Its adjustable-height rope pulleys help tailor movements to individual needs, while the ultra-silent, high-precision bearing carriage delivers smooth, controlled sessions. Built to be stable and highly resistant, it includes a box, jump board, and handles for versatile programming. An innovative loop handle system eliminates ring noise and glides quietly for a more comfortable, premium feel during every rep.",
+  "features": [
+    "Rock maple & stainless steel frame",
+    "Physio-height bed, easier access",
+    "Tower kit included",
+    "Adjustable height rope pulleys",
+    "4-position adjustable footbar",
+    "Ultra-quiet 8-wheel carriage",
+    "Durable, studio-grade upholstery",
+    "5-spring resistance set",
+    "4-position adjustable spring bar",
+    "3-position adjustable headrest",
+    "Removable padded shoulder rests",
+    "Box included",
+    "Wide removable jump board",
+    "Front foot strap",
+    "Reformer cover mat with handles",
+    "3-height adjustable push-bar + safety strap",
+    "Quiet loop handle system",
+    "Rock maple roll-down bar",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Wooden reformer structure + carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam-padded handles",
+    "1 set of double loop cotton handles for hands and feet",
+    "1 set of simple cotton handles for feet",
+    "Padded shoulder rests",
+    "Reformer springs: 2 strong red, 2 medium green, and 1 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Foot strap",
+    "Pulley posts",
+    "A set of pulley ropes",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wooden Reformer Fisio With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "93.31\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "27.17\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "176.37 lb / 80 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=_bDQl63VkLE"
+  ],
+  "variants": [
+    {
+      "sku": "300005",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/781-1096-physio-wood-reformer-with-tower.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Physio Reformer With Tower/300005"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera Fisio/300005"
+        }
+      ],
+      "_source": {
+        "articleRef": "300005",
+        "description": "PHYSIO REFORMER WITH TOWER_BLACK",
+        "priceUsd": 4590,
+        "barcode": "8421941005459"
+      }
+    },
+    {
+      "sku": "700035",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/781-1098-physio-wood-reformer-with-tower.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Physio Reformer With Tower/700035"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Reformer Madera Fisio/700035"
+        }
+      ],
+      "_source": {
+        "articleRef": "700035",
+        "description": "PHYSIO REFORMER WITH TOWER_GREY",
+        "priceUsd": 4590,
+        "barcode": "8421941006128"
+      }
+    }
+  ]
+}

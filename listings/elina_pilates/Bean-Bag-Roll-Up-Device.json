@@ -1,0 +1,43 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Bean Bag Roll-Up Device",
+  "title": "Elina Pilates Bean Bag Roll-up Device",
+  "overviewParagraph": "The Bean Bag Roll-up Device strengthens arm, wrist, and forearm mobility by having you hold the bar at shoulder height and roll/unroll the rope for controlled resistance. Designed to support tennis elbow (lateral epicondylitis) therapy, it helps improve circulation while building strength and endurance in the forearms. The weighted bag-and-rope design lets you customize difficulty by adding or removing weight and adjusting how far the bar is held from your shoulders. When the bag is emptied, it folds and rolls up compactly for easy storage and transport.",
+  "features": [
+    "Wooden bar & rope design",
+    "Weighted bean bag resistance",
+    "Arm, wrist & forearm strengthening",
+    "Tennis elbow therapy support",
+    "Improves circulation with regular use",
+    "Roll-up rope exercise motion",
+    "Adjustable bag weight",
+    "Easy to store & transport"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "",
+    "columns": [],
+    "rows": []
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "500106",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/accessories/1090-bean-bag-roll-up-device-8421941015267.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Bean Bag Roll-Up Device/500106"
+        }
+      ],
+      "_source": {
+        "articleRef": "500106",
+        "description": "BEAN BAG ROLL-UP DEVICE",
+        "priceUsd": 90,
+        "barcode": "8421941015267"
+      }
+    }
+  ]
+}

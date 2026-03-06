@@ -1,0 +1,71 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Mirror Wall Unit",
+  "title": "Elina Pilates Wall Unit With Mirror",
+  "overviewParagraph": "The Wall Unit With Mirror is a versatile, wall-mounted workout station designed to maximize space while enabling countless exercises on a single machine. Its acrylic mirror finish helps you monitor form during home training so you can execute movements with proper technique. Built from high-quality wood and aluminum, the unit is adjustable to suit different exercises and user needs. The clean, elegant design keeps your training area functional without sacrificing style.",
+  "features": [
+    "Wood & aluminum wall unit",
+    "Acrylic mirror finish panel",
+    "Space-saving wall-mounted design",
+    "Flush-to-wall installation",
+    "Adjustable spring resistance system",
+    "2-year warranty"
+  ],
+  "inclusions": [
+    "2 long springs - Yellow (light resistance)",
+    "2 long springs - Green (medium resistance)",
+    "2 short springs - Yellow (light resistance)",
+    "2 short springs - Green (medium resistance)",
+    "One pair of hand grips",
+    "One pair of soft foot loops",
+    "Solid wood Roll down bar",
+    "Solid wood Dowel (bottom bar)",
+    "Push bar with five height positions",
+    "Security strap for trapeze",
+    "Side and center anchor points for spring attachment",
+    "Designed to be mounted flush against the wall",
+    "Dimensions: 55.5 cm (Mirror) X 180 cm X 7.5 cm. 80 cm (Maximum width)"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wall Unit With Mirror",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Dimensions",
+        "values": [
+          "55.5 cm (Mirror) X 180 cm X 7.5 cm"
+        ]
+      },
+      {
+        "label": "Maximum Width",
+        "values": [
+          "80 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300027",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/1377-wall-unit-with-mirror.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Mirror Wall Unit/300027"
+        }
+      ],
+      "_source": {
+        "articleRef": "300027",
+        "description": "MIRROR WALL UNIT",
+        "priceUsd": 990,
+        "barcode": "8421941018633"
+      }
+    }
+  ]
+}

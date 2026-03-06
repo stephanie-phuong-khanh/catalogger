@@ -1,0 +1,99 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Wall Unit",
+  "title": "Elina Pilates Wall Unit",
+  "overviewParagraph": "The Wall Unit is a Pilates wall unit built for secure, comfortable support during controlled strength and mobility work. Its special leather cover and non-slip, ecofriendly materials help you maintain stable contact. A reinforced wood structure delivers high resistance, while high-density EVA filling cushions pressure points for comfort.",
+  "features": [
+    "Reinforced wood structure",
+    "Leather cover upholstery",
+    "High-density EVA padding",
+    "Non-slip ecofriendly materials",
+    "Space-saving wall unit design",
+    "Removable stainless steel tower"
+  ],
+  "inclusions": [
+    "Stainless steel tower, easily removable.",
+    "Anodized aluminum push-bar with rubber grip and padded protection. Adjustable in 3 positions and hooks for upper and lower springs.",
+    "Complete set of springs: 2 short light springs (yellow), 2 long light springs (yellow), 2 short medium springs (green) and 2 long medium springs (green).",
+    "Complete set of handles: 1 set of padded handles and 1 set of single handles.",
+    "Roll-down bar in solid beech wood.",
+    "Safety strap for the Push-bar.",
+    "Fastening strap.",
+    "Mat strap."
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wall Unit",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Tower measures",
+        "values": [
+          "215 x 69 cm"
+        ]
+      },
+      {
+        "label": "Mat measures",
+        "values": [
+          "220 x 63 x 18.5 cm"
+        ]
+      },
+      {
+        "label": "Boxes measures",
+        "values": [
+          "30 x 42 x 18.5 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300010",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/791-1120-wall-unit.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wall Unit/300010"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Wall Unit/Wall Unit/300010"
+        }
+      ],
+      "_source": {
+        "articleRef": "300010",
+        "description": "WALL UNIT_BLACK",
+        "priceUsd": 1975,
+        "barcode": "8421941924057"
+      }
+    },
+    {
+      "sku": "700050",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/wall-units-for-pilates/791-1121-wall-unit.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Wall Unit/700050"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Wall Unit/Wall Unit/700050"
+        }
+      ],
+      "_source": {
+        "articleRef": "700050",
+        "description": "WALL UNIT_GREY",
+        "priceUsd": 1975,
+        "barcode": "8421941006241"
+      }
+    }
+  ]
+}

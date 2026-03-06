@@ -1,0 +1,151 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer Master Instructor",
+  "title": "Elina Pilates Master Instructor Reformer",
+  "overviewParagraph": "The Master Instructor Reformer is a next-generation professional Pilates Reformer designed for a superior, studio-level training experience. Its integrated Mini-tower with adjustable pulleys and a horizontal ballet bar expands your exercise library, supporting strength, flexibility, stretching, and full-body conditioning across beginner to advanced levels. An ultra-silent carriage with high-precision bearings plus an innovative loop handle system keeps movement smooth and quiet for focused sessions. Equipped with a retractable cord collection system, box, jump board, and straps, it’s set up for complete, organized workouts from day one.",
+  "features": [
+    "Waterproof-varnished American maple frame",
+    "Mini-tower with adjustable pulleys",
+    "Horizontal tower bar for ballet stretches",
+    "7-position quick-release footbar",
+    "Horizontally sliding footbar",
+    "Non-slip padded footbar & platform",
+    "Ultra-silent carriage, precision bearings",
+    "Retractable under-carriage cord storage",
+    "Shock-absorbing bed, 4 settings",
+    "6 high-quality resistance springs",
+    "3-height spring bar",
+    "3-position adjustable headrest",
+    "Adjustable shoulder pads",
+    "Extra-wide stable padded box",
+    "Extra-wide removable jump board",
+    "Adjustable full-length foot strap",
+    "Front foot strap",
+    "Front transport wheels",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Master Instructor Reformer",
+    "Complete mini tower with pulleys",
+    "Essentials Kit with box, jump board, and handles",
+    "Extra-wide box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam-padded handles",
+    "1 set of cotton handles for hands and feet with double loop",
+    "Padded shoulder pads",
+    "Springs: 2 strong red, 2 medium green, and 2 light yellow",
+    "Foot securing strap",
+    "Foot anchoring strap",
+    "1 pair of wheels",
+    "One set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Master Instructor Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "93.70\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "32.68\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "14.17\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "15.75\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "179.68 lb / 81.5 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Maximum Weight Supported",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=BYJFX58dc4A"
+  ],
+  "variants": [
+    {
+      "sku": "100140",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1123-1954-master-instructor-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Master Instructor/100140"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Master Instructor/Master Instructor/100140"
+        }
+      ],
+      "_source": {
+        "articleRef": "100140",
+        "description": "REFORMER MASTER INSTRUCTOR_BLACK",
+        "priceUsd": 4590,
+        "barcode": "8421941015335"
+      }
+    },
+    {
+      "sku": "100141",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1123-1955-master-instructor-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Master Instructor/100141"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Master Instructor/Master Instructor/100141"
+        }
+      ],
+      "_source": {
+        "articleRef": "100141",
+        "description": "REFORMER MASTER INSTRUCTOR_GREY",
+        "priceUsd": 4590,
+        "barcode": "8421941015342"
+      }
+    }
+  ]
+}

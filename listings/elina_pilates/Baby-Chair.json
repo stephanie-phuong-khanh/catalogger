@@ -1,0 +1,122 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Baby Chair",
+  "title": "Elina Pilates Baby Pilates Chair",
+  "overviewParagraph": "The Baby Pilates Chair helps strengthen your back and support injury recovery with more than 60 exercise options in a compact chair format. Its maple wood structure is built for durability, while the padded pedal improves comfort and control during seated or kneeling work. Two springs with three hook positions each let you quickly adjust resistance to match different users and progressions. Designed for instructors, the smaller footprint allows closer access to students to improve cueing, learning, and technique.",
+  "features": [
+    "Solid maple wood frame",
+    "Stainless steel hardware",
+    "Compact baby chair footprint",
+    "Instructor-friendly access",
+    "60+ exercise options",
+    "Back strengthening & rehab support",
+    "Padded tilting backrest",
+    "Classic wooden handles",
+    "2 springs resistance system",
+    "3 hook positions per spring",
+    "Non-slip, durable upholstery",
+    "2-year warranty"
+  ],
+  "inclusions": [
+    "Chair structure",
+    "Tilting backrest",
+    "1 set of classic handles",
+    "Chair springs: 2 long classic ones"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Baby Pilates Chair",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Chair Length",
+        "values": [
+          "46.46\""
+        ]
+      },
+      {
+        "label": "Chair Width",
+        "values": [
+          "15.55\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "33.27\""
+        ]
+      },
+      {
+        "label": "Seat Length",
+        "values": [
+          "18.5\""
+        ]
+      },
+      {
+        "label": "Seat Width",
+        "values": [
+          "15.55\""
+        ]
+      },
+      {
+        "label": "Seat Height",
+        "values": [
+          "10.24\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=m5i3Sa20dhE",
+    "https://www.youtube.com/watch?v=9SJBNzxZITM"
+  ],
+  "variants": [
+    {
+      "sku": "400300",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1094-1888-baby-chair-8421941014468.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Baby Chair/400300"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Baby chair/400300"
+        }
+      ],
+      "_source": {
+        "articleRef": "400300",
+        "description": "BABY CHAIR_BLACK",
+        "priceUsd": 1490,
+        "barcode": "8421941015144"
+      }
+    },
+    {
+      "sku": "400301",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1094-1889-baby-chair-8421941014468.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Baby Chair/400301"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Baby chair/400301"
+        }
+      ],
+      "_source": {
+        "articleRef": "400301",
+        "description": "BABY CHAIR_GREY",
+        "priceUsd": 1490,
+        "barcode": "8421941015151"
+      }
+    }
+  ]
+}

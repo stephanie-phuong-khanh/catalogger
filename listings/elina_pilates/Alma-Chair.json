@@ -1,0 +1,116 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Alma Chair",
+  "title": "Elina Pilates Pilates Chair Alma",
+  "overviewParagraph": "The Pilates Chair Alma combines a modern, standout design with the solidity and versatility required for professional Pilates training. Two adjustable resistance springs let you fine-tune intensity for controlled, progressive workouts, while the double pedal can be used together or independently to target both lower and upper body with more exercise options. Built-in elastic bands with handles add resistance work for arms, shoulders, and back to support toning and strength. Designed for stability, fluidity, and control, it’s ideal for focused full-body conditioning in one compact piece.",
+  "features": [
+    "High-resistance wood frame, lightweight",
+    "Stainless steel hardware",
+    "Compact footprint",
+    "Split pedal design, 2 pedals",
+    "Independent or linked pedal use",
+    "Insertable wooden rod connector",
+    "2 adjustable resistance springs",
+    "Multi-position spring anchoring",
+    "Padded, anti-slip pedals",
+    "Durable upholstery",
+    "Elastic straps with handles",
+    "2-year warranty"
+  ],
+  "inclusions": [
+    "Chair frame",
+    "Padded pedals",
+    "1 set of padded handles with elastic straps",
+    "Springs of the chair: 2 springs",
+    "Wooden rod to connect pedals"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Pilates Chair Alma",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Chair length",
+        "values": [
+          "33.07\""
+        ]
+      },
+      {
+        "label": "Chair width",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Maximum height",
+        "values": [
+          "22.44\""
+        ]
+      },
+      {
+        "label": "Seat length",
+        "values": [
+          "13.78\""
+        ]
+      },
+      {
+        "label": "Seat width",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Seat height",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Rod length",
+        "values": [
+          "40.15\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "400401",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1382-3081-alma-chair.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Alma Chair/400401"
+        }
+      ],
+      "_source": {
+        "articleRef": "400401",
+        "description": "ALMA CHAIR_BLACK",
+        "priceUsd": 1190,
+        "barcode": "8421941019333"
+      }
+    },
+    {
+      "sku": "400402",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/1382-3080-alma-chair.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Alma Chair/400402"
+        }
+      ],
+      "_source": {
+        "articleRef": "400402",
+        "description": "ALMA CHAIR_GREY",
+        "priceUsd": 1190,
+        "barcode": "8421941019340"
+      }
+    }
+  ]
+}

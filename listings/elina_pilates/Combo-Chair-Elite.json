@@ -1,0 +1,140 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Combo Chair Elite",
+  "title": "Elina Pilates Elite Pilates Combo Chair",
+  "overviewParagraph": "The Elite Pilates Combo Chair is a sturdy, innovative Pilates chair designed under the guidance of top professionals for effective full-body training. Lower springs provide reverse resistance, letting you vary challenge and control to target strength and stability. Two pedals support simultaneous or alternating movements, so you can train both sides evenly or focus on unilateral work. Built with a wooden handle and easy-roll wheels, it’s simple to reposition and handle between exercises.",
+  "features": [
+    "Lightweight compact wood frame",
+    "Stainless steel hardware",
+    "Lower spring system, reverse resistance",
+    "4 resistance springs included",
+    "4 mini springs included",
+    "2 padded non-slip pedals",
+    "Split or linked pedal use",
+    "3-height removable handles",
+    "Rubber-grip handles",
+    "Elastic resistance straps",
+    "Anti-slip durable upholstery",
+    "Multi-position spring anchoring",
+    "Rear transport wheels",
+    "2-year warranty included"
+  ],
+  "inclusions": [
+    "Chair structure",
+    "Padded pedals",
+    "1 set of padded handles",
+    "1 set of padded handles with elastic straps",
+    "Chair springs: 2 medium green and 2 strong red",
+    "Mini springs: 2 medium and 2 strong",
+    "1 pair of spring anchoring posts",
+    "Wooden dowel",
+    "1 pair of wheels"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Elite Pilates Combo Chair",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Chair Length",
+        "values": [
+          "33.07\""
+        ]
+      },
+      {
+        "label": "Chair Width",
+        "values": [
+          "26.77\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "50\""
+        ]
+      },
+      {
+        "label": "Seat Length",
+        "values": [
+          "13.78\""
+        ]
+      },
+      {
+        "label": "Seat Width",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Seat Height",
+        "values": [
+          "24\""
+        ]
+      },
+      {
+        "label": "Dowel Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "85.98 lb / 39 kg (without accessories)"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=gNCEeNX5QyQ"
+  ],
+  "variants": [
+    {
+      "sku": "400012",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/815-1126-combo-chair-elitebase-madera.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Combo Chair Elite/400012"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Elite Combo Chair/400012"
+        }
+      ],
+      "_source": {
+        "articleRef": "400012",
+        "description": "COMBO CHAIR ELITE_GREY",
+        "priceUsd": 1730,
+        "barcode": "8421941958168"
+      }
+    },
+    {
+      "sku": "700070",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-chairs/815-1129-combo-chair-elitebase-madera.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Combo Chair Elite/700070"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Chair/Elite Combo Chair/700070"
+        }
+      ],
+      "_source": {
+        "articleRef": "700070",
+        "description": "COMBO CHAIR ELITE_BLACK",
+        "priceUsd": 1730,
+        "barcode": "8421941006401"
+      }
+    }
+  ]
+}

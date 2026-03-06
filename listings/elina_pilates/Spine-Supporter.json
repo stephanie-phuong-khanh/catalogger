@@ -1,0 +1,82 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Spine Supporter",
+  "title": "Elina Pilates Spine Supporter",
+  "overviewParagraph": "N/A - compose this manually",
+  "features": [
+    "Built-in handles",
+    "Supports back & reduces neck tension",
+    "Ideal for abdominal exercises",
+    "Pregnancy-friendly Pilates adaptation"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "Key dimensions of Spine Supporter",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Weight",
+        "values": [
+          "8 kg"
+        ]
+      },
+      {
+        "label": "Measures",
+        "values": [
+          "80 x 41 x 42 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "450035",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/796-1193-spine-support.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Spine Supporter/450035"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Spine/Spine Supporter/450035"
+        }
+      ],
+      "_source": {
+        "articleRef": "450035",
+        "description": "SPINE SUPPORTER_BLACK",
+        "priceUsd": 500,
+        "barcode": "8421941927614"
+      }
+    },
+    {
+      "sku": "700105",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/barrels-arcs-for-pilates/796-1195-spine-support.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Spine Supporter/700105"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Other/Spine/Spine Supporter/700105"
+        }
+      ],
+      "_source": {
+        "articleRef": "700105",
+        "description": "SPINE SUPPORTER_GREY",
+        "priceUsd": 500,
+        "barcode": "8421941006685"
+      }
+    }
+  ]
+}

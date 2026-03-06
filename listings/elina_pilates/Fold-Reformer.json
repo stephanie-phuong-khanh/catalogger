@@ -1,0 +1,202 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Fold Reformer",
+  "title": "Elina Pilates Fold Reformer For Home",
+  "overviewParagraph": "The Fold Reformer For Home is a compact, foldable Elina Pilates reformer that delivers professional-quality Pilates training in a home-friendly footprint. Built from durable American maple wood, it provides the firmness and stability needed for confident, controlled workouts. Its patented alignment system eliminates the gap and “jump” common in foldable models, keeping carriage travel smooth and continuous over time, and it’s been R&D tested through high-intensity sessions. Includes a Foot Strap and Jump Board (Box optional) to support a full range of exercises for all levels.",
+  "features": [
+    "American maple wood frame",
+    "Waterproof varnish finish",
+    "Foldable, space-saving design",
+    "Patented gap-free alignment system",
+    "Ultra-quiet 8-wheel carriage",
+    "Smooth, impact-damped cushioning",
+    "Quick-release footbar, 6 positions",
+    "Non-slip padded footbar",
+    "Adjustable bed height legs: 28 or 35.5 cm",
+    "Adjustable shoulder rests",
+    "3-position adjustable headrest",
+    "High-resistance alloy springs",
+    "Retractable cord storage",
+    "Removable foot support",
+    "Includes foot strap & jump board",
+    "Optional box attachment",
+    "2-year warranty on all parts"
+  ],
+  "inclusions": [
+    "Foldable Reformer for home use: Structure + carriage",
+    "Five high-precision springs with three resistance levels that can be combined based on the desired intensity",
+    "Two green springs with low resistance",
+    "One yellow spring with medium resistance",
+    "Two red springs with high resistance",
+    "Box (OPTIONAL) wide padded, making it easier to place between the shoulder rests and supports, providing total stability. It can be positioned either parallel or perpendicular to the reformer",
+    "Padded shoulder rests that are very easy to insert and remove",
+    "Sturdy and wide jump board designed to facilitate foot placement and easy positioning and removal",
+    "Padded foot platform",
+    "One set of hand straps and one set of double-loop hand and foot straps",
+    "One set of ropes",
+    "Retractable automatic cord storage system",
+    "8 wheels for transporting the Foldable Reformer",
+    "4 adjustable legs with 2 height options"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Fold Reformer For Home",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "92.52\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "24.02\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.02\" (With folded legs) 13.98\" (With extended legs. Maximum height)"
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "39.76\" (Total) 29.53\" (Under shoulder rest)"
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "14.17\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "158.733 lb / 72 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Max Weight Supported",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "26.77\" x 15.35\" x 11.02\""
+        ]
+      },
+      {
+        "label": "Jump Board",
+        "values": [
+          "22.44\" x 23.03\""
+        ]
+      },
+      {
+        "label": "Maximum Carriage Travel",
+        "values": [
+          "74.80\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300680",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1371-3337-reformer-plegable-para-casa.html#/upholstered_color-black/options-without_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Fold Reformer/300680"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Fold/300680"
+        }
+      ],
+      "_source": {
+        "articleRef": "300680",
+        "description": "FOLD REFORMER_BLACK",
+        "priceUsd": 1790,
+        "barcode": "8421941019081"
+      }
+    },
+    {
+      "sku": "300681",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1371-3336-reformer-plegable-para-casa.html#/105-upholstered_color-grey/201-options-without_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Fold Reformer/300681"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Fold/300681"
+        }
+      ],
+      "_source": {
+        "articleRef": "300681",
+        "description": "FOLD REFORMER_GREY",
+        "priceUsd": 1790,
+        "barcode": "8421941019098"
+      }
+    },
+    {
+      "sku": "300691",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1371-3326-reformer-plegable-para-casa.html#/104-upholstered_color-black/200-options-with_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Fold Reformer/300691"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Fold/300691"
+        }
+      ],
+      "_source": {
+        "articleRef": "300691",
+        "description": "FOLD REFORMER + BOX_BLACK",
+        "priceUsd": 1990,
+        "barcode": "8421941019197"
+      }
+    },
+    {
+      "sku": "300692",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1371-3325-reformer-plegable-para-casa.html#/105-upholstered_color-grey/200-options-with_box",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Fold Reformer/300692"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Home/Fold/300692"
+        }
+      ],
+      "_source": {
+        "articleRef": "300692",
+        "description": "FOLD REFORMER + BOX_GREY",
+        "priceUsd": 1990,
+        "barcode": "8421941019203"
+      }
+    }
+  ]
+}

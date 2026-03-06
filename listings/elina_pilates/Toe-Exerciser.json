@@ -1,0 +1,43 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Toe Exerciser",
+  "title": "Elina Pilates Pilates Toe Exerciser",
+  "overviewParagraph": "The Pilates Toe Exerciser strengthens, corrects, fortifies, and aligns your toes to build stronger foot muscles, improve flexibility, and support better balance. Designed for barefoot Pilates work, it helps you perform Reformer and mat exercises with control and clean technique.",
+  "features": [
+    "Leather & steel construction",
+    "Toe strength & alignment training",
+    "Improves toe flexibility",
+    "Supports barefoot Pilates form",
+    "Enhances balance & stability",
+    "Comfortable soft-strap fit",
+    "Opposing-foot resistance exercise",
+    "Encourages healthier foot function"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "",
+    "columns": [],
+    "rows": []
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "500102",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/accessories/1086-toe-exerciser-8421941015229.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Toe Exerciser/500102"
+        }
+      ],
+      "_source": {
+        "articleRef": "500102",
+        "description": "TOE EXERCISER",
+        "priceUsd": 75,
+        "barcode": "8421941015229"
+      }
+    }
+  ]
+}

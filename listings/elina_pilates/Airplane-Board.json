@@ -1,0 +1,43 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Airplane Board",
+  "title": "Elina Pilates Airplane Board Pilates",
+  "overviewParagraph": "The Airplane Board Pilates lets you perform the Pilates Airplane exercise on your Cadillac comfortably, safely, and with full control—so you can train confidently even in challenging “standing in the air” positions. Its solid wooden base delivers stable, resistant support to help you maintain alignment and focus on form. Designed to suit all user levels, it adapts easily to different bodies and abilities. With a built-in foot strap and two hooks, it installs quickly on your Cadillac for secure setup and consistent practice.",
+  "features": [
+    "Solid wood base",
+    "Safer, controlled Airplane exercise",
+    "Cadillac-compatible attachment",
+    "Comfortable standing-in-air support",
+    "Adaptable fit for all users",
+    "Durable, confidence-inspiring platform",
+    "Built-in foot strap",
+    "Dual hooks for quick setup"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "",
+    "columns": [],
+    "rows": []
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "500105",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/accessories/1089-airplane-board-8421941015250.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Airplane Board/500105"
+        }
+      ],
+      "_source": {
+        "articleRef": "500105",
+        "description": "AIRPLANE BOARD",
+        "priceUsd": 110,
+        "barcode": "8421941015250"
+      }
+    }
+  ]
+}

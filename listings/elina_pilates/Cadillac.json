@@ -1,0 +1,118 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Cadillac",
+  "title": "Elina Pilates Wooden Cadillac",
+  "overviewParagraph": "The Wooden Cadillac is a premium Pilates apparatus built from American rock maple for exceptional stability and long-term durability. Stainless steel and anodized aluminum components deliver smooth, reliable performance through repeated sessions, while a leather-upholstered bed is engineered to hold up to heavy use. High-density EVA foam cushioning provides comfortable, supportive contact so you can focus on controlled movement and alignment. Designed to comply with environmental regulations, it’s a dependable choice for consistent Pilates training.",
+  "features": [
+    "American rock maple wood frame",
+    "Stainless steel & anodized aluminum parts",
+    "Full-length mat surface cover",
+    "Quick-adjust horizontal & vertical bars",
+    "Anodized aluminum safety stretching bar",
+    "Padded wooden trapeze bar",
+    "6 short, 4 long color-coded springs with handles",
+    "Solid beech wood roll-down bar",
+    "Padded cotton handles pair",
+    "Soft Fuzzies handles pair",
+    "Stability strap included",
+    "Leather upholstery with EVA foam",
+    "High-density EVA foam padding",
+    "Multiple upholstery color options",
+    "10-year structure warranty",
+    "2-year parts warranty",
+    "10-year warranty on structure, 2 years on parts"
+  ],
+  "inclusions": [
+    "Continuous mat to fully cover the surface. Very light",
+    "Horizontal and vertical movement bars with quick adjustment system",
+    "Anodized aluminum stretching bar with rubber grip and padded protection. With safety strap. For upper and lower springs. Adjustable in 3 positions",
+    "Wooden trapeze bar with padded protection; covered springs for added safety; hanging strap",
+    "Short Cadillac springs with handles: 2 yellow (light), 2 green (medium), and 2 red (strong)",
+    "Long Cadillac springs with handles: 2 yellow (light), 2 green (medium)",
+    "Solid beech wood roll-down bar",
+    "1 pair of simple padded cotton handles",
+    "1 pair of very soft Fuzzies handles",
+    "Stability strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Wooden Cadillac",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Length",
+        "values": [
+          "251 cm"
+        ]
+      },
+      {
+        "label": "Width",
+        "values": [
+          "78 cm"
+        ]
+      },
+      {
+        "label": "Structure width",
+        "values": [
+          "68.5 cm"
+        ]
+      },
+      {
+        "label": "Bed height",
+        "values": [
+          "58 cm"
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "300002",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/cadillacs-trapeze-for-pilates/794-1102-cadillac.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Cadillac/300002"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Cadillac/Cadillac Wood/300002"
+        }
+      ],
+      "_source": {
+        "articleRef": "300002",
+        "description": "CADILLAC_BLACK",
+        "priceUsd": 3995,
+        "barcode": "8421941005435"
+      }
+    },
+    {
+      "sku": "700025",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/cadillacs-trapeze-for-pilates/794-1103-cadillac.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Cadillac/700025"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Cadillac/Cadillac Wood/700025"
+        }
+      ],
+      "_source": {
+        "articleRef": "700025",
+        "description": "CADILLAC_GREY",
+        "priceUsd": 3995,
+        "barcode": "8421941006043"
+      }
+    }
+  ]
+}

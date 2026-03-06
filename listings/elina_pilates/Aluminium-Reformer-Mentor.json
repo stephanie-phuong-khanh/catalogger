@@ -1,0 +1,158 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Aluminium Reformer Mentor",
+  "title": "Elina Pilates Mentor Reformer",
+  "overviewParagraph": "The Mentor Reformer is a compact, professional Pilates reformer built for highly versatile full-body training across all levels. Its Mini Tower with adjustable pulleys and a horizontal ballet/stretch bar expands exercise variety, while the footbar moves the full length of the machine to dial in precise positioning for strength, mobility, and control work. A high-resistance anodized aluminum frame with steel feet delivers lasting stability, and the smooth, silent carriage with a new loop handle system eliminates ring noise for more comfortable sessions. It includes an extra-wide box, jump board, and handles to support stretching, cardio-style jump training, and supported technique work.",
+  "features": [
+    "Anodized aluminum frame & steel feet",
+    "Mini Tower with adjustable pulleys",
+    "Horizontal ballet bar for stretching",
+    "7-position quick-release footbar",
+    "Full-length sliding footbar",
+    "Non-slip padded footbar & footboard",
+    "Ultra-silent carriage glide",
+    "Smooth loop handle system",
+    "Durable heavy-use upholstery",
+    "4-position bed cushioning system",
+    "6-spring resistance set",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Extra-wide padded box",
+    "Wide removable jump board",
+    "Adjustable foot anchoring strap",
+    "Front foot strap",
+    "Front wheels for easy transport",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Mentor Reformer",
+    "Complete Mini tower with pulleys",
+    "Essentials Kit with box, jump board, and handles",
+    "Extra-wide box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded footbar",
+    "1 set of padded foam handles",
+    "1 set of cotton handles for hands and feet with double loop",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 2 light yellow",
+    "Foot support strap",
+    "Foot anchoring strap",
+    "1 pair of wheels",
+    "1 set of pulley cords"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Mentor Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "98.43\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "29.53\""
+        ]
+      },
+      {
+        "label": "Reformer Frame Height",
+        "values": [
+          "12.80\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "39.37\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "16.14\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "179.68 lb / 81.5 kg (without accessories)"
+        ]
+      },
+      {
+        "label": "Maximum Weight Supported",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 18.71\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=3jtb6P7951c",
+    "https://www.youtube.com/watch?v=kAazYUOnK7Q"
+  ],
+  "variants": [
+    {
+      "sku": "100400",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1121-1930-mentor-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer Mentor/100400"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Mentor/Mentor/100400"
+        }
+      ],
+      "_source": {
+        "articleRef": "100400",
+        "description": "ALUMINIUM REFORMER MENTOR_BLACK",
+        "priceUsd": 3990,
+        "barcode": "8421941015823"
+      }
+    },
+    {
+      "sku": "100401",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/1121-1931-mentor-reformer.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Aluminium Reformer Mentor/100401"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Mentor/Mentor/100401"
+        }
+      ],
+      "_source": {
+        "articleRef": "100401",
+        "description": "ALUMINIUM REFORMER MENTOR_GREY",
+        "priceUsd": 3990,
+        "barcode": "8421941015830"
+      }
+    }
+  ]
+}

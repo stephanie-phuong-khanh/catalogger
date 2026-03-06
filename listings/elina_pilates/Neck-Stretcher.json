@@ -1,0 +1,43 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Neck Stretcher",
+  "title": "Elina Pilates Neck Stretcher For Pilates",
+  "overviewParagraph": "The Neck Stretcher For Pilates helps strengthen neck and facial muscles while improving spine stability, making it ideal for targeted cervical conditioning. Regular use can elongate the neck joint, supporting better alignment and controlled mobility. It secures with a strap around the forehead and nape and connects via a ring and rubber straps to provide resistance through a Pilates Cadillac, Wall Unit, or Guillotine Tower. Designed with durable, high-quality materials, it enables precise, careful exercise for safe, effective training.",
+  "features": [
+    "Durable, high-quality materials",
+    "Forehead & nape strap harness",
+    "Resistance ring connection",
+    "Rubber straps for tower mounting",
+    "Strengthens neck & facial muscles",
+    "Improves spinal stability",
+    "Helps elongate neck joint",
+    "Requires Cadillac, Wall Unit, or Tower"
+  ],
+  "inclusions": [],
+  "specifications": {
+    "tableTitle": "",
+    "columns": [],
+    "rows": []
+  },
+  "youtubeUrls": [],
+  "variants": [
+    {
+      "sku": "500101",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/accessories/1085-neck-stretcher-8421941015212.html",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Neck Stretcher/500101"
+        }
+      ],
+      "_source": {
+        "articleRef": "500101",
+        "description": "NECK STRETCHER",
+        "priceUsd": 125,
+        "barcode": "8421941015212"
+      }
+    }
+  ]
+}

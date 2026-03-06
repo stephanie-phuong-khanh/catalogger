@@ -1,0 +1,164 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer With Tower Elite",
+  "title": "Elina Pilates Elite Reformer With Tower",
+  "overviewParagraph": "The Elite Reformer With Tower is a best-selling Pilates reformer kit used in studios worldwide, built for versatile full-body training with smooth, controlled movement. Its ultra-quiet, high-precision bearing carriage and innovative loop handle system eliminate distracting noise, letting you focus on form and more comfortable reps. A quick-release foot bar speeds transitions between exercises, while the stackable design makes storage simple in tight spaces. It includes a box, jump board, and handles so you can expand your workout variety right out of the box.",
+  "features": [
+    "Rock maple wood frame",
+    "Stainless steel tower hardware",
+    "Stackable design for small spaces",
+    "7-position quick-release foot bar",
+    "Ultra-quiet 8-wheel carriage",
+    "Noise-free loop handle system",
+    "4-position dual-height spring bar",
+    "6 reformer springs included",
+    "8 tower springs included",
+    "Adjustable height pulleys",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Cleat-adjustable ropes",
+    "3-position adjustable carriage stops",
+    "Padded box included",
+    "Wide removable jump board",
+    "Non-slip 3-height push-bar",
+    "Transport wheels for easy rolling",
+    "10-year structural warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + Elite reformer carriage",
+    "Essentials Kit with box, jump board, and handles",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded foot bar",
+    "1 set of hard foam padded handles",
+    "1 set of double loop cotton handles for hands and feet",
+    "1 set of single loop cotton handles for feet",
+    "Padded shoulder rests",
+    "Reformer springs: 2 strong red, 2 medium green, and 2 light yellow",
+    "Tower springs: 2 short light (yellow), 2 short medium (green), 2 long light (yellow), and 2 long medium (green)",
+    "Foot strap",
+    "Pulleys poles",
+    "1 pair of wheels",
+    "Set of pulley ropes",
+    "Wooden pick",
+    "Stainless steel tower",
+    "Mat to cover the reformer",
+    "Roll-down bar",
+    "Push-bar",
+    "Safety strap"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Elite Reformer With Tower",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.88\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "30.32\""
+        ]
+      },
+      {
+        "label": "Reformer Structure Height",
+        "values": [
+          "11.81\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "28.94\""
+        ]
+      },
+      {
+        "label": "Maximum Height with tower",
+        "values": [
+          "79.53\""
+        ]
+      },
+      {
+        "label": "Carriage Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Carriage Height",
+        "values": [
+          "15.55\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "187.40 lb / 85 kg"
+        ]
+      },
+      {
+        "label": "Box Measurements",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=exLsV9QUNCY"
+  ],
+  "variants": [
+    {
+      "sku": "300006",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/814-1072-elite-wood-reformer-with-tower.html#/105-upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer With Tower Elite/300006"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Elite/300006"
+        }
+      ],
+      "_source": {
+        "articleRef": "300006",
+        "description": "REFORMER WITH TOWER ELITE_GREY",
+        "priceUsd": 5295,
+        "barcode": "8421941005466"
+      }
+    },
+    {
+      "sku": "700040",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/reformers-with-tower-for-pilates/814-1075-elite-wood-reformer-with-tower.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer With Tower Elite/700040"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Elite/700040"
+        }
+      ],
+      "_source": {
+        "articleRef": "700040",
+        "description": "REFORMER WITH TOWER ELITE_BLACK",
+        "priceUsd": 5295,
+        "barcode": "8421941006166"
+      }
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "_listingFormat": "elina_pilates",
+  "status": "full",
+  "productName": "Reformer Elite",
+  "title": "Elina Pilates Elite Reformer",
+  "overviewParagraph": "The Elite Reformer is a best-selling Pilates reformer kit trusted by studios worldwide, built for smooth, quiet training sessions. Its ultra-silent carriage with high-precision bearings and innovative loop handle system eliminate distracting noise, so you can focus on controlled, comfortable movement. A quick-release footbar makes setup and adjustments fast between exercises, while the stackable design simplifies storage in home or studio spaces. Complete with box, jump board, and handles, it delivers a versatile platform for full-body Pilates workouts.",
+  "features": [
+    "Rock maple wood & stainless steel build",
+    "Stackable frame for compact storage",
+    "7-position quick-release footbar",
+    "Non-slip padded footbar & footboard",
+    "Ultra-silent 8-wheel carriage",
+    "Durable studio-grade upholstery",
+    "Adjustable pulleys with clamp cords",
+    "3-position carriage stopper",
+    "6-spring set, 4-position spring bar",
+    "Dual-height spring bar settings",
+    "3-position adjustable headrest",
+    "Adjustable padded shoulder rests",
+    "Stable padded Pilates box included",
+    "Wide removable jump board included",
+    "Smooth silent loop handles",
+    "Adjustable foot straps",
+    "Front transport wheels",
+    "10-year frame warranty, 2-year parts warranty"
+  ],
+  "inclusions": [
+    "Structure + carriage of the Elite Reformer",
+    "Essentials Kit with box, jump board, and straps",
+    "Padded box",
+    "Jump board",
+    "Padded foot platform",
+    "Padded footbar",
+    "1 set of hard foam padded straps",
+    "1 set of cotton straps for hands and feet with double loop",
+    "Padded shoulder rests",
+    "Springs: 2 strong red, 2 medium green, and 2 light yellow",
+    "Foot fastening strap",
+    "Pulley posts",
+    "1 pair of wheels",
+    "One set of pulley ropes"
+  ],
+  "specifications": {
+    "tableTitle": "Key dimensions of Elite Reformer",
+    "columns": [
+      "Specification",
+      "Value"
+    ],
+    "rows": [
+      {
+        "label": "Reformer Length",
+        "values": [
+          "94.88\""
+        ]
+      },
+      {
+        "label": "Reformer Width",
+        "values": [
+          "30.32\""
+        ]
+      },
+      {
+        "label": "Reformer Frame Height",
+        "values": [
+          "11.81\""
+        ]
+      },
+      {
+        "label": "Maximum Height",
+        "values": [
+          "28.94\""
+        ]
+      },
+      {
+        "label": "Bed Length",
+        "values": [
+          "40.15\""
+        ]
+      },
+      {
+        "label": "Bed Height",
+        "values": [
+          "15.55\""
+        ]
+      },
+      {
+        "label": "Weight",
+        "values": [
+          "187.40 lb / 85 kg"
+        ]
+      },
+      {
+        "label": "Max Weight Capacity",
+        "values": [
+          "330.7 lb / 150 kg"
+        ]
+      },
+      {
+        "label": "Box Dimensions",
+        "values": [
+          "27.95\" x 88.18\" x 11.03\""
+        ]
+      }
+    ]
+  },
+  "youtubeUrls": [
+    "https://www.youtube.com/watch?v=exLsV9QUNCY"
+  ],
+  "variants": [
+    {
+      "sku": "100006",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/813-1066-elite-reformer.html#/upholstered_color-grey",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Elite/100006"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Elite/100006"
+        }
+      ],
+      "_source": {
+        "articleRef": "100006",
+        "description": "REFORMER ELITE_GREY",
+        "priceUsd": 3995,
+        "barcode": "8421941005367"
+      }
+    },
+    {
+      "sku": "700015",
+      "vendorPageUrl": "https://www.elinapilates.com/eu/en/pilates-reformers/813-1071-elite-reformer.html#/104-upholstered_color-black",
+      "googleDriveLinks": [
+        {
+          "label": "Scraped from vendor site:",
+          "baseUrlConstantKey": "vendorSiteScraped",
+          "path": "Reformer Elite/700015"
+        },
+        {
+          "label": "Images provided by vendor:",
+          "baseUrlConstantKey": "elinaProvided",
+          "path": "Reformers/Elite/700015"
+        }
+      ],
+      "_source": {
+        "articleRef": "700015",
+        "description": "REFORMER ELITE_BLACK",
+        "priceUsd": 3995,
+        "barcode": "8421941005961"
+      }
+    }
+  ]
+}
