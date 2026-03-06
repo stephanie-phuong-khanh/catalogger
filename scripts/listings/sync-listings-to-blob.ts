@@ -9,6 +9,7 @@
  * - --full: wipes all blobs under listings/ in the store, then uploads current local files.
  *   Use this to make Blob exactly match local (handles renames, deletes, and updates).
  * - --single <path>: upload only one file. Path is relative to data/listings (e.g. tab_09_gdina_traditional/GDI-8005-01.json).
+ * - --only <path>: upload only files under this subpath (e.g. elina_pilates). Path is relative to data/listings.
  *
  * Requires CATALOGGER_LISTINGS_READ_WRITE_TOKEN in .env or .env.local (from the private listings Blob store).
  *
@@ -16,6 +17,7 @@
  *   npm run sync-listings-to-blob                              # upload all (overwrite existing)
  *   npm run sync-listings-to-blob -- --full                    # full sync: wipe then upload
  *   npm run sync-listings-to-blob -- --single elina_pilates/Reformer-Elite.json  # one file
+ *   npm run sync-listings-to-blob -- --only elina_pilates      # only files under data/listings/elina_pilates/
  */
 
 import fs from 'fs';
@@ -87,6 +89,8 @@ async function main() {
   const fullSync = process.argv.includes('--full');
   const singleIdx = process.argv.indexOf('--single');
   const singlePath = singleIdx !== -1 ? process.argv[singleIdx + 1]?.trim() : undefined;
+  const onlyIdx = process.argv.indexOf('--only');
+  const onlyPath = onlyIdx !== -1 ? process.argv[onlyIdx + 1]?.trim() : undefined;
 
   if (fullSync) {
     console.log('Full sync: listing existing blobs under listings/...');
@@ -105,8 +109,18 @@ async function main() {
     process.exit(1);
   }
 
+  const startDir = onlyPath
+    ? path.join(CONFIG.listingsDir, onlyPath.replace(/^\.\//, '').replace(/\\/g, '/'))
+    : CONFIG.listingsDir;
+  const initialRelativeDir = onlyPath ? onlyPath.replace(/^\.\//, '').replace(/\\/g, '/').replace(/\/$/, '') : '';
+
+  if (onlyPath && (!fs.existsSync(startDir) || !fs.statSync(startDir).isDirectory())) {
+    console.error(`Path not found or not a directory: data/listings/${onlyPath}`);
+    process.exit(1);
+  }
+
   let files: { absolutePath: string; blobPathname: string }[] = [
-    ...walkListingFiles(CONFIG.listingsDir),
+    ...walkListingFiles(startDir, initialRelativeDir),
   ];
 
   if (singlePath) {
@@ -131,7 +145,8 @@ async function main() {
   }
 
   if (!singlePath) {
-    console.log(`Uploading ${files.length} file(s) to Vercel Blob (prefix: ${CONFIG.blobPrefix}/)...\n`);
+    const scope = onlyPath ? ` (under ${onlyPath}/)` : '';
+    console.log(`Uploading ${files.length} file(s) to Vercel Blob (prefix: ${CONFIG.blobPrefix}/)${scope}...\n`);
   }
 
   for (const { absolutePath, blobPathname } of files) {
