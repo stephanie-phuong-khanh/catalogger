@@ -1,8 +1,9 @@
 /**
  * Entry point to iterate through the cropping of an image with spacial awareness of the subject via segmentation.
- * 
+ *
  * Usage:
  *   npm run crop-with-segmentation -- --image-path "path/to/image.png" --out-dir "path/to/output/dir"
+ *   npm run crop-with-segmentation -- --image-path "path/to/image.png" --out-dir "data/image-experiments" --stroke-width 12
  */
 
 
@@ -43,6 +44,15 @@ function parseOutDir(): string {
   return CONFIG.outDir;
 }
 
+function parseStrokeWidth(): number {
+  const argIndex = process.argv.findIndex((arg) => arg === '--stroke-width' || arg.startsWith('--stroke-width='));
+  if (argIndex === -1) return 4;
+  const arg = process.argv[argIndex];
+  const value = arg?.includes('=') ? arg.split('=').slice(1).join('=').trim() : process.argv[argIndex + 1];
+  const n = value ? parseInt(value, 10) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : 4;
+}
+
 function getBoundingBox(
   polygon: Array<{ x: number; y: number }>,
 ): { left: number; top: number; right: number; bottom: number } {
@@ -58,12 +68,13 @@ function drawBoundingBoxOverlay(
   imageWidth: number,
   imageHeight: number,
   boundingBox: { left: number; top: number; right: number; bottom: number },
+  strokeWidthPx: number = 4,
 ): Promise<Buffer> {
   const w = boundingBox.right - boundingBox.left;
   const h = boundingBox.bottom - boundingBox.top;
   const svg = Buffer.from(
     `<svg width="${imageWidth}" height="${imageHeight}" xmlns="http://www.w3.org/2000/svg">
-    <rect x="${boundingBox.left}" y="${boundingBox.top}" width="${w}" height="${h}" fill="none" stroke="blue" stroke-width="2"/>
+    <rect x="${boundingBox.left}" y="${boundingBox.top}" width="${w}" height="${h}" fill="none" stroke="blue" stroke-width="${strokeWidthPx}"/>
   </svg>`,
   );
   return sharp(svg).png().toBuffer();
@@ -130,6 +141,7 @@ async function main() {
   }
 
   parseOutDir();
+  const strokeWidthPx = parseStrokeWidth();
   const base = path.basename(imagePath, path.extname(imagePath));
 
   if (!SUPPORTED_IMAGE_FORMATS.includes(path.extname(imagePath).slice(1).toLowerCase())) {
@@ -177,8 +189,8 @@ async function main() {
   );
 
   // Base = image + red polygon; then composite blue bbox on top so both are visible.
-  const segmentationOverlayBuffer = await drawSegmentationOverlay(imageBuffer, segmentation);
-  const bboxOnlyBuffer = await drawBoundingBoxOverlay(imageWidth, imageHeight, boundingBox);
+  const segmentationOverlayBuffer = await drawSegmentationOverlay(imageBuffer, segmentation, strokeWidthPx);
+  const bboxOnlyBuffer = await drawBoundingBoxOverlay(imageWidth, imageHeight, boundingBox, strokeWidthPx);
   const segBboxExt = path.extname(imagePath).toLowerCase();
   let segBboxPipeline = sharp(segmentationOverlayBuffer).composite([{ input: bboxOnlyBuffer, top: 0, left: 0 }]);
   const segBboxBuffer =
@@ -213,7 +225,7 @@ async function main() {
   }
 
   // Save image with segmentation, bbox, and proposed crop overlay: [seg-bbox-crop] <base>.<ext>.
-  const cropOverlayBuffer = await drawCropOverlay(imageWidth, imageHeight, proposedCrop);
+  const cropOverlayBuffer = await drawCropOverlay(imageWidth, imageHeight, proposedCrop, strokeWidthPx);
   const segBboxCropBuffer = await applyOverlays(
     segBboxBuffer,
     [cropOverlayBuffer],

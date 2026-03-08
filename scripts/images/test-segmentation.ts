@@ -8,6 +8,7 @@
  * Usage:
  *   npm run test-segmentation -- --image-path "path/to/image.png"
  *   npm run test-segmentation -- --image-path "path/to/image.jpg" --out-dir "data/my-seg"
+ *   npm run test-segmentation -- --image-path "path/to/image.png" --out-dir "data/my-seg" --stroke-width 12
  *   npm run test-segmentation -- --image-path "path/to/image.png" --out-dir "data/my-seg" --invert-mask
  */
 
@@ -46,6 +47,15 @@ function parseOutDir(): string {
     if (value) CONFIG.outDir = value;
   }
   return CONFIG.outDir;
+}
+
+function parseStrokeWidth(): number {
+  const argIndex = process.argv.findIndex((arg) => arg === '--stroke-width' || arg.startsWith('--stroke-width='));
+  if (argIndex === -1) return 4;
+  const arg = process.argv[argIndex];
+  const value = arg?.includes('=') ? arg.split('=').slice(1).join('=').trim() : process.argv[argIndex + 1];
+  const n = value ? parseInt(value, 10) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : 4;
 }
 
 async function main() {
@@ -106,9 +116,10 @@ async function main() {
   }
 
   parseOutDir();
+  const strokeWidthPx = parseStrokeWidth();
   const base = path.basename(imagePath, path.extname(imagePath));
 
-  const overlayBuffer = await drawSegmentationOverlay(imageBuffer, segmentation);
+  const overlayBuffer = await drawSegmentationOverlay(imageBuffer, segmentation, strokeWidthPx);
   saveProcessedImage(overlayBuffer, path.join(CONFIG.outDir, `[segmentation] ${base}.png`));
   console.log('Saved polygon overlay:', path.join(CONFIG.outDir, `[segmentation] ${base}.png`));
 
